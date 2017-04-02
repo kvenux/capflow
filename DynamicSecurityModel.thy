@@ -19,8 +19,8 @@ locale SM =
     domain_vpeq_lemma : "\<forall> s t a . (domain s a) = (domain t a)" and
     (*domain_vpeq_lemma : "\<forall> s t a . dom_eq s t a \<longrightarrow> (domain s a) = (domain t a)" and*)
     interf_reflexive: "\<forall>d s. (d @ s \<leadsto> d)" and
-    execute_exclusive: "\<forall>a. is_execute a  \<longrightarrow> \<not>(is_grant a)" and
-    grant_exclusive: "\<forall>a. is_grant a  \<longrightarrow> \<not>(is_execute a)"
+    execute_exclusive: "\<forall>a. is_execute a  \<longleftrightarrow> \<not>(is_grant a)" and
+    grant_exclusive: "\<forall>a. is_grant a   \<longleftrightarrow> \<not>(is_execute a)"
 begin
    
     definition non_interferes ::  "'d \<Rightarrow> 's \<Rightarrow> 'd \<Rightarrow> bool" ("(_ @ _ \<setminus>\<leadsto> _)")
@@ -347,7 +347,7 @@ begin
         apply (simp add:weakly_grant_step_consistent_def)
         by auto
 
-     lemma lemma_3: "\<lbrakk>reachable0 s;
+     lemma lemma_3: "\<lbrakk>\<forall>a s t u as. reachable0 s;
                       reachable0 t;
                       weakly_grant_step_consistent;    
                       (s \<approx> (sources (a # as) u s) \<approx> t);
@@ -364,25 +364,27 @@ begin
      lemma lemma_4_sub3 : "the (grant_dest s a) \<notin> (sources (a # as) u s) \<Longrightarrow>  v \<in> (sources (a # as) u s) \<longrightarrow> the (grant_dest s a) \<noteq> v  "
         by blast
 
-     lemma lemma_4_sub_1: "\<lbrakk>is_grant a;
+     lemma lemma_4_sub_1: "\<lbrakk>\<forall>a s D. is_grant a;
                       reachable0 s;
                       grant_local_respect;
                       the (grant_dest s a) \<notin> D\<rbrakk>
                       \<Longrightarrow> (s \<approx> D \<approx> (step s a))"
        using grant_local_respect_def by force
 
-     lemma lemma_4: "\<lbrakk>is_grant a;
+     lemma lemma_4: "\<lbrakk>\<forall>a s u as. is_grant a;
                       reachable0 s; 
                       grant_local_respect;
                       the (grant_dest s a) \<notin> (sources (a # as) u s)\<rbrakk>
                       \<Longrightarrow> (s \<approx> (sources (a # as) u s) \<approx> (step s a))"
        using grant_local_respect_def by force
-    
+
      lemma sources_eq1: "\<forall>s t as u. reachable0 s \<and>
                     reachable0 t \<and>
                     weakly_step_consistent \<and>
                     dynamic_local_respect \<and>
                     policy_respect \<and>
+                    weakly_grant_step_consistent \<and>
+                    grant_local_respect \<and>
                     (s \<approx> (sources as u s) \<approx> t)
                     \<longrightarrow> (sources as u s) = (sources as u t)"
        proof -
@@ -393,14 +395,22 @@ begin
                     weakly_step_consistent \<and>
                     dynamic_local_respect \<and>
                     policy_respect \<and>
+                    weakly_grant_step_consistent \<and>
+                    grant_local_respect \<and>
                     (s \<approx> (sources as u s) \<approx> t)
                     \<longrightarrow> (sources as u s) = (sources as u t)"
           proof(induct as)
             case Nil then show ?case by (simp add: sources_Nil)
           next
             case (Cons b bs)
-            assume p0: "\<forall>s t u.((reachable0 s) \<and> (reachable0 t) \<and> weakly_step_consistent 
-                                \<and> dynamic_local_respect \<and> policy_respect \<and> (s \<approx> (sources bs u s) \<approx> t)) \<longrightarrow>
+            assume p0: "\<forall>s t u.((reachable0 s) 
+                                \<and> (reachable0 t) 
+                                \<and> weakly_step_consistent 
+                                \<and> dynamic_local_respect 
+                                \<and> policy_respect 
+                                \<and> weakly_grant_step_consistent 
+                                \<and> grant_local_respect 
+                                \<and> (s \<approx> (sources bs u s) \<approx> t)) \<longrightarrow>
                                   (sources bs u s) = (sources bs u t)"
             then show ?case
               proof -
@@ -412,6 +422,8 @@ begin
                  assume p4: policy_respect
                  assume p5: "(s \<approx> (sources (b # bs) u s) \<approx> t)" 
                  assume p6: "dynamic_local_respect"
+                 assume p7: "weakly_grant_step_consistent"
+                 assume p8: "grant_local_respect"
                  have "sources (b # bs) u s = sources (b # bs) u t "
                    proof (cases "is_execute b")
                      assume a0: "is_execute b "
@@ -425,8 +437,8 @@ begin
                               \<longrightarrow> interferes (the (domain s b)) s v = interferes (the (domain t b)) t v "
                        using ivpeq_def p4 p5 sources_Cons by fastforce
                      have a8: "(sources bs u (step s b)) = (sources bs u (step t b))"
-                       using a2 p0 p1 p2 p3 p4 p6 reachableStep by blast
-                     then show "sources (b # bs) u s = sources (b # bs) u t "
+                       using a2 p0 p1 p2 p3 p4 p6 p7 p8 reachableStep by blast
+                     then show "sources (b # bs) u s = sources (b # bs) u t"
                        using a8 a3 a7 sources_Cons by auto
                      next
                        assume a0: "\<not> is_execute b "
@@ -434,11 +446,25 @@ begin
                          by (simp add: a0 sources_Cons)
                        have a2: "sources (b # bs) u t = sources bs u (step t b)"
                          by (simp add: a0 sources_Cons)
-                       have a3: "((step s b) \<approx> (sources bs u (step s b)) \<approx> (step t b))"
-                       have a4: "(sources bs u (step s b)) = (sources bs u (step t b))"
-                       
-                     
-               }
+                       have a3: "is_grant b"
+                         using a0 execute_exclusive by auto
+                       have a4: "((step s b) \<approx> (sources bs u (step s b)) \<approx> (step t b))"
+                         proof (cases "the (grant_dest s b) \<in> (sources (b # bs) u s)")
+                           assume b0: "the (grant_dest s b) \<in> (sources (b # bs) u s)"
+                           show "((step s b) \<approx> (sources bs u (step s b)) \<approx> (step t b))"
+                             using a1 a3 b0 p1 p2 p5 p7 by auto
+                         next
+                           assume b1: "the (grant_dest s b) \<notin> sources (b # bs) u s"
+                           have "(s \<approx> (sources (b # bs) u s) \<approx> (step s b))"
+                             using a3 b1 grant_local_respect_def p1 p8 by force
+                           show ?thesis
+                             by (smt a1 a3 grant_local_respect_def ivpeq_def lemma_1_sub_4
+                               p1 p2 p5 p7 p8 vpeq_symmetric_lemma weakly_grant_step_consistent_def)
+                         qed
+                       show ?thesis
+                         using a1 a2 a4 p0 p1 p2 p3 p4 p6 p7 p8 reachableStep by blast
+                   qed
+              }
               then show ?thesis by blast
               qed
           qed
@@ -447,7 +473,7 @@ begin
        then show ?thesis by blast
        qed
 
-     lemma sources_eq1: "\<lbrakk>reachable0 s;
+     lemma sources_eq2: "\<lbrakk>reachable0 s;
                     reachable0 t;
                     weakly_step_consistent;
                     dynamic_local_respect;
@@ -502,21 +528,101 @@ begin
               using a12 a13 a3 by blast
             then have "s' = s \<and> t'=t \<longrightarrow> sources as u s' = sources as u t'"
               using Cons.hyps Cons.prems(5) a14 a15 p2 p5 a16 by blast
-            then have "sources as u s' = sources as u t'"
-            have a9: "(sources as u (step s a)) = (sources as u (step t a))"
-                                                                                 
+            then have "sources as u s' = sources as u t'"                                                              
             
               oops
 
-    lemma lemma_5_test: "\<lbrakk>reachable0 s;
+    lemma lemma_5_test: "\<lbrakk>\<forall>s t u as. reachable0 s;
                     reachable0 t;
                     weakly_step_consistent;
                     dynamic_local_respect;
                     policy_respect;
                     weakly_grant_step_consistent;
-                    grant_local_respect\<rbrakk>
-                     \<Longrightarrow>(s \<approx> (sources as u s) \<approx> t) \<longrightarrow> ((s \<lhd> as \<cong> t \<lhd> (ipurge as u t) @ u))"
+                    grant_local_respect;
+                    (s \<approx> (sources as u s) \<approx> t)\<rbrakk>
+                     \<Longrightarrow> ((s \<lhd> as \<cong> t \<lhd> (ipurge as u t) @ u))"
       proof -
+      { 
+        fix as
+        have  "\<forall>s t u. reachable0 s \<and>
+                    reachable0 t \<and>
+                    weakly_step_consistent \<and>
+                    dynamic_local_respect \<and>
+                    policy_respect \<and>
+                    weakly_grant_step_consistent \<and>
+                    grant_local_respect \<and>
+                    (s \<approx> (sources as u s) \<approx> t)
+                    \<longrightarrow> ((s \<lhd> as \<cong> t \<lhd> (ipurge as u t) @ u))"
+          proof (induct as)
+            case Nil show ?case using sources_Nil by auto
+          next
+            case (Cons b bs)
+            assume p0: "\<forall>s t u.((reachable0 s) 
+                                \<and> (reachable0 t) 
+                                \<and> weakly_step_consistent 
+                                \<and> dynamic_local_respect 
+                                \<and> policy_respect 
+                                \<and> weakly_grant_step_consistent 
+                                \<and> grant_local_respect 
+                                \<and> (s \<approx> (sources bs u s) \<approx> t)) \<longrightarrow>
+                                  ((s \<lhd> bs \<cong> t \<lhd> (ipurge bs u t) @ u))"
+            then show ?case
+              proof -
+              { 
+                fix s t u
+                assume p1: "reachable0 s"
+                assume p2: "reachable0 t"
+                assume p3: weakly_step_consistent
+                assume p4: dynamic_local_respect
+                assume p5: policy_respect
+                assume p6: weakly_grant_step_consistent
+                assume p7: grant_local_respect
+                assume p8: "(s \<approx> (sources (b # bs) u s) \<approx> t)"
+                have "s \<lhd> b # bs \<cong> t \<lhd> ipurge (b # bs) u t @ u"
+                  proof (cases "is_execute b")
+                    assume a0: "is_execute b"
+                    have a1: "((step s b) \<approx> (sources bs u (step s b)) \<approx> (step t b))"
+                      using a0 lemma_1 p1 p2 p3 p4 p5 p8 by blast
+                    have "s \<lhd> b # bs \<cong> t \<lhd> ipurge (b # bs) u t @ u"
+                      proof (cases "the (domain s b) \<in> sources (b # bs) u s")
+                        assume b0: "the (domain s b) \<in> sources (b # bs) u s"
+                        have b1: "interferes (the (domain s b)) s u = interferes (the (domain t b)) t u "
+                          using p1 p5 p8 sources_refl by fastforce
+                        have b2: "\<forall>v. v\<in>sources bs u (step s b) 
+                              \<longrightarrow> interferes (the (domain s b)) s v = interferes (the (domain t b)) t v "
+                          using ivpeq_def p5 p8 sources_Cons by fastforce
+                        have b3: "ipurge (b # bs) u t = b # (ipurge bs u (step t b))"
+                          by (metis a0 b0 domain_vpeq_lemma ipurge_Cons p1 p2 p3 p4 p5 p6 p7 p8 sources_eq1)
+                        have b4: "(((step s b) \<lhd> bs \<cong> (step t b) \<lhd> (ipurge bs u (step t b)) @ u))"
+                          using Cons.hyps a1 p1 p2 p3 p4 p5 p6 p7 reachableStep by blast
+                        then show ?thesis
+                          using b3 b4 by auto
+                      next
+                        assume b0: "the (domain s b) \<notin> sources (b # bs) u s"
+                        have "ipurge (b # bs) u t = (ipurge bs u (step t b))"
+                          by (metis a0 b0 domain_vpeq_lemma execute_exclusive ipurge_Cons p1 p2 p3 p4 p5 p6 p7 p8 sources_eq1)
+                        have b1: "(s \<approx> (sources bs u (step s b)) \<approx> (step s b))"
+                          using a0 b0 lemma_2 p1 p4 by blast
+                        have b2:"(s \<approx> (sources bs u (step s b)) \<approx> t)"
+                          using a0 b0 lemma_1_sub_3 p8 by blast
+                        have b3: "((step s b) \<approx> (sources bs u (step s b)) \<approx> t)"
+                          by (meson b1 b2 ivpeq_def vpeq_symmetric_lemma vpeq_transitive_lemma)
+                        have b4: "(((step s b) \<lhd> bs \<cong> t \<lhd> (ipurge bs u t) @ u))"
+                          using Cons.hyps b3 p1 p2 p3 p4 p5 p6 p7 reachableStep by blast
+                        have b5: "(t \<approx> (sources bs u (step s b)) \<approx> (step t b))"
+                          using a0 b0 lemma_1_sub_2 p4 p5 p8 by blast
+                        have b6: "ipurge bs u t = ipurge bs u (step t b)"
+                        have b5: "(((step s b) \<lhd> bs \<cong> t \<lhd> (ipurge bs u (step t b)) @ u))"
+
+              }
+              then show ?thesis by 1blast
+              qed
+          qed
+
+        }
+       then show ?thesis by blast
+       qed
+(*
         assume a1: "reachable0 s"
         assume a2: "reachable0 t"
         assume a3: weakly_step_consistent
@@ -548,7 +654,7 @@ begin
                       assume d0: "\<not> (is_execute b)"
          
           oops
-
+*)
 
     lemma lemma_5: "\<lbrakk>reachable0 s;
                     reachable0 t;
