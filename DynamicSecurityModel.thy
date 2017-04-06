@@ -185,10 +185,20 @@ begin
       "\<lbrakk>reachable0 t; (s \<lhd> as \<cong> t \<lhd> bs @ d); (t \<lhd> bs \<cong> x \<lhd> cs @ d)\<rbrakk> \<Longrightarrow> (s \<lhd> as \<cong> x \<lhd> cs @ d)"
         using observ_equivalence_def vpeq_transitive_lemma by blast
 
-     definition noninfluence_gen::"bool" 
-       where "noninfluence_gen \<equiv> \<forall> d as s t. reachable0 s \<and> reachable0 t
+     definition noninfluence::"bool" 
+       where "noninfluence \<equiv> \<forall> d as s t. reachable0 s \<and> reachable0 t
                                 \<and> (s \<approx> (sources as d s) \<approx> t)
                                 \<longrightarrow> (s \<lhd> as \<cong> t \<lhd> (ipurge as d t) @ d)"
+
+     definition noninterference :: "bool"
+      where "noninterference \<equiv> \<forall>d as. (s0 \<lhd> as \<cong> s0 \<lhd> (ipurge as d s0) @ d)"
+
+     definition noninterference_r :: "bool"
+      where "noninterference_r \<equiv> \<forall>d as s. reachable0 s \<longrightarrow> (s \<lhd> as \<cong> s \<lhd> (ipurge as d s) @ d)"
+
+     definition nonleakage :: "bool" 
+      where "nonleakage \<equiv> \<forall>d as s t. reachable0 s \<and> reachable0 t
+                                      \<and> (s \<approx> (sources as d s) \<approx> t) \<longrightarrow> (s \<lhd> as \<cong> t \<lhd> as @ d)"
 
 subsection{* Unwinding conditions*}
 
@@ -197,11 +207,10 @@ subsection{* Unwinding conditions*}
                               (s \<sim> (the (domain s a)) \<sim> t) \<longrightarrow> ((step s a) \<sim> d \<sim> (step t a))"
 
      definition dynamic_local_respect :: "bool" where
-        "dynamic_local_respect \<equiv> \<forall>a d s. reachable0 s \<and>  \<not>((the (domain s a)) @ s \<leadsto> d) \<longrightarrow> (s \<sim> d \<sim> (step s a)) "
+        "dynamic_local_respect \<equiv> \<forall>a d s. reachable0 s \<and> \<not>((the (domain s a)) @ s \<leadsto> d) \<longrightarrow> (s \<sim> d \<sim> (step s a)) "
 
      definition policy_respect :: "bool" where
-        "policy_respect \<equiv> \<forall>a u s t. reachable0 s \<and> reachable0 t \<and> (s \<sim> u \<sim> t)
-                        \<longrightarrow> (interferes (the (domain s a)) s u = interferes (the (domain t a)) t u)"
+        "policy_respect \<equiv> \<forall>a u s t. reachable0 s \<and> reachable0 t \<and> (s \<sim> u \<sim> t) \<longrightarrow> (interferes (the (domain s a)) s u = interferes (the (domain t a)) t u)"
                                                   
      definition weakly_grant_step_consistent :: "bool" where
         "weakly_grant_step_consistent \<equiv>  \<forall>a d s t. reachable0 s \<and> reachable0 t \<and> is_grant a \<and> (s \<sim> d \<sim> t) \<and>
@@ -232,12 +241,27 @@ subsection{* Unwinding conditions*}
       apply(simp add: sources_Cons) 
       using enabled reachableStep  
         by metis
+
+     lemma sources_eq2: "(s \<sim> u \<sim> t) \<longrightarrow> ((sources as u s) = (sources as u t))"
+       apply (induct as)
+       apply (simp add: sources_Nil)
+       apply (simp add: sources_Cons)
+
+       oops
      
+subsection{* Inference framework of information flow security properties *}
 
+    lemma noninf_impl_nonintf_r: "noninfluence \<Longrightarrow> noninterference_r"
+      using ivpeq_def noninfluence_def noninterference_r_def vpeq_reflexive_lemma by blast    
 
-     lemma lemma_1_sub_1 : "\<lbrakk>\<forall>a as u s t. 
-                       reachable0 s;
-                       reachable0 t;
+    lemma noninf_impl_nonlk: "noninfluence \<Longrightarrow> nonleakage"
+      using noninterference_r_def nonleakage_def observ_equiv_sym 
+        observ_equiv_trans noninfluence_def noninf_impl_nonintf_r by blast   
+
+    theorem nonintf_r_impl_noninterf: "noninterference_r \<Longrightarrow> noninterference"
+      using noninterference_def noninterference_r_def reachable_s0 by auto 
+
+     lemma lemma_1_sub_1 : "\<lbrakk>reachable0 s ;
                        dynamic_local_respect;
                        policy_respect;
                        is_execute a;
@@ -247,9 +271,8 @@ subsection{* Unwinding conditions*}
         apply (simp add:dynamic_local_respect_def sources_Cons)
         by blast
 
-     lemma lemma_1_sub_2 : "\<lbrakk>\<forall>a as u t s.
-                       reachable0 s;
-                       reachable0 t;
+     lemma lemma_1_sub_2 : "\<lbrakk>reachable0 s ;
+                       reachable0 t ;
                        dynamic_local_respect;
                        policy_respect;
                        is_execute a;
@@ -261,9 +284,8 @@ subsection{* Unwinding conditions*}
         apply (simp add:sources_Cons)      
         by blast
 
-     lemma lemma_1_sub_2_1 : "\<lbrakk>\<forall>a as u s t. 
-                       reachable0 s;
-                       reachable0 t;
+     lemma lemma_1_sub_2_1 : "\<lbrakk>reachable0 s ;
+                       reachable0 t ;
                        dynamic_local_respect;
                        policy_respect;
                        is_execute a;
@@ -275,62 +297,22 @@ subsection{* Unwinding conditions*}
         apply (simp add:sources_Cons)
         by blast
      
-     lemma lemma_1_sub_3 : "\<lbrakk>\<forall>a as u s t. 
-                       reachable0 s;
-                       reachable0 t;
-                       is_execute a;
+     lemma lemma_1_sub_3 : "\<lbrakk>is_execute a;
                        the (domain s a) \<notin> sources (a # as) u s;
                        (s \<approx> (sources (a # as) u s) \<approx> t)\<rbrakk>     
                       \<Longrightarrow> (s \<approx> (sources as u (step s a)) \<approx> t)"
          apply (simp add:sources_Cons)
+         apply (simp add:sources_Cons)
          done
 
-     lemma lemma_1_sub_4 : "\<lbrakk>\<forall>a as u s t. 
-                       reachable0 s;
-                       reachable0 t;
-                       (s \<approx> (sources as u (step s a)) \<approx> t);
-                       (s \<approx> (sources as u (step s a)) \<approx> (step s a));
-                       (t \<approx> (sources as u (step s a)) \<approx> (step t a)) \<rbrakk>
+     lemma lemma_1_sub_4 : "\<lbrakk>(s \<approx> (sources as u (step s a)) \<approx> t);
+                             (s \<approx> (sources as u (step s a)) \<approx> (step s a));
+                             (t \<approx> (sources as u (step s a)) \<approx> (step t a)) \<rbrakk>
                       \<Longrightarrow> ((step s a) \<approx>(sources as u (step s a)) \<approx> (step t a))"
        by (meson ivpeq_def vpeq_symmetric_lemma vpeq_transitive_lemma)
+           
 
-     lemma lemma_1 : "\<lbrakk>\<forall>a as u s t. 
-                      reachable0 s;
-                      reachable0 t;
-                      weakly_step_consistent;
-                      dynamic_local_respect;
-                      policy_respect;
-                      (s \<approx> (sources (a # as) u s) \<approx> t);
-                      is_execute a\<rbrakk>
-                      \<Longrightarrow> ((step s a) \<approx> (sources as u (step s a)) \<approx> (step t a))"
-      proof -
-        assume p1: "reachable0 s"
-        assume p2: "reachable0 t"
-        assume p3: weakly_step_consistent
-        assume p4: dynamic_local_respect
-        assume p5: policy_respect
-        assume p6: "(s \<approx> (sources (a # as) u s) \<approx> t)"
-        assume p7: "is_execute a"
-      {
-        fix a as u s t
-        have "reachable0 s  \<and> reachable0 t \<and> weakly_step_consistent  \<and> dynamic_local_respect 
-                  \<and> policy_respect   
-                  \<and> (s \<approx> (sources (a # as) u s) \<approx> t)
-                  \<and> is_execute a \<longrightarrow> ((step s a) \<approx> (sources as u (step s a)) \<approx> (step t a)) "
-          proof (cases "the (domain s a)\<in>sources (a # as) u s")
-            assume a0: "the (domain s a)\<in>sources (a # as) u s"
-            have a1: "(s \<sim> u \<sim> t)"
-            have a2: "(s \<sim> (the (domain s a)) \<sim> t)"
-      }
-      then show ?thesis by blast
-    qed
-
-
-      
-        
-    
-     lemma lemma_1_test : "\<lbrakk>\<forall>a as u s t. 
-                      reachable0 s;
+     lemma lemma_1 : "\<lbrakk>reachable0 s;
                       reachable0 t;
                       weakly_step_consistent;
                       dynamic_local_respect;
@@ -342,21 +324,21 @@ subsection{* Unwinding conditions*}
        apply (simp add:weakly_step_consistent_def)
        apply (simp add:sources_Cons)                                                        
          proof -
-           assume b0: "reachable0 s"
-           assume b1: "reachable0 t"
            assume a1: dynamic_local_respect
            assume a2: policy_respect
            assume a3: "is_execute a"
            assume a4: "the (domain s a) \<notin> sources (a # as) u s"
            assume a5: "(s \<approx> (sources (a # as) u s) \<approx> t)"
+           assume b0: "reachable0 s"
+           assume b1: "reachable0 t"
 
            have a6:"(s \<approx> (sources as u (step s a)) \<approx> t)"
-             using a5 sources_Cons by auto
-           have a7: "(s \<approx> (sources as u (step s a)) \<approx> (step s a))"
-             using a1 a3 a4 b0 sources_Cons by fastforce
-           have a8: "(t \<approx> (sources as u (step s a)) \<approx> (step t a))"
-             using b0 b1 a1 a2 a3 a4 a5 lemma_1_sub_2 by auto
-           then show ?thesis
+            using a1 a2 a3 a4 a5 lemma_1_sub_3 by auto
+           then have a7: "(s \<approx> (sources as u (step s a)) \<approx> (step s a))"
+            using b0 a1 a2 a3 a4 a5 lemma_1_sub_1 by auto
+           then have a8: "(t \<approx> (sources as u (step s a)) \<approx> (step t a))"
+            using b1 b0 a1 a2 a3 a4 a5 lemma_1_sub_2 by auto
+           then show " ((step s a) \<approx>(sources as u (step s a)) \<approx> (step t a))"
             using a6 a7 lemma_1_sub_4 by blast
          qed
 
@@ -478,12 +460,12 @@ subsection{* Unwinding conditions*}
                          have b2: "(domain s b) = (domain t b)"
                            using b1 domain_equal_def p1 p2 p8 by blast
                          have b3: "interferes (the (domain s b)) s u = interferes (the (domain t b)) t u "
-                           using p1 p4 p9 sources_refl by fastforce
+                           using p1 p2 p4 p9 sources_refl by fastforce
                          have b4: "(sources bs u (step s b)) = (sources bs u (step t b))"
                            using a2 p0 p1 p2 p3 p4 p5 p6 p7 p8 reachableStep by blast
                          have b5: "\<forall>v. v\<in>sources bs u (step s b) 
                               \<longrightarrow> interferes (the (domain s b)) s v = interferes (the (domain t b)) t v "
-                           using ivpeq_def p4 p9 sources_Cons by fastforce
+                           using p1 p2 ivpeq_def p4 p9 sources_Cons by fastforce
                          then show "sources (b # bs) u s = sources (b # bs) u t"
                            using b4 b2 b5 sources_Cons by auto
                        next
@@ -495,7 +477,7 @@ subsection{* Unwinding conditions*}
                          have b3: "\<forall>v. v\<in>sources bs u (step s b)\<longrightarrow>\<not> interferes (the (domain s b)) s v "
                            using a0 b0 sources_Cons by auto
                          have b4: "\<forall>v. v\<in>sources bs u (step s b)\<longrightarrow>\<not> interferes (the (domain t b)) t v "
-                           using b1 b3 ivpeq_def p4 p9 policy_respect_def by blast
+                           using p1 p2 b1 b3 ivpeq_def p4 p9 policy_respect_def by blast
                          have b5: "\<forall>v. v\<in>sources bs u (step t b)\<longrightarrow>\<not> interferes (the (domain t b)) t v "
                            by (simp add: b2 b4)
                          have b7: "sources (b # bs) u t = sources bs u (step t b)"
@@ -622,7 +604,7 @@ subsection{* Unwinding conditions*}
                          have b3: "\<forall>v. v\<in>sources bs u (step s b)\<longrightarrow>\<not> interferes (the (domain s b)) s v "
                            using a0 b0 sources_Cons by auto
                          have b4: "\<forall>v. v\<in>sources bs u (step s b)\<longrightarrow>\<not> interferes (the (domain t b)) t v "
-                           using b1 b3 ivpeq_def p4 p9 policy_respect_def by blast
+                           using p1 p2 b1 b3 ivpeq_def p4 p9 policy_respect_def by blast
                          have b5: "the (domain t b) \<notin> (sources (b # bs) u t)"
                            using a3 b1 b4 interf_reflexive by auto
                          have b6: "ipurge (b # bs) u s = ipurge bs u (step s b)"
@@ -679,7 +661,7 @@ subsection{* Unwinding conditions*}
        then show ?thesis by blast
        qed
 
-    lemma lemma_5_test: "\<forall>s t as u. reachable0 s \<and>
+    lemma non_influgence_lemma: "\<forall>s t as u. reachable0 s \<and>
                     reachable0 t \<and>
                     weakly_step_consistent \<and>
                     dynamic_local_respect \<and>
@@ -742,10 +724,10 @@ subsection{* Unwinding conditions*}
                       proof (cases "the (domain s b) \<in> sources (b # bs) u s")
                         assume b0: "the (domain s b) \<in> sources (b # bs) u s"
                         have b1: "interferes (the (domain s b)) s u = interferes (the (domain t b)) t u "
-                          using p1 p5 p8 sources_refl by fastforce
+                          using p1 p2 p5 p8 sources_refl by fastforce
                         have b2: "\<forall>v. v\<in>sources bs u (step s b) 
                               \<longrightarrow> interferes (the (domain s b)) s v = interferes (the (domain t b)) t v "
-                          using ivpeq_def p5 p8 sources_Cons by fastforce
+                          using p1 p2 ivpeq_def p5 p8 sources_Cons by fastforce
                         have b3: "ipurge (b # bs) u t = b # (ipurge bs u (step t b))"
                           by (metis a0 b0 domain_equal_def ipurge_Cons ivpeq_def p1 p2 p3 p4 p5 p6 p7 p8 p9 sources_eq1)
                         have b4: "(((step s b) \<lhd> bs \<cong> (step t b) \<lhd> (ipurge bs u (step t b)) @ u))"
@@ -765,7 +747,7 @@ subsection{* Unwinding conditions*}
                         have b5: "(((step s b) \<lhd> bs \<cong> t \<lhd> (ipurge bs u t) @ u))"
                           using b4 p0 p1 p10 p2 p3 p4 p5 p6 p7 p9 reachableStep by blast
                         have b6: "(t \<approx> (sources bs u (step s b)) \<approx> (step t b))"
-                          using a0 b0 lemma_1_sub_2 p4 p5 p8 by blast
+                          using p1 p2 a0 b0 lemma_1_sub_2 p4 p5 p8 by blast
                         have b7: "ipurge bs u t = ipurge bs u (step t b)"
                           by (metis a1 b4 ipurge_eq p1 p10 p2 p3 p4 p5 p6 p7 p9 reachableStep)
                         have b8: "(((step s b) \<lhd> bs \<cong> t \<lhd> (ipurge bs u (step t b)) @ u))"
@@ -826,32 +808,135 @@ subsection{* Unwinding conditions*}
        then show ?thesis by blast
        qed
 
-     theorem UnwindingTheorem : "\<lbrakk>weakly_step_consistent;
-                                dynamic_local_respect;
-                                policy_respect;
-                                weakly_grant_step_consistent;
-                                grant_local_respect;
-                                domain_equal;
-                                grant_dest_equal\<rbrakk> 
-                                \<Longrightarrow> noninfluence_gen"
-     proof -
-     {
-       assume p1:weakly_step_consistent
-       assume p2:dynamic_local_respect
-       assume p3:policy_respect
-       assume p4:weakly_grant_step_consistent
-       assume p5:grant_local_respect
-       assume p6:domain_equal
-       assume p7:grant_dest_equal
-       {
 
-         }
-              then show ?thesis by auto
+    theorem UnwindingTheorem : "\<lbrakk>weakly_step_consistent;
+                            dynamic_local_respect;
+                            policy_respect;
+                            weakly_grant_step_consistent;
+                            grant_local_respect;
+                            domain_equal;
+                            grant_dest_equal\<rbrakk> 
+                            \<Longrightarrow> noninfluence"
+      proof -
+        assume p3: weakly_step_consistent
+        assume p4: dynamic_local_respect
+        assume p5: policy_respect
+        assume p6: weakly_grant_step_consistent
+        assume p7: grant_local_respect
+        assume p9: domain_equal
+        assume p10: grant_dest_equal
+        {
+        fix as d
+        have "\<forall>s t. reachable0 s \<and>
+                  reachable0 t \<and>
+                  (s \<approx> (sources as d s) \<approx> t)
+                  \<longrightarrow> ((s \<lhd> as \<cong> t \<lhd> (ipurge as d  t) @ d))"
+          proof(induct as)
+            case Nil show ?case using sources_Nil by auto
+          next
+            case (Cons b bs)
+            assume p0: "\<forall>s t. reachable0 s \<and>
+                  reachable0 t \<and>
+                  (s \<approx> (sources bs d s) \<approx> t)
+                  \<longrightarrow> ((s \<lhd> bs \<cong> t \<lhd> (ipurge bs d  t) @ d))"
+            then show ?case
+              proof -
+              { 
+                fix s t
+                assume p1: "reachable0 s"
+                assume p2: "reachable0 t"
+                assume p8: "(s \<approx> (sources (b # bs) d s) \<approx> t)"
+                have "s \<lhd> b # bs \<cong> t \<lhd> ipurge (b # bs) d t @ d"
+                  proof (cases "is_execute b")
+                    assume a0: "is_execute b"
+                    have a1: "((step s b) \<approx> (sources bs d (step s b)) \<approx> (step t b))"
+                      using a0 lemma_1 p1 p2 p3 p4 p5 p8 by blast
+                    then show ?thesis
+                      proof (cases "the (domain s b) \<in> sources (b # bs) d s")
+                        assume b0: "the (domain s b) \<in> sources (b # bs) d s"
+                        have b1: "interferes (the (domain s b)) s d = interferes (the (domain t b)) t d "
+                          using p1 p2 p5 p8 sources_refl by fastforce
+                        have b2: "\<forall>v. v\<in>sources bs d (step s b) 
+                              \<longrightarrow> interferes (the (domain s b)) s v = interferes (the (domain t b)) t v "
+                          using p1 p2 ivpeq_def p5 p8 sources_Cons by fastforce
+                        have b3: "ipurge (b # bs) d t = b # (ipurge bs d (step t b))"
+                          by (metis a0 b0 domain_equal_def ipurge_Cons ivpeq_def p1 p2 p3 p4 p5 p6 p7 p8 p9 sources_eq1)
+                        have b4: "(((step s b) \<lhd> bs \<cong> (step t b) \<lhd> (ipurge bs d (step t b)) @ d))"
+                          using a1 p0 p1 p10 p2 p3 p4 p5 p6 p7 p9 reachableStep by blast
+                        then show ?thesis
+                          using b3 b4 by auto
+                      next
+                        assume b0: "the (domain s b) \<notin> sources (b # bs) d s"
+                        have b1: "ipurge (b # bs) d t = (ipurge bs d (step t b))"
+                          by (metis a0 a1 b0 execute_exclusive ipurge_Cons ipurge_eq p1 p10 p2 p3 p4 p5 p6 p7 p8 p9 reachableStep)
+                        have b2: "(s \<approx> (sources bs d (step s b)) \<approx> (step s b))"
+                          using a0 b0 lemma_2 p1 p4 by blast
+                        have b3:"(s \<approx> (sources bs d (step s b)) \<approx> t)"
+                          using a0 b0 lemma_1_sub_3 p8 by blast
+                        have b4: "((step s b) \<approx> (sources bs d (step s b)) \<approx> t)"
+                          by (meson b3 b2 ivpeq_def vpeq_symmetric_lemma vpeq_transitive_lemma)
+                        have b5: "(((step s b) \<lhd> bs \<cong> t \<lhd> (ipurge bs d t) @ d))"
+                          using b4 p0 p1 p10 p2 p3 p4 p5 p6 p7 p9 reachableStep by blast
+                        have b6: "(t \<approx> (sources bs d (step s b)) \<approx> (step t b))"
+                          using p1 p2 a0 b0 lemma_1_sub_2 p4 p5 p8 by blast
+                        have b7: "ipurge bs d t = ipurge bs d (step t b)"
+                          by (metis a1 b4 ipurge_eq p1 p10 p2 p3 p4 p5 p6 p7 p9 reachableStep)
+                        have b8: "(((step s b) \<lhd> bs \<cong> t \<lhd> (ipurge bs d (step t b)) @ d))"
+                          using b5 b7 by auto
+                        then show ?thesis
+                          using b1 observ_equivalence_def run_Cons by auto
+                      qed
+                   next
+                     assume a0: "\<not> is_execute b "
+                     have a1: "is_grant b"
+                       using a0 execute_exclusive by auto
+                     then show ?thesis
+                       proof (cases "the (grant_dest s b) \<in> (sources (b # bs) d s)")
+                         assume b0: "the (grant_dest s b) \<in> (sources (b # bs) d s)"
+                         have b1: "((step s b) \<approx> (sources bs d (step s b)) \<approx> (step t b))"
+                           using a1 b0 lemma_3_sub_1 p1 p2 p6 p8 by auto
+                         have b2: "(ipurge bs d (step s b)) = (ipurge bs d (step t b))"
+                           using b1 ipurge_eq p1 p10 p2 p3 p4 p5 p6 p7 p9 reachableStep by blast
+                         have b3: "ipurge (b # bs) d t = b # (ipurge bs d (step t b))"
+                           by (metis a1 b0 b2 ipurge_Cons ipurge_eq p1 p10 p2 p3 p4 p5 p6 p7 p8 p9)
+                         have b4: "(step s b) \<lhd> bs \<cong> (step t b) \<lhd> ipurge bs d (step t b) @ d "
+                           using p0 b1 p1 p10 p2 p3 p4 p5 p6 p7 p9 reachableStep by blast
+                         then show ?thesis
+                           using b3 observ_equivalence_def run_Cons by auto
+                       next
+                         assume b0: "the (grant_dest s b) \<notin> (sources (b # bs) d s)"
+                         have b1: "the (grant_dest t b) \<notin> (sources (b # bs) d t)"
+                           by (metis b0 grant_dest_equal_def ivpeq_def p1 p10 p2 p3 p4 p5 p6 p7 p8 p9 sources_eq1 vpeq_symmetric_lemma)
+                         have b2: "ipurge (b # bs) d t = (ipurge bs d (step t b))"
+                           by (simp add: a0 b1)
+                         have b3: "(s \<approx> (sources bs d (step s b)) \<approx> (step s b))"
+                           by (metis a1 b0 grant_local_respect_def ivpeq_def lemma_3_sub_1 p1 p7)
+                         have b4: "(t \<approx> (sources bs d (step t b)) \<approx> (step t b))"
+                           by (metis a1 b1 grant_local_respect_def ivpeq_def lemma_3_sub_1 p2 p7)
+                         have b5: "(sources bs d (step s b)) = (sources bs d (step t b))"
+                           using a1 lemma_3_sub_1 p1 p2 p3 p4 p5 p6 p7 p8 p9 sources_eq1 by blast
+                         have b6: "(s \<approx> (sources bs d (step s b)) \<approx> t)"
+                           using a1 lemma_3_sub_1 p8 by auto
+                         have b7: "((step s b) \<approx> (sources bs d (step s b)) \<approx> t)"
+                           by (meson b3 b6 ivpeq_def vpeq_symmetric_lemma vpeq_transitive_lemma)
+                         have b8: "(((step s b) \<lhd> bs \<cong> t \<lhd> (ipurge bs d t) @ d))"
+                           using b7 p0 p1 p10 p2 p3 p4 p5 p6 p7 p9 reachableStep by blast
+                         have b9: "((step s b) \<approx> (sources bs d (step s b)) \<approx> (step t b))"
+                           by (metis b3 b4 b5 b6 lemma_1_sub_4)
+                         have b10: "ipurge bs d t = ipurge bs d (step t b)"
+                           by (metis b9 b7 ipurge_eq p1 p10 p2 p3 p4 p5 p6 p7 p9 reachableStep)
+                         have b11: "(((step s b) \<lhd> bs \<cong> t \<lhd> (ipurge bs d (step t b)) @ d))"
+                           using b8 b10 by auto
+                         then show ?thesis
+                           using b2 observ_equivalence_def run_Cons by auto
+                       qed
+                   qed
+              }
+              then show ?thesis by blast
               qed
           qed
-
-     }
-      then show ?thesis using noninfluence_gen_def by blast
+          }
+      then show ?thesis using noninfluence_def by blast
     qed
 
 end
