@@ -153,11 +153,10 @@ begin
     declare reachable_def[cong del] and reachable0_def[cong del]
 
 end
-print_locale! SM
 
 subsection{* Information flow security properties *}
 
-locale SM_enabled = SM s0 step domain sched vpeq interference
+locale SM_enabled = SM s0 step domain sched vpeq interference            
   for s0 :: 's and
        step :: "'e \<Rightarrow> ('s \<times> 's) set" and
        domain :: "'s \<Rightarrow> 'e \<Rightarrow> ('d option)" and

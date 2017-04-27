@@ -1,4 +1,4 @@
-theory DynamicSecurityModel
+theory Dynamic_model_test
 imports Main
 begin
 subsection {* Security State Machine *}
@@ -8,20 +8,16 @@ locale SM =
   fixes is_grant :: "'e \<Rightarrow> bool"
   fixes step :: "'s \<Rightarrow> 'e \<Rightarrow> 's"
   fixes domain :: "'e \<Rightarrow> ('d option)"
-  fixes grant_dest :: "'e \<Rightarrow> ('d option)"
+  fixes changed_edge :: "'s \<Rightarrow> 'e \<Rightarrow> ('d \<times> 'd) set"
+  fixes edges :: "'s \<Rightarrow> ('d \<times> 'd) set"      
   fixes vpeq :: "'s \<Rightarrow> 'd \<Rightarrow> 's \<Rightarrow> bool"  ("(_ \<sim> _ \<sim> _)")
-  fixes interferes :: "'d \<Rightarrow> 's \<Rightarrow> 'd \<Rightarrow> bool" ("(_ @ _ \<leadsto>_)")
   assumes 
     vpeq_transitive_lemma : "\<forall> s t r d. (s \<sim> d \<sim> t) \<and> (t \<sim> d \<sim> r) \<longrightarrow> (s \<sim> d \<sim> r)" and
     vpeq_symmetric_lemma : "\<forall> s t d. (s \<sim> d \<sim> t) \<longrightarrow> (t \<sim> d \<sim> s)" and
     vpeq_reflexive_lemma : "\<forall> s d. (s \<sim> d \<sim> s)" and
-    interf_reflexive: "\<forall>d s. (d @ s \<leadsto> d)" and
     execute_exclusive: "\<forall>a. is_execute a  \<longleftrightarrow> \<not>(is_grant a)" and
     grant_exclusive: "\<forall>a. is_grant a   \<longleftrightarrow> \<not>(is_execute a)"
 begin
-   
-    definition non_interferes ::  "'d \<Rightarrow> 's \<Rightarrow> 'd \<Rightarrow> bool" ("(_ @ _ \<setminus>\<leadsto> _)")
-      where "(u @ s \<setminus>\<leadsto> v) \<equiv> (u @ s \<leadsto> v)"
 
     definition ivpeq :: "'s \<Rightarrow> 'd set \<Rightarrow> 's \<Rightarrow> bool" ("(_ \<approx> _ \<approx> _)")
       where "ivpeq s D t \<equiv> \<forall> d \<in> D. (s \<sim> d \<sim> t)"
@@ -36,7 +32,7 @@ begin
     definition reachable0 :: "'s \<Rightarrow> bool"  where
       "reachable0 s \<equiv> reachable s0 s"
       
-    declare non_interferes_def[cong] and ivpeq_def[cong] and reachable_def[cong]
+    declare ivpeq_def[cong] and reachable_def[cong]
             and reachable0_def[cong] and run.simps(1)[cong] and run.simps(2)[cong]
 
     lemma reachable_s0 : "reachable0 s0"
@@ -134,15 +130,15 @@ end
 
 subsection{* Information flow security properties *}
 
-locale SM_enabled = SM s0 is_execute is_grant step domain grant_dest vpeq interferes
+locale SM_enabled = SM s0 is_execute is_grant step domain changed_edge edges vpeq
   for s0 :: 's and
        is_execute :: "'e \<Rightarrow> bool" and
        is_grant :: "'e \<Rightarrow> bool" and
        step :: "'s \<Rightarrow> 'e \<Rightarrow> 's" and
        domain :: "'e \<Rightarrow> ('d option)" and
-       grant_dest :: "'e \<Rightarrow> ('d option)" and
-       vpeq :: "'s \<Rightarrow> 'd \<Rightarrow> 's \<Rightarrow> bool"  ("(_ \<sim> _ \<sim> _)") and
-       interferes :: "'d \<Rightarrow> 's \<Rightarrow> 'd \<Rightarrow> bool" ("(_ @ _ \<leadsto>_)")
+       changed_edge :: "'s \<Rightarrow> 'e \<Rightarrow> ('d \<times> 'd) set" and
+       edges :: "'s \<Rightarrow> ('d \<times> 'd) set" and
+       vpeq :: "'s \<Rightarrow> 'd \<Rightarrow> 's \<Rightarrow> bool"  ("(_ \<sim> _ \<sim> _)")
   +
   assumes enabled0: "\<forall>s a. reachable0 s \<longrightarrow> (\<exists> s'. s' = step s a)"
 begin
@@ -153,7 +149,7 @@ begin
     primrec sources :: "'e list \<Rightarrow> 'd \<Rightarrow> 's \<Rightarrow> 'd set" where
       sources_Nil:"sources [] d s = {d}" |
       sources_Cons:"sources (a # as) d s = (\<Union>{sources as d (step s a)}) \<union> 
-                              {w . w = the (domain a) \<and> is_execute a \<and> (\<exists>v . interferes w s v \<and> v\<in>sources as d (step s a))}"
+                              {w . w = the (domain a) \<and> is_execute a \<and> (\<exists>v . (w, v) \<in> edges s \<and> v\<in>sources as d (step s a))}"
     declare sources_Nil [simp del]
     declare sources_Cons [simp del]
 
@@ -161,8 +157,12 @@ begin
     
     primrec ipurge :: "'e list \<Rightarrow> 'd \<Rightarrow> 's  \<Rightarrow> 'e list" where
       ipurge_Nil:   "ipurge [] u s = []" |
-      ipurge_Cons:  "ipurge (a#as) u s = (if (is_execute a \<and> the (domain a) \<in> (sources (a#as) u s))  \<or>
-                                                    (is_grant a \<and> the (grant_dest a) \<in> (sources (a#as) u s) ) then
+      ipurge_Cons:  "ipurge (a#as) u s = (if (is_execute a \<and> the (domain a) \<in> (sources (a#as) u s))
+                                            then
+                                              a # ipurge as u (step s a)
+                                          else if(is_grant a \<and> (\<exists>w v. (w,v) \<in> changed_edge s a \<and> v \<in> (sources (a#as) u s)))
+(*                                                    (is_grant a \<and> (grant_dest a) \<inter> (sources (a#as) u s) \<noteq> {} ) then*)
+                                            then
                                               a # ipurge as u (step s a)
                                            else
                                               ipurge as u (step s a)
@@ -211,10 +211,10 @@ subsection{* Unwinding conditions*}
                                                   
      definition weakly_grant_step_consistent :: "bool" where
         "weakly_grant_step_consistent \<equiv>  \<forall>a d s t. reachable0 s \<and> reachable0 t \<and> is_grant a \<and> (s \<sim> d \<sim> t) \<and>
-                              (s \<sim> (the (grant_dest a)) \<sim> t) \<longrightarrow> ((step s a) \<sim> d \<sim> (step t a))"
+                              (s \<approx> ((grant_dest a)) \<approx> t) \<longrightarrow> ((step s a) \<sim> d \<sim> (step t a))"
 
      definition grant_local_respect :: "bool" where
-        "grant_local_respect \<equiv>  \<forall>s v a. reachable0 s \<and> \<not>(v = the (grant_dest a)) \<and> is_grant a \<longrightarrow> 
+        "grant_local_respect \<equiv>  \<forall>s v a. reachable0 s \<and> \<not>(v \<notin> (grant_dest a)) \<and> is_grant a \<longrightarrow> 
                                 (s \<sim> v \<sim> (step s a))"
 
      declare weakly_step_consistent_def [cong] and dynamic_local_respect_def [cong] and policy_respect_def [cong]
@@ -361,25 +361,15 @@ subsection{* Inference framework of information flow security properties *}
         using grant_exclusive
         by blast
 
-     lemma lemma_3_sub_2: "\<lbrakk>reachable0 s;
-                      reachable0 t;
-                      weakly_grant_step_consistent;    
-                      (s \<approx> D \<approx> t);
-                     the (grant_dest a) \<in> D;
-                      is_grant a\<rbrakk>
-                      \<Longrightarrow> ((step s a) \<approx> D \<approx> (step t a))"
-        apply (simp add:weakly_grant_step_consistent_def)
-        by auto
-
      lemma lemma_3: "\<lbrakk>\<forall>a s t u as. reachable0 s;
                       reachable0 t;
                       weakly_grant_step_consistent;    
                       (s \<approx> (sources (a # as) u s) \<approx> t);
-                      the (grant_dest a) \<in> (sources (a # as) u s);
+                      (grant_dest a) \<inter> (sources (a # as) u s) \<noteq> {};
                       is_grant a\<rbrakk>
                       \<Longrightarrow> ((step s a) \<approx> (sources as u (step s a)) \<approx> (step t a))"
        apply (simp add: weakly_grant_step_consistent_def)
-       apply (simp add: sources_Cons)
+       apply (simp add: sources_Cons)                  
        done
      
      lemma lemma_4_sub3 : "the (grant_dest a) \<notin> (sources (a # as) u s) \<Longrightarrow>  v \<in> (sources (a # as) u s) \<longrightarrow> the (grant_dest a) \<noteq> v  "

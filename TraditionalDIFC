@@ -1,0 +1,5 @@
+theory Traditional_DIFC
+imports DynamicCapabilityModel
+begin
+
+end
