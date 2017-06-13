@@ -206,13 +206,14 @@ subsection{* Unwinding conditions*}
      definition dynamic_local_respect :: "bool" where
         "dynamic_local_respect \<equiv> \<forall>a d s. reachable0 s \<and> \<not>((the (domain a)) @ s \<leadsto> d) \<longrightarrow> (s \<sim> d \<sim> (step s a)) "
 
-     definition policy_respect :: "bool" where
-        "policy_respect \<equiv> \<forall>a u s t. reachable0 s \<and> reachable0 t \<and> (s \<sim> u \<sim> t) \<longrightarrow> (interferes (the (domain a)) s u = interferes (the (domain a)) t u)"
+     definition policy_respect :: "bool" where                           
+        "policy_respect \<equiv> \<forall>a u s t. reachable0 s \<and> reachable0 t \<and> (s \<sim> u \<sim> t)
+                              \<longrightarrow> (interferes (the (domain a)) s u = interferes (the (domain a)) t u)"
                                                   
      definition weakly_grant_step_consistent :: "bool" where
         "weakly_grant_step_consistent \<equiv>  \<forall>a d s t. reachable0 s \<and> reachable0 t \<and> is_grant a \<and> (s \<sim> d \<sim> t) \<and>
                               (s \<sim> (the (grant_dest a)) \<sim> t) \<longrightarrow> ((step s a) \<sim> d \<sim> (step t a))"
-
+                                                                                    
      definition grant_local_respect :: "bool" where
         "grant_local_respect \<equiv>  \<forall>s v a. reachable0 s \<and> \<not>(v = the (grant_dest a)) \<and> is_grant a \<longrightarrow> 
                                 (s \<sim> v \<sim> (step s a))"
@@ -406,7 +407,6 @@ subsection{* Inference framework of information flow security properties *}
                     policy_respect \<and>
                     weakly_grant_step_consistent \<and>
                     grant_local_respect \<and>
-                    domain_equal \<and>
                     (s \<approx> (sources as u s) \<approx> t)
                     \<longrightarrow> (sources as u s) = (sources as u t)"
        proof -
@@ -706,7 +706,7 @@ subsection{* Inference framework of information flow security properties *}
                           by (metis a0 b0 ipurge_Cons p1 p2 p3 p4 p5 p6 p7 p8 sources_eq1)
                         have b4: "(((step s b) \<lhd> bs \<cong> (step t b) \<lhd> (ipurge bs u (step t b)) @ u))"
                           using a1 p0 p1 p2 p3 p4 p5 p6 p7 reachableStep by blast
-                        then show ?thesis
+                        show ?thesis
                           using b3 b4 by auto
                       next
                         assume b0: "the (domain b) \<notin> sources (b # bs) u s"

@@ -55,7 +55,7 @@ record Sys_Config = partconf :: Partitions
 
 subsubsection {* System state *}
 
-type_synonym Ports = "port_id \<rightharpoonup> Port_Type" 
+type_synonym Ports = "port_id \<rightharpoonup> Port_Type"    
 
 type_synonym Channels = "channel_id \<rightharpoonup> Channel_Type"
           
@@ -71,7 +71,7 @@ record State =
           current :: domain_id 
           partitions :: Partitions_State
           comm :: Communication_State                                 
-          part_ports :: "port_id \<rightharpoonup> partition_id"
+          part_ports :: "port_id \<rightharpoonup> partition_id"          
                                                                        
 subsubsection {* Events *}
                                                              
@@ -409,7 +409,7 @@ definition create_sampling_port :: "Sys_Config \<Rightarrow> State \<Rightarrow>
                 \<or> p \<notin> get_partition_cfg_ports_byid sc (current s))
             then (s,None)
             else
-              let cs = comm s; 
+              let cs = comm s;                 
                   pts = ports cs; 
                   partpts = part_ports s;
                   part = current s;

@@ -1,4 +1,4 @@
-theory Dynamic_model_test
+theory Dynamic_model_v3
 imports Main
 begin
 subsection {* Security State Machine *}
@@ -16,9 +16,7 @@ locale SM =
     vpeq_symmetric_lemma : "\<forall> s t d. (s \<sim> d \<sim> t) \<longrightarrow> (t \<sim> d \<sim> s)" and
     vpeq_reflexive_lemma : "\<forall> s d. (s \<sim> d \<sim> s)" and
     execute_exclusive: "\<forall>a. is_execute a  \<longleftrightarrow> \<not>(is_grant a)" and
-    grant_exclusive: "\<forall>a. is_grant a   \<longleftrightarrow> \<not>(is_execute a)" and
-    taint_set_consistance_lemma: "\<forall>a s d. is_execute a \<longrightarrow> t_set s d = t_set (step s a) d" and
-    taint_set_respect_lemma: "\<forall>s t u. (s \<sim> d \<sim> t) \<longrightarrow> t_set s d = t_set t d"
+    grant_exclusive: "\<forall>a. is_grant a   \<longleftrightarrow> \<not>(is_execute a)" 
 begin
 
     definition ivpeq :: "'s \<Rightarrow> 'd set \<Rightarrow> 's \<Rightarrow> bool" ("(_ \<approx> _ \<approx> _)")
@@ -151,22 +149,24 @@ begin
     primrec sources :: "'e list \<Rightarrow> 'd \<Rightarrow> 's \<Rightarrow> 'd set" where
       sources_Nil:"sources [] d s = {d}" |
       sources_Cons:"sources (a # as) d s = (\<Union>{sources as d (step s a)}) \<union> 
-                              {w . w = the (domain a) \<and> is_execute a \<and> (\<exists>v . t_set s w \<subseteq> t_set s v \<and> v\<in>sources as d (step s a))}"
-    declare sources_Nil [simp del]
+                              {w . (w = the (domain a) \<and> is_execute a \<and> (\<exists>v . t_set s w \<subseteq> t_set s v \<and> v\<in>sources as d (step s a)))
+                              \<or> (w = the (grant_dest a) \<and> \<not> is_execute a \<and> (\<exists>v . t_set s w \<subseteq> t_set s v \<and> v\<in>sources as d (step s a)))}"
+                                                                                            
+    declare sources_Nil [simp del]                                         
     declare sources_Cons [simp del]
 
     
     
     primrec ipurge :: "'e list \<Rightarrow> 'd \<Rightarrow> 's  \<Rightarrow> 'e list" where
       ipurge_Nil:   "ipurge [] u s = []" |
-      ipurge_Cons:  "ipurge (a#as) u s = (if (is_execute a \<and> the (domain a) \<in> (sources (a#as) u s))
+      ipurge_Cons:  "ipurge (a#as) u s = (if (is_execute a \<and> the (domain a) \<notin> (sources (a#as) u s))
                                             then
-                                              a # ipurge as u (step s a)
-                                          else if(is_grant a \<and> the (grant_dest a) \<in> (sources (a#as) u s))
+                                              ipurge as u (step s a)
+                                          else if(\<not>is_execute a \<and> the (grant_dest a) \<notin> (sources (a#as) u s))
                                             then
-                                              a # ipurge as u (step s a)
+                                              ipurge as u (step s a)
                                            else
-                                              ipurge as u (step s a)        
+                                              a # ipurge as u (step s a)        
                                           )"
 (*
     lemma execute_not_change0: "is_execute a \<and> t = step s a \<longrightarrow> t_set s d = t_set t d"
@@ -303,17 +303,25 @@ subsection{* Unwinding conditions*}
                                 \<longrightarrow> (s \<sim> d \<sim> (step s a)) "
                                         
      definition non_interference_respect :: "bool" where
-        "non_interference_respect \<equiv> \<forall>a d s t. reachable0 s \<and> reachable0 t \<and> is_execute a \<and> (s \<sim> d \<sim> t) \<and>
-                                    \<not> (t_set s (the (domain a)) \<subseteq> t_set s d) \<longrightarrow> \<not> (t_set t (the (domain a)) \<subseteq> t_set t d)"
-                                                                                              
+        "non_interference_respect \<equiv> \<forall>d v s t. reachable0 s \<and> reachable0 t \<and> (s \<sim> d \<sim> t) \<and>
+                                    \<not> (t_set s v \<subseteq> t_set s d) \<longrightarrow> \<not> (t_set t v \<subseteq> t_set t d)"
+
      definition weakly_grant_step_consistent :: "bool" where
         "weakly_grant_step_consistent \<equiv>  \<forall>a d s t. reachable0 s \<and> reachable0 t \<and> is_grant a \<and> (s \<sim> d \<sim> t) \<and>
                               (s \<sim> (the (grant_dest a)) \<sim> t) \<longrightarrow> ((step s a) \<sim> d \<sim> (step t a))"
 
+     (* 
+     This action a is happened outside the sources.
+     We may need to add a more specific condition:
+       t_set s (the grant_dest a) \<subseteq> t_set s v
+     If we add a tag to a domain whose t_set is already not subseteq to v,
+     this action would not change the noninterf relationship.
+      *)
      definition grant_local_respect :: "bool" where
-        "grant_local_respect \<equiv>  \<forall>s v a. reachable0 s \<and> \<not>(v = (the (grant_dest a))) \<and> is_grant a \<longrightarrow> 
+        "grant_local_respect \<equiv>  \<forall>s v a. reachable0 s
+                                \<and> is_grant a \<and> \<not> (t_set s (the (grant_dest a)) \<subseteq> t_set s v) \<longrightarrow> 
                                 (s \<sim> v \<sim> (step s a))"
-
+                                                       
      declare weakly_step_consistent_def [cong] and dynamic_local_respect_def [cong]
               and weakly_grant_step_consistent_def [cong] and grant_local_respect_def 
 
@@ -378,8 +386,6 @@ subsection{* Inference framework of information flow security properties *}
             using a5 a6 sources_Cons by auto
           have b3: "\<forall>v. v\<in>sources as u (step s a) \<longrightarrow> (s \<sim> v \<sim> t)"
             using a7 b2 ivpeq_def by blast
-          have b6: "\<forall>v. v\<in>sources as u (step s a) \<longrightarrow> t_set s v = t_set t v "
-            by (simp add: b3 taint_set_respect_lemma)
           have b4: "\<forall>v. v\<in>sources as u (step s a) \<longrightarrow> \<not> (t_set t (the(domain a)) \<subseteq> t_set t v)"
             using a1 a2 a4 a5 b1 b3 non_interference_respect_def by blast          
           have b5: "\<forall>v. v\<in>sources as u (step s a) \<longrightarrow> (t \<sim> v \<sim> (step t a))"
@@ -461,7 +467,7 @@ subsection{* Inference framework of information flow security properties *}
           have b1: "s \<sim> (the(domain a)) \<sim> t"
             using a3 a4 by auto
           have b2: "sources (a#as) u s = sources as u (step s a) \<union> {the(domain a)}"
-            using a3 sources_Cons by auto
+            using a3 a5 sources_Cons by auto
           have b3: "\<forall>v. v\<in>(sources as u (step s a)) \<longrightarrow> (s \<sim> v \<sim> t)"
             using a4 b2 by auto
           have b4: "\<forall>v. v\<in>(sources as u (step s a)) \<longrightarrow> ((step s a) \<sim> v \<sim> (step t a))"
@@ -479,11 +485,12 @@ subsection{* Inference framework of information flow security properties *}
        apply (simp add:dynamic_local_respect_def)
        apply (simp add:sources_Cons)
        by blast
-
+(*
      lemma lemma_3_sub_1: "is_grant a \<Longrightarrow> (sources (a # as) u s) =  (sources as u (step s a))"
         apply (simp add:sources_Cons)
         using grant_exclusive
         by blast
+*)
 (*
      lemma lemma_3: "\<lbrakk>\<forall>a s t u as. reachable0 s;
                       reachable0 t;
@@ -499,17 +506,27 @@ subsection{* Inference framework of information flow security properties *}
      lemma lemma_4_sub3 : "the (grant_dest a) \<notin> (sources (a # as) u s) \<Longrightarrow>  v \<in> (sources (a # as) u s) \<longrightarrow> the (grant_dest a) \<noteq> v  "
         by blast
 
+     lemma lemma_4_sub_1_0:"\<lbrakk>\<forall>a s v. is_grant a;
+                      reachable0 s;
+                      grant_local_respect;
+                      \<not> (t_set s (the (grant_dest a)) \<subseteq> t_set s v)\<rbrakk>
+                      \<Longrightarrow> (s \<sim> v \<sim> (step s a))"
+       using grant_local_respect_def by force
+
      lemma lemma_4_sub_1: "\<lbrakk>\<forall>a s D. is_grant a;
                       reachable0 s;
                       grant_local_respect;
-                      the (grant_dest a) \<notin> D\<rbrakk>
+                      (\<forall>v. v \<in> D \<and>
+                      \<not> (t_set s (the (grant_dest a)) \<subseteq> t_set s v))\<rbrakk>
                       \<Longrightarrow> (s \<approx> D \<approx> (step s a))"
        using grant_local_respect_def by force
 
      lemma lemma_4: "\<lbrakk>\<forall>a s u as. is_grant a;
                       reachable0 s; 
                       grant_local_respect;
-                      the (grant_dest a) \<notin> (sources (a # as) u s)\<rbrakk>
+                      (\<forall>v. v \<in> (sources (a # as) u s) \<and>
+                      the (grant_dest a) \<noteq> v \<and>
+                      \<not> (t_set s (the (grant_dest a)) \<subseteq> t_set s v))\<rbrakk>
                       \<Longrightarrow> (s \<approx> (sources (a # as) u s) \<approx> (step s a))"
        using grant_local_respect_def by force
 
@@ -568,22 +585,19 @@ subsection{* Inference framework of information flow security properties *}
                          have b1: "s \<sim> (the(domain b)) \<sim> t"
                            using b0 p9 by auto
                          have b2: "sources (b # bs) u s = {the (domain b)} \<union> sources bs u (step s b)"
-                           using b0 sources_Cons by auto
+                           using b0 a0 sources_Cons by auto
                          have b3: "((step s b) \<approx> (sources bs u (step s b)) \<approx> (step t b))"
                            using a0 lemma_1_0 p1 p2 p3 p5 p9 b0 by blast 
                          have b4: "(sources bs u (step s b)) = (sources bs u (step t b))"
                            using b3 p0 p1 p2 p3 p4 p5 p6 p7 reachableStep by blast
-                         have b5: "t_set s (the (domain b)) = t_set t (the (domain b))"
-                           using b1 taint_set_respect_lemma by auto
+
                          have b6: "\<forall>v. v\<in>sources bs u (step s b) \<longrightarrow> (s \<sim> v \<sim> t)"
                            using p9 b2 by auto
-                         have b7: "\<forall>v. v\<in>sources bs u (step s b) 
-                              \<longrightarrow> t_set s v = t_set t v "
-                           using b6 taint_set_respect_lemma by auto
+
                          have b8: "\<exists>v. v\<in>sources bs u (step s b) \<and> (t_set s (the (domain b)) \<subseteq> t_set s v)"
                            using b0 sources_Cons by auto
                          have b9: "\<exists>v. v\<in>sources bs u (step t b) \<and> (t_set t (the (domain b)) \<subseteq> t_set t v)"
-                           using b4 b5 b7 b8 by blast
+                           by (metis b4 b6 b8 non_interference_respect_def p1 p2 p4 vpeq_symmetric_lemma)
                          have b10: "sources (b # bs) u t = {the (domain b)} \<union> sources bs u (step t b)"
                            using b9 sources_Cons a0 by auto
                          show "sources (b # bs) u s = sources (b # bs) u t"
@@ -591,14 +605,11 @@ subsection{* Inference framework of information flow security properties *}
                        next                                      
                          assume b0: "the (domain b) \<notin> (sources (b # bs) u s)"
                          have b1: "sources (b # bs) u s = sources bs u (step s b)"
-                           using b0 sources_Cons by auto
+                           using b0 a0 sources_Cons by auto
                          have b2: "(s \<approx> (sources bs u (step s b)) \<approx> (step s b))"
                            using a0 b0 lemma_2 p1 p5 by blast
                          have b3: "\<forall>v. v\<in>sources bs u (step s b) \<longrightarrow> (s \<sim> v \<sim> t)"
                            using p9 b1 by auto
-                         have b4: "\<forall>v. v\<in>sources bs u (step s b) 
-                              \<longrightarrow> t_set s v = t_set t v "
-                           using b3 taint_set_respect_lemma by auto
                          have b5: "(t \<approx> (sources bs u (step s b)) \<approx> (step t b))"
                            using a0 b0 lemma_1_sub_2 p1 p2 p4 p5 p9 by blast
                          have b6: "(s \<approx> (sources bs u (step s b)) \<approx> t)"
@@ -607,7 +618,7 @@ subsection{* Inference framework of information flow security properties *}
                            using b1 b2 b5 lemma_1_sub_4 p9 by auto         
                          have b8: "(sources bs u (step s b)) = (sources bs u (step t b))"
                            using b7 p0 p1 p2 p3 p4 p5 p6 p7 reachableStep by blast
-                         have b9: "\<forall>v. v\<in>sources bs u (step s b)\<longrightarrow> \<not> t_set s (the(domain b)) \<subseteq> t_set s v"
+                         have b9: "\<forall>v. v\<in>sources bs u (step s b) \<longrightarrow> \<not> t_set s (the(domain b)) \<subseteq> t_set s v"
                            using a0 b0 sources_Cons by auto
                          have b10: "\<forall>v. v\<in>sources bs u (step s b) \<longrightarrow> \<not> t_set t (the(domain b)) \<subseteq> t_set t v"
                            using p1 p2 p4 a0 b3 b9 non_interference_respect_def by blast
@@ -620,27 +631,64 @@ subsection{* Inference framework of information flow security properties *}
                          qed
                      next
                        assume a0: "\<not> is_execute b "
-                       have a1: "sources (b # bs) u s = sources bs u (step s b)"
-                         by (simp add: a0 sources_Cons)
-                       have a2: "sources (b # bs) u t = sources bs u (step t b)"
+                       have a1: "sources bs u (step s b) \<subseteq> sources (b # bs) u s"
                          by (simp add: a0 sources_Cons)
                        have a3: "is_grant b"
                          using a0 execute_exclusive by auto
-                       have a4: "((step s b) \<approx> (sources bs u (step s b)) \<approx> (step t b))"
+                       have a4: "sources (b # bs) u s = sources (b # bs) u t"
                          proof (cases "the (grant_dest b) \<in> (sources (b # bs) u s)")
                            assume b0: "the (grant_dest b) \<in> (sources (b # bs) u s)"
-                           show "((step s b) \<approx> (sources bs u (step s b)) \<approx> (step t b))"
+                           have b1: "s \<sim> (the(grant_dest b)) \<sim> t"
+                             using b0 p9 by auto
+                           have b2: "sources (b # bs) u s = {the (grant_dest b)} \<union> sources bs u (step s b)"
+                             using b0 a0 sources_Cons by auto
+                           have b3: "((step s b) \<approx> (sources bs u (step s b)) \<approx> (step t b))"
                              using a1 a3 b0 p1 p2 p6 p9 by auto
+                           have b4: "(sources bs u (step s b)) = (sources bs u (step t b))"
+                             using b3 p0 p1 p2 p3 p4 p5 p6 p7 reachableStep by blast
+                           have b6: "\<forall>v. v\<in>sources bs u (step s b) \<longrightarrow> (s \<sim> v \<sim> t)"
+                             using p9 b2 by auto
+                           have b8: "\<exists>v. v\<in>sources bs u (step s b) \<and> (t_set s (the (grant_dest b)) \<subseteq> t_set s v)"
+                             using b0 sources_Cons by auto
+                           have b9: "\<exists>v. v\<in>sources bs u (step t b) \<and> (t_set t (the (grant_dest b)) \<subseteq> t_set t v)"
+                             by (metis b4 b6 b8 non_interference_respect_def p1 p2 p4 vpeq_symmetric_lemma)
+                           have b10: "sources (b # bs) u t = {the (grant_dest b)} \<union> sources bs u (step t b)"
+                             using b9 sources_Cons a0 by auto
+                           show "sources (b # bs) u s = sources (b # bs) u t"
+                             using b4 b10 b2 by auto  
                          next
-                           assume b1: "the (grant_dest b) \<notin> sources (b # bs) u s"
-                           have "(s \<approx> (sources (b # bs) u s) \<approx> (step s b))"
+                           assume b0: "the (grant_dest b) \<notin> (sources (b # bs) u s)"
+                           have b1: "\<forall>v. v\<in>sources bs u (step s b) \<longrightarrow> \<not> t_set s (the(grant_dest b)) \<subseteq> t_set s v"
+                             using a0 b0 sources_Cons by auto
+                           have b2: "(s \<approx> (sources bs u (step s b)) \<approx> (step s b))"
                              using a3 b1 grant_local_respect_def p1 p7 by force
+                           have b3: "\<forall>v. v\<in>sources bs u (step s b) \<longrightarrow> (s \<sim> v \<sim> t)"
+                             using p9 a1 by auto
+                           have b4: "\<forall>v. v\<in>sources bs u (step s b) \<longrightarrow> \<not> t_set t (the(grant_dest b)) \<subseteq> t_set t v"
+                             using p1 p2 p4 b3 b2 b1 non_interference_respect_def by blast
+                           have b5: "(t \<approx> (sources bs u (step s b)) \<approx> (step t b))"
+                             using a3 b1 b4 grant_local_respect_def p2 p7 by force
+                           have b6: "(s \<approx> (sources bs u (step s b)) \<approx> t)"
+                             using a1 p9 by auto
+                           have b7: "((step s b) \<approx> (sources bs u (step s b)) \<approx> (step t b))"
+                             using b2 b5 b6 lemma_1_sub_4 by blast
+                           have b8: "(sources bs u (step s b)) = (sources bs u (step t b))"
+                             using b7 p0 p1 p2 p3 p4 p5 p6 p7 reachableStep by blast
+                           have b9: "\<forall>v. v\<in>sources bs u (step s b) \<longrightarrow> \<not> t_set s (the(grant_dest b)) \<subseteq> t_set s v"
+                             using a0 b0 sources_Cons by auto
+                           have b10: "\<forall>v. v\<in>sources bs u (step s b) \<longrightarrow> \<not> t_set t (the(grant_dest b)) \<subseteq> t_set t v"
+                             using p1 p2 p4 a0 b3 b9 non_interference_respect_def by blast
+                           have b11: "the (grant_dest b) \<notin> (sources (b # bs) u t)"
+                             using b10 b8 sources_Cons by auto
+                           have b12: "sources (b # bs) u t = sources bs u (step t b)"
+                             using b11 a0 sources_Cons by auto
+                           have b13: "sources (b # bs) u s = sources bs u (step s b)"
+                             using b0 a0 sources_Cons by auto
                            show ?thesis
-                             by (smt a1 a3 grant_local_respect_def ivpeq_def lemma_1_sub_4
-                               p1 p2 p6 p7 p9 vpeq_symmetric_lemma weakly_grant_step_consistent_def)
+                             using b13 b12 b8 by auto
                          qed
-                       show ?thesis
-                         using a1 a2 a4 p0 p1 p2 p3 p4 p5 p6 p7 reachableStep by blast
+                       then show ?thesis
+                         by auto
                    qed
               }
               then show ?thesis by blast
@@ -718,14 +766,11 @@ subsection{* Inference framework of information flow security properties *}
                        next
                          assume b0: "the (domain b) \<notin> (sources (b # bs) u s)"
                          have b1: "sources (b # bs) u s = sources bs u (step s b)"
-                           using b0 sources_Cons by auto
+                           using a0 b0 sources_Cons by auto
                          have b2: "(s \<approx> (sources bs u (step s b)) \<approx> (step s b))"
                            using a0 b0 lemma_2 p1 p5 by blast
                          have b3: "\<forall>v. v\<in>sources bs u (step s b) \<longrightarrow> (s \<sim> v \<sim> t)"
                            using p9 b1 by auto
-                         have b4: "\<forall>v. v\<in>sources bs u (step s b) 
-                              \<longrightarrow> t_set s v = t_set t v "
-                           using b3 taint_set_respect_lemma by auto
                          have b5: "(t \<approx> (sources bs u (step s b)) \<approx> (step t b))"
                            using a0 b0 lemma_1_sub_2 p1 p2 p4 p5 p9 by blast
                          have b6: "(s \<approx> (sources bs u (step s b)) \<approx> t)"
@@ -737,7 +782,7 @@ subsection{* Inference framework of information flow security properties *}
                          have b9: "\<forall>v. v\<in>sources bs u (step s b)\<longrightarrow> \<not> t_set s (the(domain b)) \<subseteq> t_set s v"
                            using a0 b0 sources_Cons by auto
                          have b10: "\<forall>v. v\<in>sources bs u (step s b) \<longrightarrow> \<not> t_set t (the(domain b)) \<subseteq> t_set t v"
-                           by (metis a0 b1 b9 ivpeq_def non_interference_respect_def p1 p2 p4 p9)
+                           by (metis b1 b9 ivpeq_def non_interference_respect_def p1 p2 p4 p9)
                          have b11: "the (domain b) \<notin> (sources (b # bs) u t)"
                            using b10 b8 sources_Cons by auto
                          have b12: "ipurge (b # bs) u s = ipurge bs u (step s b)"
@@ -754,26 +799,34 @@ subsection{* Inference framework of information flow security properties *}
                      then show ?thesis
                        proof (cases "the (grant_dest b) \<in> (sources (b # bs) u s)")
                          assume b0: "the (grant_dest b) \<in> (sources (b # bs) u s)"
-                         have b1: "((step s b) \<approx> (sources bs u (step s b)) \<approx> (step t b))"
-                           using a1 b0 lemma_3_sub_1 p1 p2 p6 p9 by auto
-                         have b2: "(ipurge bs u (step s b)) = (ipurge bs u (step t b))"
-                           using b1 p0 p1 p2 p3 p4 p5 p6 p7 p9 reachableStep by blast
+                         have b1: "(sources (b # bs) u s) = {the (grant_dest b)} \<union> (sources bs u (step s b))"
+                           using b0 a0 sources_Cons by auto
+                         have b2: "((step s b) \<approx> (sources bs u (step s b)) \<approx> (step t b))"
+                           using a1 b1 b0 p1 p2 p6 p9 by auto
+                         have b3: "(ipurge bs u (step s b)) = (ipurge bs u (step t b))"
+                           using b2 p0 p1 p2 p3 p4 p5 p6 p7 p9 reachableStep by blast
                          then show ?thesis
-                           by (metis a1 b0 b2 ipurge_Cons p1 p2 p3 p4 p5 p6 p7 p9 sources_eq1)
+                           by (metis b0 ipurge_Cons p1 p2 p3 p4 p5 p6 p7 p9 sources_eq1)
                        next
                          assume b0: "the (grant_dest b) \<notin> (sources (b # bs) u s)"
                          have b1: "sources (b # bs) u s = sources bs u (step s b)"
-                           by (simp add: a0 sources_Cons)
+                           using b0 a0 sources_Cons by auto
+                         have c0: "\<forall>v. v\<in>sources bs u (step s b) \<longrightarrow> \<not> t_set s (the(grant_dest b)) \<subseteq> t_set s v"
+                           using a0 b0 sources_Cons by auto 
                          have b2: "(s \<approx> (sources (b # bs) u s) \<approx> (step s b))"
-                           using a1 b0 grant_local_respect_def p1 p7 by force
+                           using a1 b0 c0 b1 grant_local_respect_def p1 p7 by force
                          have b3: "ipurge (b # bs) u s = ipurge bs u (step s b)"
                            using a0 b0 by auto
                          have b4: "the (grant_dest b) \<notin> (sources (b # bs) u t)"
                            by (metis b0 p1 p2 p3 p4 p5 p6 p7 p9 sources_eq1)
                          have b5: "ipurge (b # bs) u t = ipurge bs u (step t b)"
                            using a0 b4 by auto
+                         have c1: "\<forall>v. v\<in>sources bs u (step t b) \<longrightarrow> \<not> t_set t (the(grant_dest b)) \<subseteq> t_set t v"
+                           using a0 b4 sources_Cons by auto 
+                         have c2: "sources (b # bs) u t = sources bs u (step t b)"
+                           using b4 a0 sources_Cons by auto
                          have b6: "(t \<approx> (sources (b # bs) u t) \<approx> (step t b))"
-                           using a1 b4 grant_local_respect_def p2 p7 by force
+                           using a1 b4 c1 c2 grant_local_respect_def p2 p7 by force
                          have b7: "((step s b) \<approx> (sources (b # bs) u t) \<approx> (step t b))"
                            by (metis (full_types) b1 b2 b6 lemma_1_sub_4 p1 p2 p3 p4 p5 p6 p7 p9 sources_eq1)
                          have b8: "((step s b) \<approx> (sources bs u (step s b)) \<approx> (step t b))"
@@ -855,14 +908,11 @@ subsection{* Inference framework of information flow security properties *}
                       next
                         assume b0: "the (domain b) \<notin> sources (b # bs) u s"
                         have b1: "sources (b # bs) u s = sources bs u (step s b)"
-                           using b0 sources_Cons by auto
+                           using a0 b0 sources_Cons by auto
                         have b2: "(s \<approx> (sources bs u (step s b)) \<approx> (step s b))"
                            using a0 b0 lemma_2 p1 p4 by blast
                         have b3: "\<forall>v. v\<in>sources bs u (step s b) \<longrightarrow> (s \<sim> v \<sim> t)"
                            using p8 b1 by auto
-                        have b4: "\<forall>v. v\<in>sources bs u (step s b) 
-                              \<longrightarrow> t_set s v = t_set t v "
-                          using b3 taint_set_respect_lemma by auto
                         have b5: "(t \<approx> (sources bs u (step s b)) \<approx> (step t b))"
                           using a0 b0 lemma_1_sub_2 p1 p2 p4 p5 p8 by blast
                         have b6: "(s \<approx> (sources bs u (step s b)) \<approx> t)"
@@ -874,7 +924,7 @@ subsection{* Inference framework of information flow security properties *}
                         have b9: "\<forall>v. v\<in>sources bs u (step s b)\<longrightarrow> \<not> t_set s (the(domain b)) \<subseteq> t_set s v"
                           using a0 b0 sources_Cons by auto
                         have b10: "\<forall>v. v\<in>sources bs u (step s b) \<longrightarrow> \<not> t_set t (the(domain b)) \<subseteq> t_set t v"
-                          by (metis a0 b3 b9 non_interference_respect_def p1 p2 p5)
+                          by (metis b3 b9 non_interference_respect_def p1 p2 p5)
                         have b11: "the (domain b) \<notin> (sources (b # bs) u t)"
                            using b10 b8 sources_Cons by auto
                         have b12: "ipurge (b # bs) u t = ipurge bs u (step t b)"
@@ -903,12 +953,14 @@ subsection{* Inference framework of information flow security properties *}
                      then show ?thesis
                        proof (cases "the (grant_dest b) \<in> (sources (b # bs) u s)")
                          assume b0: "the (grant_dest b) \<in> (sources (b # bs) u s)"
+                         have c0: "(sources (b # bs) u s) = {the (grant_dest b)} \<union> (sources bs u (step s b))"
+                           using b0 a0 sources_Cons by auto
                          have b1: "((step s b) \<approx> (sources bs u (step s b)) \<approx> (step t b))"
-                           using a1 b0 lemma_3_sub_1 p1 p2 p6 p8 by auto
+                           using a1 b0 c0 p1 p2 p6 p8 by auto
                          have b2: "(ipurge bs u (step s b)) = (ipurge bs u (step t b))"
                            using b1 ipurge_eq p1 p2 p3 p4 p5 p6 p7 reachableStep by blast
                          have b3: "ipurge (b # bs) u t = b # (ipurge bs u (step t b))"
-                           by (metis a1 b0 b2 ipurge_Cons ipurge_eq p1 p2 p3 p4 p5 p6 p7 p8)
+                           by (metis a0 b0 b2 ipurge_Cons ipurge_eq p1 p2 p3 p4 p5 p6 p7 p8)                           
                          have b4: "(step s b) \<lhd> bs \<cong> (step t b) \<lhd> ipurge bs u (step t b) @ u "
                            using p0 b1 p1 p2 p3 p4 p5 p6 p7 reachableStep by blast
                          then show ?thesis
@@ -917,20 +969,30 @@ subsection{* Inference framework of information flow security properties *}
                          assume b0: "the (grant_dest b) \<notin> (sources (b # bs) u s)"
                          have b1: "the (grant_dest b) \<notin> (sources (b # bs) u t)"
                            by (metis b0 p1 p2 p3 p4 p5 p6 p7 p8 sources_eq1)
+                         have c0: "\<forall>v. v\<in>sources bs u (step s b) \<longrightarrow> \<not> t_set s (the(grant_dest b)) \<subseteq> t_set s v"
+                           using a0 b0 sources_Cons by auto 
+                         have c1: "the (grant_dest b) \<notin> (sources (b # bs) u t)"
+                           by (metis b0 p1 p2 p3 p4 p5 p6 p7 p8 sources_eq1)
+                         have c2: "\<forall>v. v\<in>sources bs u (step t b) \<longrightarrow> \<not> t_set t (the(grant_dest b)) \<subseteq> t_set t v"
+                           using a0 c1 sources_Cons by auto
+                         have c3: "(sources (b # bs) u s) = (sources bs u (step s b))"
+                           using a0 b0 sources_Cons by auto
+                         have c4: "(sources (b # bs) u t) = (sources bs u (step t b))"
+                           using a0 b1 sources_Cons by auto
                          have b2: "ipurge (b # bs) u t = (ipurge bs u (step t b))"
                            by (simp add: a0 b1)
                          have b3: "(s \<approx> (sources bs u (step s b)) \<approx> (step s b))"
-                           by (metis a1 b0 grant_local_respect_def ivpeq_def lemma_3_sub_1 p1 p7)
+                           by (metis a1 grant_local_respect_def ivpeq_def c0 p1 p7)
                          have b4: "(t \<approx> (sources bs u (step t b)) \<approx> (step t b))"
-                           by (metis a1 b1 grant_local_respect_def ivpeq_def lemma_3_sub_1 p2 p7)
-                         have b5: "(sources bs u (step s b)) = (sources bs u (step t b))"
-                           by (metis a1 lemma_3_sub_1 p1 p2 p3 p4 p5 p6 p7 p8 sources_eq1)
+                           by (metis a1 grant_local_respect_def ivpeq_def c2 p2 p7)
                          have b6: "(s \<approx> (sources bs u (step s b)) \<approx> t)"
-                           using a1 lemma_3_sub_1 p8 by auto
+                           using a1 c3 p8 by auto
                          have b7: "((step s b) \<approx> (sources bs u (step s b)) \<approx> t)"
                            by (meson b3 b6 ivpeq_def vpeq_symmetric_lemma vpeq_transitive_lemma)
                          have b8: "(((step s b) \<lhd> bs \<cong> t \<lhd> (ipurge bs u t) @ u))"
                            using b7 p0 p1 p2 p3 p4 p5 p6 p7 reachableStep by blast
+                         have b5: "(sources bs u (step s b)) = (sources bs u (step t b))"
+                           by (metis c3 c4 p1 p2 p3 p4 p5 p6 p7 p8 sources_eq1)
                          have b9: "((step s b) \<approx> (sources bs u (step s b)) \<approx> (step t b))"
                            by (metis b3 b4 b5 b6 lemma_1_sub_4)
                          have b10: "ipurge bs u t = ipurge bs u (step t b)"
@@ -1000,14 +1062,11 @@ subsection{* Inference framework of information flow security properties *}
                       next
                         assume b0: "the (domain b) \<notin> sources (b # bs) d s"
                         have b1: "sources (b # bs) d s = sources bs d (step s b)"
-                           using b0 sources_Cons by auto
+                           using a0 b0 sources_Cons by auto
                         have b2: "(s \<approx> (sources bs d (step s b)) \<approx> (step s b))"
                            using a0 b0 lemma_2 p1 p4 by blast
                         have b3: "\<forall>v. v\<in>sources bs d (step s b) \<longrightarrow> (s \<sim> v \<sim> t)"
                            using p8 b1 by auto
-                        have b4: "\<forall>v. v\<in>sources bs d (step s b) 
-                              \<longrightarrow> t_set s v = t_set t v "
-                          using b3 taint_set_respect_lemma by auto
                         have b5: "(t \<approx> (sources bs d (step s b)) \<approx> (step t b))"
                           using a0 b0 lemma_1_sub_2 p1 p2 p4 p5 p8 by blast
                         have b6: "(s \<approx> (sources bs d (step s b)) \<approx> t)"
@@ -1019,7 +1078,7 @@ subsection{* Inference framework of information flow security properties *}
                         have b9: "\<forall>v. v\<in>sources bs d (step s b)\<longrightarrow> \<not> t_set s (the(domain b)) \<subseteq> t_set s v"
                           using a0 b0 sources_Cons by auto
                         have b10: "\<forall>v. v\<in>sources bs d (step s b) \<longrightarrow> \<not> t_set t (the(domain b)) \<subseteq> t_set t v"
-                          by (metis a0 b3 b9 non_interference_respect_def p1 p2 p5)
+                          by (metis b3 b9 non_interference_respect_def p1 p2 p5)
                         have b11: "the (domain b) \<notin> (sources (b # bs) d t)"
                            using b10 b8 sources_Cons by auto
                         have b12: "ipurge (b # bs) d t = ipurge bs d (step t b)"
@@ -1048,12 +1107,14 @@ subsection{* Inference framework of information flow security properties *}
                      then show ?thesis
                        proof (cases "the (grant_dest b) \<in> (sources (b # bs) d s)")
                          assume b0: "the (grant_dest b) \<in> (sources (b # bs) d s)"
+                         have c0: "(sources (b # bs) d s) = {the (grant_dest b)} \<union> (sources bs d (step s b))"
+                           using b0 a0 sources_Cons by auto
                          have b1: "((step s b) \<approx> (sources bs d (step s b)) \<approx> (step t b))"
-                           using a1 b0 lemma_3_sub_1 p1 p2 p6 p8 by auto
+                           using a1 b0 c0 p1 p2 p6 p8 by auto
                          have b2: "(ipurge bs d (step s b)) = (ipurge bs d (step t b))"
                            using b1 ipurge_eq p1 p2 p3 p4 p5 p6 p7 reachableStep by blast
                          have b3: "ipurge (b # bs) d t = b # (ipurge bs d (step t b))"
-                           by (metis a1 b0 b2 ipurge_Cons ipurge_eq p1 p2 p3 p4 p5 p6 p7 p8)
+                           by (metis a0 b0 b2 ipurge_Cons ipurge_eq p1 p2 p3 p4 p5 p6 p7 p8)
                          have b4: "(step s b) \<lhd> bs \<cong> (step t b) \<lhd> ipurge bs d (step t b) @ d "
                            using p0 b1 p1 p2 p3 p4 p5 p6 p7 reachableStep by blast
                          then show ?thesis
@@ -1062,20 +1123,30 @@ subsection{* Inference framework of information flow security properties *}
                          assume b0: "the (grant_dest b) \<notin> (sources (b # bs) d s)"
                          have b1: "the (grant_dest b) \<notin> (sources (b # bs) d t)"
                            by (metis b0 p1 p2 p3 p4 p5 p6 p7 p8 sources_eq1)
+                         have c0: "\<forall>v. v\<in>sources bs d (step s b) \<longrightarrow> \<not> t_set s (the(grant_dest b)) \<subseteq> t_set s v"
+                           using a0 b0 sources_Cons by auto 
+                         have c1: "the (grant_dest b) \<notin> (sources (b # bs) d t)"
+                           by (metis b0 p1 p2 p3 p4 p5 p6 p7 p8 sources_eq1)
+                         have c2: "\<forall>v. v\<in>sources bs d (step t b) \<longrightarrow> \<not> t_set t (the(grant_dest b)) \<subseteq> t_set t v"
+                           using a0 c1 sources_Cons by auto
+                         have c3: "(sources (b # bs) d s) = (sources bs d (step s b))"
+                           using a0 b0 sources_Cons by auto
+                         have c4: "(sources (b # bs) d t) = (sources bs d (step t b))"
+                           using a0 b1 sources_Cons by auto
                          have b2: "ipurge (b # bs) d t = (ipurge bs d (step t b))"
                            by (simp add: a0 b1)
                          have b3: "(s \<approx> (sources bs d (step s b)) \<approx> (step s b))"
-                           by (metis a1 b0 grant_local_respect_def ivpeq_def lemma_3_sub_1 p1 p7)
+                           by (metis a1 grant_local_respect_def ivpeq_def c0 p1 p7)
                          have b4: "(t \<approx> (sources bs d (step t b)) \<approx> (step t b))"
-                           by (metis a1 b1 grant_local_respect_def ivpeq_def lemma_3_sub_1 p2 p7)
-                         have b5: "(sources bs d (step s b)) = (sources bs d (step t b))"
-                           by (metis a1 lemma_3_sub_1 p1 p2 p3 p4 p5 p6 p7 p8 sources_eq1)
+                           by (metis a1 grant_local_respect_def ivpeq_def c2 p2 p7)
                          have b6: "(s \<approx> (sources bs d (step s b)) \<approx> t)"
-                           using a1 lemma_3_sub_1 p8 by auto
+                           using a1 c3 p8 by auto
                          have b7: "((step s b) \<approx> (sources bs d (step s b)) \<approx> t)"
                            by (meson b3 b6 ivpeq_def vpeq_symmetric_lemma vpeq_transitive_lemma)
                          have b8: "(((step s b) \<lhd> bs \<cong> t \<lhd> (ipurge bs d t) @ d))"
                            using b7 p0 p1 p2 p3 p4 p5 p6 p7 reachableStep by blast
+                         have b5: "(sources bs d (step s b)) = (sources bs d (step t b))"
+                           by (metis c3 c4 p1 p2 p3 p4 p5 p6 p7 p8 sources_eq1)
                          have b9: "((step s b) \<approx> (sources bs d (step s b)) \<approx> (step t b))"
                            by (metis b3 b4 b5 b6 lemma_1_sub_4)
                          have b10: "ipurge bs d t = ipurge bs d (step t b)"

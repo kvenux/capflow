@@ -1,4 +1,4 @@
-theory Dynamic_model_test
+theory Dynamic_model_v1
 imports Main
 begin
 subsection {* Security State Machine *}
@@ -17,7 +17,7 @@ locale SM =
     vpeq_reflexive_lemma : "\<forall> s d. (s \<sim> d \<sim> s)" and
     execute_exclusive: "\<forall>a. is_execute a  \<longleftrightarrow> \<not>(is_grant a)" and
     grant_exclusive: "\<forall>a. is_grant a   \<longleftrightarrow> \<not>(is_execute a)" and
-    taint_set_consistance_lemma: "\<forall>a s d. is_execute a \<longrightarrow> t_set s d = t_set (step s a) d" and
+    (*taint_set_consistance_lemma: "\<forall>a s d. is_execute a \<longrightarrow> t_set s d = t_set (step s a) d" and*)
     taint_set_respect_lemma: "\<forall>s t u. (s \<sim> d \<sim> t) \<longrightarrow> t_set s d = t_set t d"
 begin
 
@@ -305,7 +305,7 @@ subsection{* Unwinding conditions*}
      definition non_interference_respect :: "bool" where
         "non_interference_respect \<equiv> \<forall>a d s t. reachable0 s \<and> reachable0 t \<and> is_execute a \<and> (s \<sim> d \<sim> t) \<and>
                                     \<not> (t_set s (the (domain a)) \<subseteq> t_set s d) \<longrightarrow> \<not> (t_set t (the (domain a)) \<subseteq> t_set t d)"
-                                                                                              
+
      definition weakly_grant_step_consistent :: "bool" where
         "weakly_grant_step_consistent \<equiv>  \<forall>a d s t. reachable0 s \<and> reachable0 t \<and> is_grant a \<and> (s \<sim> d \<sim> t) \<and>
                               (s \<sim> (the (grant_dest a)) \<sim> t) \<longrightarrow> ((step s a) \<sim> d \<sim> (step t a))"
@@ -607,7 +607,7 @@ subsection{* Inference framework of information flow security properties *}
                            using b1 b2 b5 lemma_1_sub_4 p9 by auto         
                          have b8: "(sources bs u (step s b)) = (sources bs u (step t b))"
                            using b7 p0 p1 p2 p3 p4 p5 p6 p7 reachableStep by blast
-                         have b9: "\<forall>v. v\<in>sources bs u (step s b)\<longrightarrow> \<not> t_set s (the(domain b)) \<subseteq> t_set s v"
+                         have b9: "\<forall>v. v\<in>sources bs u (step s b) \<longrightarrow> \<not> t_set s (the(domain b)) \<subseteq> t_set s v"
                            using a0 b0 sources_Cons by auto
                          have b10: "\<forall>v. v\<in>sources bs u (step s b) \<longrightarrow> \<not> t_set t (the(domain b)) \<subseteq> t_set t v"
                            using p1 p2 p4 a0 b3 b9 non_interference_respect_def by blast
@@ -633,11 +633,14 @@ subsection{* Inference framework of information flow security properties *}
                              using a1 a3 b0 p1 p2 p6 p9 by auto
                          next
                            assume b1: "the (grant_dest b) \<notin> sources (b # bs) u s"
-                           have "(s \<approx> (sources (b # bs) u s) \<approx> (step s b))"
+                           have b2: "(s \<approx> (sources (b # bs) u s) \<approx> (step s b))"
                              using a3 b1 grant_local_respect_def p1 p7 by force
+                           have b3: "(t \<approx> (sources (b # bs) u s) \<approx> (step t b))"
+                             using a3 b1 grant_local_respect_def p2 p7 by force
+                           have b4: "((step s b) \<approx> (sources (b # bs) u s) \<approx> (step t b))"
+                             using a1 b2 b3 lemma_1_sub_4 p9 by auto
                            show ?thesis
-                             by (smt a1 a3 grant_local_respect_def ivpeq_def lemma_1_sub_4
-                               p1 p2 p6 p7 p9 vpeq_symmetric_lemma weakly_grant_step_consistent_def)
+                             using b4 a1 by auto
                          qed
                        show ?thesis
                          using a1 a2 a4 p0 p1 p2 p3 p4 p5 p6 p7 reachableStep by blast

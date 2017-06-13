@@ -1,4 +1,4 @@
-theory Dynamic_model_test
+theory Dynamic_model_v2
 imports Main
 begin
 subsection {* Security State Machine *}
@@ -18,6 +18,9 @@ locale SM =
     execute_exclusive: "\<forall>a. is_execute a  \<longleftrightarrow> \<not>(is_grant a)" and
     grant_exclusive: "\<forall>a. is_grant a   \<longleftrightarrow> \<not>(is_execute a)" and
     taint_set_consistance_lemma: "\<forall>a s d. is_execute a \<longrightarrow> t_set s d = t_set (step s a) d" and
+    grant_not_change_lemma: "\<forall>a s d. is_grant a \<and> d \<noteq> the (grant_dest a) \<longrightarrow> t_set s d = t_set (step s a) d" and
+    grant_change_lemma: "\<forall>a s d. is_grant a \<and> d = the (grant_dest a) \<longrightarrow> t_set s d \<subseteq> t_set (step s a) d" and
+    taint_set_grant_repect: "\<forall>a s t d. is_grant a \<and> t_set s d = t_set t d \<longrightarrow> t_set (step s a) d = t_set (step t a) d" and
     taint_set_respect_lemma: "\<forall>s t u. (s \<sim> d \<sim> t) \<longrightarrow> t_set s d = t_set t d"
 begin
 
@@ -171,7 +174,116 @@ begin
 (*
     lemma execute_not_change0: "is_execute a \<and> t = step s a \<longrightarrow> t_set s d = t_set t d"
       using taint_set_consistance_lemma by auto*)
-(*
+
+    lemma ipurge_tset_lemma: "\<forall>a as u s v. ipurge (a # as) u s = ipurge as u (step s a) \<and> v \<in> sources (a # as) u s
+                                \<longrightarrow> t_set s v = t_set (step s a) v"
+      proof -
+      {
+        fix a as u s v
+        have  "ipurge (a # as) u s = ipurge as u (step s a) \<and> v \<in> sources (a # as) u s
+                                \<longrightarrow> t_set s v = t_set (step s a) v"
+          proof (cases "is_execute a")
+            assume a0: "is_execute a"
+            
+        }
+      qed
+
+    lemma ipurge_valid_lemma: "\<forall>a as u s. ipurge (a # as) u s = ipurge as u (step s a)
+                                \<longrightarrow> (sources (a # as) u s) = (sources as u s)"
+      proof - 
+      {
+        fix as
+        have "\<forall>a u s. ipurge (a # as) u s = ipurge as u (step s a)
+                                \<longrightarrow> (sources (a # as) u s) = (sources as u s)"
+          proof (induct as)
+            case Nil then show ?case by (simp add: sources_Nil)
+          next
+            case (Cons b bs)
+            assume p0: "\<forall>a u s. is_execute a \<longrightarrow> (sources bs u s) = (sources bs u (step s a))"
+            then show ?case
+              proof -
+              {
+                fix a u s
+                assume p1: "is_execute a"
+                have "(sources (b # bs) u s) = (sources (b # bs) u (step s a))"
+                  proof (cases "is_execute b")
+                    assume a0: "is_execute b"
+                    have a1: "(sources bs u s ) = (sources bs u (step s a))"
+                      by (simp add: p1 p0)
+                    have a2: "(sources bs u s ) = (sources bs u (step s b))"
+                      by (simp add: a0 p0)
+                    have a3: "(sources bs u (step s a)) = (sources bs u (step (step s a) b))"
+                      by (simp add: a0 p0)
+                    have a4: "(sources bs u (step s b)) = (sources bs u (step (step s b) a))"
+                      by (simp add: p1 p0)
+                    have a5: "(sources bs u (step (step s a) b)) = (sources bs u (step (step s b) a))"
+                      using a1 a2 a3 a4 by auto
+                    show "(sources (b # bs) u s) = (sources (b # bs) u (step s a))"
+                      proof (cases "the (domain b) \<in> (sources (b # bs) u s)")
+                        assume b0: "the (domain b) \<in> (sources (b # bs) u s)"
+                        have b1: "\<exists>v. v\<in>sources bs u (step s b) \<and> t_set s (the (domain b)) \<subseteq> t_set s v"
+                          using b0 sources_Cons by auto
+                        have b2: "t_set s (the (domain b)) = t_set (step s a) (the (domain b))"
+                          by (simp add: p1 taint_set_consistance_lemma)
+                        have b3: "\<exists>v. v\<in>sources bs u (step s b) \<and> t_set (step s a) (the (domain b)) \<subseteq> t_set  (step s a) v"
+                          using b1 p1 taint_set_consistance_lemma by blast
+                        have b4: "(sources bs u (step s b)) = (sources bs u (step (step s b) a)) "
+                          by (simp add: p0 p1) 
+                        have b5: "\<exists>v. v\<in>(sources bs u (step (step s b) a)) \<and> t_set (step s a) (the (domain b)) \<subseteq> t_set  (step s a) v"
+                          using b3 b4 by blast
+                        have b6: "\<exists>v. v\<in>(sources bs u (step (step s a) b)) \<and> t_set (step s a) (the (domain b)) \<subseteq> t_set  (step s a) v"
+                          using b5 a5 by auto
+                        have b7: "(sources (b # bs) u s) = {the (domain b)} \<union> sources bs u (step s b)"
+                          using b0 sources_Cons by auto
+                        have b8: "(sources (b # bs) u (step s a)) = {the (domain b)} \<union> sources bs u (step (step s a) b)"
+                          using a0 b6 sources_Cons by auto
+                        show ?thesis
+                          using b7 b8 b4 a5 by auto
+                      next
+                        assume b0: "the (domain b) \<notin> (sources (b # bs) u s)"
+                        have b1: "(sources bs u (step s b)) = (sources bs u (step (step s b) a))"
+                          by (simp add: p0 p1) 
+                        have b2: "sources (b # bs) u s = sources bs u (step s b)"
+                           using b0 sources_Cons by auto
+                        have b3: "\<forall>v. v \<in> sources bs u (step s b)\<longrightarrow> \<not> t_set s (the(domain b)) \<subseteq> t_set s v"
+                          using a0 b0 sources_Cons by auto
+                        have b4: "t_set s (the (domain b)) = t_set (step s a) (the (domain b))"
+                          by (simp add: p1 taint_set_consistance_lemma)
+                        have b5: "\<forall>v. v \<in> sources bs u (step s b)\<longrightarrow> t_set s v = t_set (step s a) v"
+                          by (simp add: p1 taint_set_consistance_lemma)
+                        have b6: "\<forall>v. v \<in> sources bs u (step s b)\<longrightarrow> \<not> t_set s (the(domain b)) \<subseteq> t_set s v"
+                          using b3 b4 b5 by auto
+                        have b7: "(sources bs u (step s b)) = (sources bs u (step (step s a) b))"
+                          using b1 a5 by auto
+                        have b8: "\<forall>v. v \<in> (sources bs u (step (step s a) b))\<longrightarrow> \<not> t_set s (the(domain b)) \<subseteq> t_set s v"
+                          using b7 b6 by auto
+                        have b9: "\<forall>v. v \<in> (sources bs u (step (step s a) b))
+                                \<longrightarrow> \<not> t_set (step s a) (the(domain b)) \<subseteq> t_set (step s a) v"
+                          using b4 b5 b8 b7 by auto
+                        have b10: "the (domain b) \<notin> (sources (b # bs) u (step s a))"
+                          using a0 b9 sources_Cons by auto
+                        have b11: "(sources (b # bs) u (step s a)) = (sources bs u (step (step s a) b))"
+                          using a0 b9 sources_Cons by auto
+                        show ?thesis
+                          using b11 b1 b2 a5 by auto
+                        qed
+                    next
+                      assume a0: "\<not> is_execute b"
+                      have a1: "(sources bs u (step s b)) = (sources bs u (step (step s b) a))"
+                        by (simp add: p0 p1)
+                      have a2: "(sources bs u (step (step s a) b)) = (sources bs u (step (step (step s a) b) a))"
+                        by (simp add: p0 p1)
+                      show ?thesis
+                      have a2: "(sources bs u (step (step s a) b)) = (sources bs u (step (step s b) a))"
+                      
+
+                }
+                then show ?thesis by blast1
+              qed
+        }
+        then show ?thesis by blast
+      qed
+
     lemma execute_not_change_policy: "\<forall>a as u s. is_execute a \<longrightarrow> (sources as u s) = (sources as u (step s a))"
       proof - 
       {
@@ -190,6 +302,16 @@ begin
                 have "(sources (b # bs) u s) = (sources (b # bs) u (step s a))"
                   proof (cases "is_execute b")
                     assume a0: "is_execute b"
+                    have a1: "(sources bs u s ) = (sources bs u (step s a))"
+                      by (simp add: p1 p0)
+                    have a2: "(sources bs u s ) = (sources bs u (step s b))"
+                      by (simp add: a0 p0)
+                    have a3: "(sources bs u (step s a)) = (sources bs u (step (step s a) b))"
+                      by (simp add: a0 p0)
+                    have a4: "(sources bs u (step s b)) = (sources bs u (step (step s b) a))"
+                      by (simp add: p1 p0)
+                    have a5: "(sources bs u (step (step s a) b)) = (sources bs u (step (step s b) a))"
+                      using a1 a2 a3 a4 by auto
                     show "(sources (b # bs) u s) = (sources (b # bs) u (step s a))"
                       proof (cases "the (domain b) \<in> (sources (b # bs) u s)")
                         assume b0: "the (domain b) \<in> (sources (b # bs) u s)"
@@ -203,6 +325,95 @@ begin
                           by (simp add: p0 p1) 
                         have b5: "\<exists>v. v\<in>(sources bs u (step (step s b) a)) \<and> t_set (step s a) (the (domain b)) \<subseteq> t_set  (step s a) v"
                           using b3 b4 by blast
+                        have b6: "\<exists>v. v\<in>(sources bs u (step (step s a) b)) \<and> t_set (step s a) (the (domain b)) \<subseteq> t_set  (step s a) v"
+                          using b5 a5 by auto
+                        have b7: "(sources (b # bs) u s) = {the (domain b)} \<union> sources bs u (step s b)"
+                          using b0 sources_Cons by auto
+                        have b8: "(sources (b # bs) u (step s a)) = {the (domain b)} \<union> sources bs u (step (step s a) b)"
+                          using a0 b6 sources_Cons by auto
+                        show ?thesis
+                          using b7 b8 b4 a5 by auto
+                      next
+                        assume b0: "the (domain b) \<notin> (sources (b # bs) u s)"
+                        have b1: "(sources bs u (step s b)) = (sources bs u (step (step s b) a))"
+                          by (simp add: p0 p1) 
+                        have b2: "sources (b # bs) u s = sources bs u (step s b)"
+                           using b0 sources_Cons by auto
+                        have b3: "\<forall>v. v \<in> sources bs u (step s b)\<longrightarrow> \<not> t_set s (the(domain b)) \<subseteq> t_set s v"
+                          using a0 b0 sources_Cons by auto
+                        have b4: "t_set s (the (domain b)) = t_set (step s a) (the (domain b))"
+                          by (simp add: p1 taint_set_consistance_lemma)
+                        have b5: "\<forall>v. v \<in> sources bs u (step s b)\<longrightarrow> t_set s v = t_set (step s a) v"
+                          by (simp add: p1 taint_set_consistance_lemma)
+                        have b6: "\<forall>v. v \<in> sources bs u (step s b)\<longrightarrow> \<not> t_set s (the(domain b)) \<subseteq> t_set s v"
+                          using b3 b4 b5 by auto
+                        have b7: "(sources bs u (step s b)) = (sources bs u (step (step s a) b))"
+                          using b1 a5 by auto
+                        have b8: "\<forall>v. v \<in> (sources bs u (step (step s a) b))\<longrightarrow> \<not> t_set s (the(domain b)) \<subseteq> t_set s v"
+                          using b7 b6 by auto
+                        have b9: "\<forall>v. v \<in> (sources bs u (step (step s a) b))
+                                \<longrightarrow> \<not> t_set (step s a) (the(domain b)) \<subseteq> t_set (step s a) v"
+                          using b4 b5 b8 b7 by auto
+                        have b10: "the (domain b) \<notin> (sources (b # bs) u (step s a))"
+                          using a0 b9 sources_Cons by auto
+                        have b11: "(sources (b # bs) u (step s a)) = (sources bs u (step (step s a) b))"
+                          using a0 b9 sources_Cons by auto
+                        show ?thesis
+                          using b11 b1 b2 a5 by auto
+                        qed
+                    next
+                      assume a0: "\<not> is_execute b"
+                      have a1: "(sources bs u (step s b)) = (sources bs u (step (step s b) a))"
+                        by (simp add: p0 p1)
+                      have a2: "(sources bs u (step (step s a) b)) = (sources bs u (step (step (step s a) b) a))"
+                        by (simp add: p0 p1)
+                      show ?thesis
+                      have a2: "(sources bs u (step (step s a) b)) = (sources bs u (step (step s b) a))"
+                      
+
+                }
+                then show ?thesis by blast1
+              qed
+        }
+        then show ?thesis by blast
+      qed
+
+
+(*
+    lemma execute_not_change_policy: "\<forall>as u s t. \<forall>d. t_set s d = t_set t d \<longrightarrow> (sources as u s) = (sources as u t)"
+      proof -   
+      {
+        fix as
+        have "\<forall>u s t. \<forall>d. t_set s d = t_set t d \<longrightarrow> (sources as u s) = (sources as u t)"
+          proof (induct as)
+            case Nil then show ?case by (simp add: sources_Nil)
+          next
+            case (Cons b bs)
+            assume p0: "\<forall>u s t. \<forall>d. t_set s d = t_set t d \<longrightarrow> (sources bs u s) = (sources bs u t)"
+            then show ?case
+              proof -
+              {
+                fix u s t
+                assume p1: "\<forall>d. t_set s d = t_set t d"
+                have "(sources (b # bs) u s) = (sources (b # bs) u t)"
+                  proof (cases "is_execute b")
+                    assume a0: "is_execute b"
+                    show "(sources (b # bs) u s) = (sources (b # bs) u t)"
+                      proof (cases "the (domain b) \<in> (sources (b # bs) u s)")
+                        assume b0: "the (domain b) \<in> (sources (b # bs) u s)"
+                        have b1: "\<exists>v. v\<in>sources bs u (step s b) \<and> t_set s (the (domain b)) \<subseteq> t_set s v"
+                          using b0 sources_Cons by auto
+                        have b2: "\<forall>d. t_set s d = t_set (step s b) d"
+                          using a0 taint_set_consistance_lemma by auto1
+                        have b4: "(sources bs u (step s b)) = (sources bs u (step t b)) "
+                          using p0 p1 by auto
+                        have b2: "t_set s (the (domain b)) = t_set (step s a) (the (domain b))"
+                          by (simp add: p1 taint_set_consistance_lemma)
+                        have b3: "\<exists>v. v\<in>sources bs u (step s b) \<and> t_set (step s a) (the (domain b)) \<subseteq> t_set  (step s a) v"
+                          using b1 p1 taint_set_consistance_lemma by blast1
+                        
+                        have b5: "\<exists>v. v\<in>(sources bs u (step (step s b) a)) \<and> t_set (step s a) (the (domain b)) \<subseteq> t_set  (step s a) v"
+                          using b3 b4 by blast
                         have b7: "(sources (b # bs) u s) = (sources (b # bs) u (step s a))"
                         have b6: "the (domain b) \<in> (sources (b # bs) u (step s a))"
                 }
@@ -212,6 +423,7 @@ begin
         then show ?thesis by blast
       qed
 *)
+
 (*
     lemma ipurge_completeness: "\<forall>s as u. reachable0 s
                                  \<longrightarrow> (sources as u s) = (sources (ipurge as u s) u s )"
