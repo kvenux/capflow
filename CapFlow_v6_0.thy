@@ -1,4 +1,4 @@
-theory CapFlow_v6
+theory CapFlow_v6_0
 imports Dynamic_model_v6
 begin
 
@@ -54,8 +54,7 @@ datatype Event = Client_Lookup_Endpoint_Name domain_id endpoint_name
                | Get_My_Endpoints_Set domain_id
                | Get_Caps domain_id
                | Grant_Endpoint_Cap domain_id cap cap
-               | Get_Takable_Cap domain_id cap
-               | Take_Endpoint_Cap domain_id cap cap
+               | Remove_Cap_Right domain_id cap right
 
 subsubsection {* Utility Functions used for Event Specification *} 
 
@@ -351,6 +350,38 @@ definition take_endpoint_cap :: "State \<Rightarrow> domain_id \<Rightarrow> cap
             else
               (s, False)"
 
+definition remove_cap_right :: "State \<Rightarrow> domain_id \<Rightarrow> cap \<Rightarrow> right \<Rightarrow> (State \<times> bool)"
+  where "remove_cap_right s did rm_cap right_to_rm \<equiv> 
+            let
+              caps0 = caps s;
+              cs_dst = get_domain_cap_set_from_domain_id s did;
+              cs_rest = {c. c\<in>cs_dst \<and> c\<noteq>rm_cap}
+            in
+            if(rm_cap \<in>  get_domain_cap_set_from_domain_id s did 
+              \<and> REMOVE \<in> rights rm_cap
+              \<and> right_to_rm \<in> rights rm_cap
+              \<and> REMOVE = right_to_rm
+              \<and> {REMOVE} = rights rm_cap)
+            then
+              (s\<lparr>
+                 caps := caps0(did := (cs_rest))
+                \<rparr>, True)
+            else if(
+              rm_cap \<in>  get_domain_cap_set_from_domain_id s did 
+              \<and> REMOVE \<in> rights rm_cap
+              \<and> right_to_rm \<in> rights rm_cap
+              )
+            then
+              let
+                new_cap = \<lparr> target = target rm_cap,
+                            rights = (rights rm_cap) - {right_to_rm}\<rparr>
+              in
+              (s\<lparr>
+                 caps := caps0(did := (insert new_cap cs_rest))
+                \<rparr>, True)
+            else
+              (s, False)"
+
 definition system_init :: "Sys_Config \<Rightarrow> State"
   where "system_init sc \<equiv> \<lparr>
                             caps = (\<lambda> x. {}),
@@ -392,8 +423,7 @@ definition exec_event :: "State \<Rightarrow> Event \<Rightarrow> State"
              | Get_My_Endpoints_Set did \<Rightarrow> fst (get_my_endpoints_set s did)
              | Get_Caps did \<Rightarrow>fst (get_caps s did)
              | Grant_Endpoint_Cap did grant_cap dst_cap \<Rightarrow> fst (grant_endpoint_cap s did grant_cap dst_cap)
-             | Get_Takable_Cap did take_cap \<Rightarrow> fst (get_takable_caps s did take_cap)
-             | Take_Endpoint_Cap did take_cap dst_cap \<Rightarrow> fst (take_endpoint_cap s did take_cap dst_cap)
+             | Remove_Cap_Right did dst_cap right_to_rm \<Rightarrow> fst (remove_cap_right s did dst_cap right_to_rm)
               "
 
 definition domain_of_event :: "Event \<Rightarrow> domain_id option"
@@ -404,8 +434,7 @@ definition domain_of_event :: "Event \<Rightarrow> domain_id option"
              | Get_My_Endpoints_Set did \<Rightarrow> Some did
              | Get_Caps did \<Rightarrow> Some did
              | Grant_Endpoint_Cap did grant_cap dst_cap \<Rightarrow> Some did
-             | Get_Takable_Cap did take_cap \<Rightarrow> Some did
-             | Take_Endpoint_Cap did take_cap dst_cap \<Rightarrow> Some did
+             | Remove_Cap_Right did dst_cap right_to_rm  \<Rightarrow> Some did
               "
 
 definition vpeq1 :: "State \<Rightarrow> domain_id \<Rightarrow> State \<Rightarrow> bool" ("(_ \<sim> _ \<sim> _)") 
@@ -478,10 +507,7 @@ lemma reachable_top: "\<forall> s a. (SM.reachable0 s0t exec_event) s \<longrigh
         case (Grant_Endpoint_Cap x1a x2 x3a ) show ?case
           apply (induct x1a)
           by (simp add: exec_event_def) +
-        case (Get_Takable_Cap x1a x2 ) show ?case
-          apply (induct x1a)
-          by (simp add: exec_event_def) +
-        case (Take_Endpoint_Cap x1a x2 ) show ?case
+        case (Remove_Cap_Right x1a x2 ) show ?case
           apply (induct x1a)
           by (simp add: exec_event_def) +
       qed
@@ -489,7 +515,7 @@ lemma reachable_top: "\<forall> s a. (SM.reachable0 s0t exec_event) s \<longrigh
   then show ?thesis by auto
   qed
 
-declare  Let_def [cong]
+declare  Let_def [cong] and vpeq1_def[cong]
 
 interpretation SM_enabled 
     s0t exec_event domain_of_event vpeq1 interferes 
@@ -1046,193 +1072,342 @@ subsubsection{*proving "grant endpoint cap" satisfying the "local respect" prope
     then show ?thesis by auto
   qed
 
-subsubsection{*proving "get takable caps" satisfying the "local respect" property*}
+subsubsection{*proving "remove cap right" satisfying the "local respect" property*}
 
-  lemma get_takable_caps_lcl_resp:
+  lemma remove_cap_right_notchg_domain_cap_set:
   assumes p0: "reachable0 s"
     and   p1: "\<not>(interferes did s d)"
-    and   p2: "s' = fst (get_takable_caps s did take_cap)"
-  shows   "s \<sim> d \<sim> s'"
+    and   p2: "s' = fst (remove_cap_right s did rm_cap right_to_rm)"
+  shows   "get_domain_cap_set_from_domain_id s d 
+           = get_domain_cap_set_from_domain_id s' d"
   proof -
   {
-    have a1: "s = s'"
-      by (simp add: p2 get_takable_caps_def p1)
-  }
+    have a0: "d \<noteq> did"
+      using p1 interferes_def by auto
+    have "get_domain_cap_set_from_domain_id s d 
+           = get_domain_cap_set_from_domain_id s' d"
+      proof (cases "rm_cap \<in>  get_domain_cap_set_from_domain_id s did 
+              \<and> REMOVE \<in> rights rm_cap
+              \<and> right_to_rm \<in> rights rm_cap")
+      assume b0: "rm_cap \<in>  get_domain_cap_set_from_domain_id s did 
+              \<and> REMOVE \<in> rights rm_cap
+              \<and> right_to_rm \<in> rights rm_cap"
+      have "get_domain_cap_set_from_domain_id s d 
+           = get_domain_cap_set_from_domain_id s' d"  
+        proof (cases " REMOVE = right_to_rm
+                  \<and> {REMOVE} = rights rm_cap")
+          assume c0: "REMOVE = right_to_rm
+                  \<and> {REMOVE} = rights rm_cap"
+          let ?cs_dst = "get_domain_cap_set_from_domain_id s did"
+          let ?cs_rest = "{c. c\<in>?cs_dst \<and> c\<noteq>rm_cap}"
+          have c1: "((caps s') did) = ?cs_rest"
+            using b0 c0 p2 remove_cap_right_def by auto
+          have c2: "\<forall>v. v\<noteq>did
+                    \<longrightarrow> ((caps s') v) = ((caps s) v)"
+            using b0 c0 p2 remove_cap_right_def by auto
+          have c3: "\<forall>v. v\<noteq>did
+                    \<longrightarrow> get_domain_cap_set_from_domain_id s v 
+                      = get_domain_cap_set_from_domain_id s' v"
+            using c2 get_domain_cap_set_from_domain_id_def by auto
+          have c4: "get_domain_cap_set_from_domain_id s d 
+                      = get_domain_cap_set_from_domain_id s' d"
+            using c3 a0 by auto
+          then show ?thesis by auto
+        next
+          assume c0: "\<not>(REMOVE = right_to_rm
+                      \<and> {REMOVE} = rights rm_cap)"
+          let ?cs_dst = "get_domain_cap_set_from_domain_id s did"
+          let ?cs_rest = "{c. c\<in>?cs_dst \<and> c\<noteq>rm_cap}"
+          let ?new_cap = "\<lparr> target = target rm_cap,
+                            rights = (rights rm_cap) - {right_to_rm}\<rparr>"
+          have c1: "((caps s') did) = (insert ?new_cap ?cs_rest)"
+            using b0 c0 p2 remove_cap_right_def by auto
+          have c2: "\<forall>v. v\<noteq>did
+                    \<longrightarrow> ((caps s') v) = ((caps s) v)"
+            using b0 c0 p2 remove_cap_right_def by auto
+          have c3: "\<forall>v. v\<noteq>did
+                    \<longrightarrow> get_domain_cap_set_from_domain_id s v 
+                      = get_domain_cap_set_from_domain_id s' v"
+            using c2 get_domain_cap_set_from_domain_id_def by auto
+          have c4: "get_domain_cap_set_from_domain_id s d 
+                      = get_domain_cap_set_from_domain_id s' d"
+            using c3 a0 by auto
+          then show ?thesis by auto
+        qed
+      then show ?thesis by auto
+    next
+      assume b0: "\<not>(rm_cap \<in>  get_domain_cap_set_from_domain_id s did 
+                    \<and> REMOVE \<in> rights rm_cap
+                    \<and> right_to_rm \<in> rights rm_cap)"
+      have b1: "s' = s"
+        using b0 p2 remove_cap_right_def by auto
+      have b2: "get_domain_cap_set_from_domain_id s d 
+                = get_domain_cap_set_from_domain_id s' d"
+        using b1 get_domain_cap_set_from_domain_id_def by auto
+      then show ?thesis by auto
+    qed
+    }
   then show ?thesis by auto
   qed
 
-subsubsection{*proving "take endpoint cap" satisfying the "local respect" property*}
-  
-  lemma take_endpoint_cap_notchg_domain_cap_set:
+  lemma remove_cap_right_notchg_policy:
   assumes p0: "reachable0 s"
     and   p1: "\<not>(interferes did s d)"
-    and   p2: "s' = fst (take_endpoint_cap s did take_cap dst_cap)"
-  shows   "get_domain_cap_set_from_domain_id s d 
-           = get_domain_cap_set_from_domain_id s' d"
-  proof (cases "take_cap \<in>  get_domain_cap_set_from_domain_id s did 
-              \<and> TAKE \<in> rights take_cap 
-              \<and> interferes did s (target dst_cap)
-              \<and> dst_cap \<in> get_domain_cap_set_from_domain_id s (target take_cap)")
-    assume a0: "take_cap \<in>  get_domain_cap_set_from_domain_id s did 
-              \<and> TAKE \<in> rights take_cap 
-              \<and> interferes did s (target dst_cap)
-              \<and> dst_cap \<in> get_domain_cap_set_from_domain_id s (target take_cap)"
-    have a1: "\<forall>v. v\<noteq>did
-              \<longrightarrow> (caps s) v = (caps s') v"
-      using a0 p2 take_endpoint_cap_def get_domain_cap_set_from_domain_id_def by auto
-    let ?did_target = "target dst_cap"
-    have a2: "d \<noteq> did"
-      using p1 interferes_def by auto
-    have a3: "d \<noteq> ?did_target"
-      using p1 a0 interferes_def by auto
-    have a4: "\<forall>v. v\<noteq>did
-              \<longrightarrow> (caps s) v = (caps s') v"
-      using a0 p2 take_endpoint_cap_def get_domain_cap_set_from_domain_id_def by auto
-    have a5: "(caps s) d = (caps s') d"
-      using a2 a4 by auto
-    have a6: "get_domain_cap_set_from_domain_id s d 
-           = get_domain_cap_set_from_domain_id s' d"
-      using a5 get_domain_cap_set_from_domain_id_def by auto
-    then show ?thesis by auto
-  next
-    assume a0: "\<not>(take_cap \<in>  get_domain_cap_set_from_domain_id s did 
-              \<and> TAKE \<in> rights take_cap 
-              \<and> interferes did s (target dst_cap)
-              \<and> dst_cap \<in> get_domain_cap_set_from_domain_id s (target take_cap))"
-    have a1: "s = s'"
-      using a0 p2 take_endpoint_cap_def by auto
-    have a2: "get_domain_cap_set_from_domain_id s d 
-           = get_domain_cap_set_from_domain_id s' d"
-      using a1 get_domain_cap_set_from_domain_id_def by auto
-    then show ?thesis by auto
-  qed
-
-  lemma take_endpoint_cap_notchg_policy:
-  assumes p0: "reachable0 s"
-    and   p1: "\<not>(interferes did s d)"
-    and   p2: "s' = fst (take_endpoint_cap s did take_cap dst_cap)"
+    and   p2: "s' = fst (remove_cap_right s did rm_cap right_to_rm)"
   shows   "(\<forall>v. interferes v s d \<longleftrightarrow> interferes v s' d)"
-  proof (cases "take_cap \<in>  get_domain_cap_set_from_domain_id s did 
-              \<and> TAKE \<in> rights take_cap 
-              \<and> interferes did s (target dst_cap)
-              \<and> dst_cap \<in> get_domain_cap_set_from_domain_id s (target take_cap)")
-    assume a0: "take_cap \<in>  get_domain_cap_set_from_domain_id s did 
-              \<and> TAKE \<in> rights take_cap 
-              \<and> interferes did s (target dst_cap)
-              \<and> dst_cap \<in> get_domain_cap_set_from_domain_id s (target take_cap)"
-    have a1: "\<forall>v. v\<noteq>did
-              \<longrightarrow> (caps s) v = (caps s') v"
-      using a0 p2 take_endpoint_cap_def get_domain_cap_set_from_domain_id_def by auto
-    let ?did_target = "target dst_cap"
-    have a2: "d \<noteq> did"
+  proof -
+  {
+    have a0: "d \<noteq> did"
       using p1 interferes_def by auto
-    have a3: "d \<noteq> ?did_target"
-      using p1 a0 interferes_def by auto
-    have a4: "\<forall>v. v\<noteq>did
-              \<longrightarrow> (caps s) v = (caps s') v"
-      using a0 p2 take_endpoint_cap_def get_domain_cap_set_from_domain_id_def by auto
-    have a5: "(caps s) d = (caps s') d"
-      using a2 a4 by auto
-    have a6: "get_domain_cap_set_from_domain_id s d 
-           = get_domain_cap_set_from_domain_id s' d"
-      using a5 get_domain_cap_set_from_domain_id_def by auto
-    have a7: "\<forall>v. v\<noteq>did
-              \<longrightarrow> get_domain_cap_set_from_domain_id s v 
-                = get_domain_cap_set_from_domain_id s' v"
-      using a4 get_domain_cap_set_from_domain_id_def by auto
-    have a8: "\<forall>v. v\<noteq>did
-              \<longrightarrow> interferes v s d \<longleftrightarrow> interferes v s' d" 
-      using a7 a6 interferes_def by auto
-    have a9: "get_domain_cap_set_from_domain_id s' did
-              = {dst_cap} \<union> get_domain_cap_set_from_domain_id s did"
-      using a0 p2 take_endpoint_cap_def get_domain_cap_set_from_domain_id_def by auto
-    have a10: "interferes did s d = interferes did s' d"
-      using a9 a3 interferes_def by auto
-    have a11: "\<forall>v. interferes v s d \<longleftrightarrow> interferes v s' d"
-      using a8 a10 by force
-    then show ?thesis by auto
-  next
-    assume a0: "\<not>(take_cap \<in>  get_domain_cap_set_from_domain_id s did 
-              \<and> TAKE \<in> rights take_cap 
-              \<and> interferes did s (target dst_cap)
-              \<and> dst_cap \<in> get_domain_cap_set_from_domain_id s (target take_cap))"
-    have a1: "s = s'"
-      using a0 p2 take_endpoint_cap_def by auto
-    have a2: "(\<forall>v. interferes v s d \<longleftrightarrow> interferes v s' d)"
-      using a1 interferes_def by auto
-    then show ?thesis by auto
+    have "(\<forall>v. interferes v s d \<longleftrightarrow> interferes v s' d)"
+      proof (cases "rm_cap \<in>  get_domain_cap_set_from_domain_id s did 
+              \<and> REMOVE \<in> rights rm_cap
+              \<and> right_to_rm \<in> rights rm_cap")
+      assume b0: "rm_cap \<in>  get_domain_cap_set_from_domain_id s did 
+              \<and> REMOVE \<in> rights rm_cap
+              \<and> right_to_rm \<in> rights rm_cap"
+      have a1: "d \<noteq> target rm_cap"
+        by (metis b0 interferes_def p1)
+      have "(\<forall>v. interferes v s d \<longleftrightarrow> interferes v s' d)"
+        proof (cases " REMOVE = right_to_rm
+                  \<and> {REMOVE} = rights rm_cap")
+          assume c0: "REMOVE = right_to_rm
+                  \<and> {REMOVE} = rights rm_cap"
+          let ?cs_dst = "get_domain_cap_set_from_domain_id s did"
+          let ?cs_rest = "{c. c\<in>?cs_dst \<and> c\<noteq>rm_cap}"
+          have c1: "((caps s') did) = ?cs_rest"
+            using b0 c0 p2 remove_cap_right_def by auto
+          have c2: "\<forall>v. v\<noteq>did
+                    \<longrightarrow> ((caps s') v) = ((caps s) v)"
+            using b0 c0 p2 remove_cap_right_def by auto
+          have c3: "\<forall>v. v\<noteq>did
+                    \<longrightarrow> get_domain_cap_set_from_domain_id s v 
+                      = get_domain_cap_set_from_domain_id s' v"
+            using c2 get_domain_cap_set_from_domain_id_def by auto
+          have c4: "get_domain_cap_set_from_domain_id s d 
+                      = get_domain_cap_set_from_domain_id s' d"
+            using c3 a0 by auto
+          have c5: "get_domain_cap_set_from_domain_id s d 
+                      = get_domain_cap_set_from_domain_id s' d"
+            using c3 a0 by auto
+          have c6: "\<forall>v. v\<noteq>did
+                    \<longrightarrow> interferes v s d \<longleftrightarrow> interferes v s' d"
+            using c3 c5 interferes_def by auto
+          have c7: "((caps s') did) = (?cs_rest)"
+            using b0 c0 p2 remove_cap_right_def by auto
+          have c8: "get_domain_cap_set_from_domain_id s' did
+                  = ?cs_rest"
+            using c7 get_domain_cap_set_from_domain_id_def by auto
+          have c9: "get_domain_cap_set_from_domain_id s' did 
+                    \<subseteq> get_domain_cap_set_from_domain_id s did"
+            using c8 by auto
+          have c10: "\<not>(\<exists>c. c\<in>(get_domain_cap_set_from_domain_id s did) \<and> target c = d)"
+            by (metis interferes_def p1)
+          have c11: "\<not>(\<exists>c. c\<in>(get_domain_cap_set_from_domain_id s' did) \<and> target c = d)"
+            using c10 c9 by auto
+          have c12: "\<not>(interferes did s' d)"
+            using a0 c11 interferes_def by auto
+          have c13: "interferes did s' d = interferes did s d"
+            using c12 p1 by auto
+          have c14: "(\<forall>v. interferes v s d \<longleftrightarrow> interferes v s' d)"
+            using c6 c13 by auto
+          then show ?thesis by auto
+        next
+          assume c0: "\<not>(REMOVE = right_to_rm
+                      \<and> {REMOVE} = rights rm_cap)"
+          let ?cs_dst = "get_domain_cap_set_from_domain_id s did"
+          let ?cs_rest = "{c. c\<in>?cs_dst \<and> c\<noteq>rm_cap}"
+          let ?new_cap = "\<lparr> target = target rm_cap,
+                            rights = (rights rm_cap) - {right_to_rm}\<rparr>"
+          have c1: "((caps s') did) = (insert ?new_cap ?cs_rest)"
+            using b0 c0 p2 remove_cap_right_def by auto
+          have c2: "\<forall>v. v\<noteq>did
+                    \<longrightarrow> ((caps s') v) = ((caps s) v)"
+            using b0 c0 p2 remove_cap_right_def by auto
+          have c3: "\<forall>v. v\<noteq>did
+                    \<longrightarrow> get_domain_cap_set_from_domain_id s v 
+                      = get_domain_cap_set_from_domain_id s' v"
+            using c2 get_domain_cap_set_from_domain_id_def by auto
+          have c4: "get_domain_cap_set_from_domain_id s d 
+                      = get_domain_cap_set_from_domain_id s' d"
+            using c3 a0 by auto
+          have c5: "get_domain_cap_set_from_domain_id s d 
+                      = get_domain_cap_set_from_domain_id s' d"
+            using c3 a0 by auto
+          have c6: "\<forall>v. v\<noteq>did
+                    \<longrightarrow> interferes v s d \<longleftrightarrow> interferes v s' d"
+            using c3 c5 interferes_def by auto
+          have c7: "get_domain_cap_set_from_domain_id s' did 
+                      = (insert ?new_cap ?cs_rest)"
+            using c1 get_domain_cap_set_from_domain_id_def by auto
+          have c8: "\<not>(\<exists>c. c\<in>(get_domain_cap_set_from_domain_id s did) \<and> target c = d)"
+            by (metis interferes_def p1)
+          have c9: "\<not>(\<exists>c. c\<in>(get_domain_cap_set_from_domain_id s' did) \<and> target c = d)"
+            using c8 c7 a1 by auto
+          have c10: "\<not>(interferes did s' d)"
+            using a0 c9 interferes_def by auto
+          have c11: "interferes did s' d = interferes did s d"
+            using c10 p1 by auto
+          have c12: "(\<forall>v. interferes v s d \<longleftrightarrow> interferes v s' d)"
+            using c6 c11 by auto
+          then show ?thesis by auto
+        qed
+      then show ?thesis by auto
+    next
+      assume b0: "\<not>(rm_cap \<in>  get_domain_cap_set_from_domain_id s did 
+                    \<and> REMOVE \<in> rights rm_cap
+                    \<and> right_to_rm \<in> rights rm_cap)"
+      have b1: "s' = s"
+        using b0 p2 remove_cap_right_def by auto
+      have b2: "(\<forall>v. interferes v s d \<longleftrightarrow> interferes v s' d)"
+        using b1 interferes_def by auto
+      then show ?thesis by auto
+    qed
+    }
+  then show ?thesis by auto
   qed
 
-  lemma take_endpoint_cap_notchg_dom_eps:
+  lemma remove_cap_right_notchg_dom_eps:
   assumes p0: "reachable0 s"
-    and   p1: "\<not>(interferes did s d)"
-    and   p2: "s' = fst (take_endpoint_cap s did take_cap dst_cap)"
+    and   p2: "s' = fst (remove_cap_right s did rm_cap right_to_rm)"
   shows   "get_endpoints_of_domain s d = get_endpoints_of_domain s' d"
-  proof (cases "take_cap \<in>  get_domain_cap_set_from_domain_id s did 
-              \<and> TAKE \<in> rights take_cap 
-              \<and> interferes did s (target dst_cap)
-              \<and> dst_cap \<in> get_domain_cap_set_from_domain_id s (target take_cap)")
-    assume a0: "take_cap \<in>  get_domain_cap_set_from_domain_id s did 
-              \<and> TAKE \<in> rights take_cap 
-              \<and> interferes did s (target dst_cap)
-              \<and> dst_cap \<in> get_domain_cap_set_from_domain_id s (target take_cap)"
-    have a2: "domain_endpoint s = domain_endpoint s'"
-      using a0 p2 take_endpoint_cap_def by auto
-    have a3: "get_endpoints_of_domain s d 
-           = get_endpoints_of_domain s' d"
-      using a2 get_endpoints_of_domain_def by auto
-    then show ?thesis by auto
-  next
-    assume a0: "\<not>(take_cap \<in>  get_domain_cap_set_from_domain_id s did 
-              \<and> TAKE \<in> rights take_cap 
-              \<and> interferes did s (target dst_cap)
-              \<and> dst_cap \<in> get_domain_cap_set_from_domain_id s (target take_cap))"
-    have a1: "s = s'"
-      using a0 p2 take_endpoint_cap_def by auto
-    have a2: "get_endpoints_of_domain s d 
-           = get_endpoints_of_domain s' d"
-      using a1 get_endpoints_of_domain_def by auto
-    then show ?thesis by auto
+  proof -
+  {
+    have "get_endpoints_of_domain s d = get_endpoints_of_domain s' d"
+      proof (cases "rm_cap \<in>  get_domain_cap_set_from_domain_id s did 
+              \<and> REMOVE \<in> rights rm_cap
+              \<and> right_to_rm \<in> rights rm_cap")
+      assume b0: "rm_cap \<in>  get_domain_cap_set_from_domain_id s did 
+              \<and> REMOVE \<in> rights rm_cap
+              \<and> right_to_rm \<in> rights rm_cap"
+      have "get_endpoints_of_domain s d = get_endpoints_of_domain s' d"
+        proof (cases " REMOVE = right_to_rm
+                  \<and> {REMOVE} = rights rm_cap")
+          assume c0: "REMOVE = right_to_rm
+                  \<and> {REMOVE} = rights rm_cap"
+          let ?cs_dst = "get_domain_cap_set_from_domain_id s did"
+          let ?cs_rest = "{c. c\<in>?cs_dst \<and> c\<noteq>rm_cap}"
+          have c1: "((caps s') did) = ?cs_rest"
+            using b0 c0 p2 remove_cap_right_def by auto
+          have c2: "get_endpoints_of_domain s d = get_endpoints_of_domain s' d"
+            using b0 c0 p2 remove_cap_right_def get_endpoints_of_domain_def by auto
+          then show ?thesis by auto
+        next
+          assume c0: "\<not>(REMOVE = right_to_rm
+                      \<and> {REMOVE} = rights rm_cap)"
+          let ?cs_dst = "get_domain_cap_set_from_domain_id s did"
+          let ?cs_rest = "{c. c\<in>?cs_dst \<and> c\<noteq>rm_cap}"
+          let ?new_cap = "\<lparr> target = target rm_cap,
+                            rights = (rights rm_cap) - {right_to_rm}\<rparr>"
+          have c1: "((caps s') did) = (insert ?new_cap ?cs_rest)"
+            using b0 c0 p2 remove_cap_right_def by auto
+          have c2: "get_endpoints_of_domain s d = get_endpoints_of_domain s' d"
+            using b0 c0 p2 remove_cap_right_def get_endpoints_of_domain_def by auto
+          then show ?thesis by auto
+        qed
+      then show ?thesis by auto
+    next
+      assume b0: "\<not>(rm_cap \<in>  get_domain_cap_set_from_domain_id s did 
+                    \<and> REMOVE \<in> rights rm_cap
+                    \<and> right_to_rm \<in> rights rm_cap)"
+      have b1: "s' = s"
+        using b0 p2 remove_cap_right_def by auto
+      have b2: "get_endpoints_of_domain s d = get_endpoints_of_domain s' d"
+        using b1 get_endpoints_of_domain_def by auto
+      then show ?thesis by auto
+    qed
+    }
+  then show ?thesis by auto
   qed
 
-  lemma take_endpoint_cap_notchg_ep_msgs:
+  lemma remove_cap_right_notchg_ep_msgs:
   assumes p0: "reachable0 s"
-    and   p1: "\<not>(interferes did s d)"
-    and   p2: "s' = fst (take_endpoint_cap s did take_cap dst_cap)"
+    and   p2: "s' = fst (remove_cap_right s did rm_cap right_to_rm)"
   shows   "(\<forall>ep. ep\<in>get_endpoints_of_domain s d 
             \<longrightarrow> get_msg_set_from_endpoint_id s ep = get_msg_set_from_endpoint_id s' ep )"
-  proof (cases "take_cap \<in>  get_domain_cap_set_from_domain_id s did 
-              \<and> TAKE \<in> rights take_cap 
-              \<and> interferes did s (target dst_cap)
-              \<and> dst_cap \<in> get_domain_cap_set_from_domain_id s (target take_cap)")
-    assume a0: "take_cap \<in>  get_domain_cap_set_from_domain_id s did 
-              \<and> TAKE \<in> rights take_cap 
-              \<and> interferes did s (target dst_cap)
-              \<and> dst_cap \<in> get_domain_cap_set_from_domain_id s (target take_cap)"
-    have a2: "domain_endpoint s = domain_endpoint s'"
-      using a0 p2 take_endpoint_cap_def by auto
-    have a3: "get_endpoints_of_domain s d 
-           = get_endpoints_of_domain s' d"
-      using a2 get_endpoints_of_domain_def by auto
+  proof -
+  {
+    have "(\<forall>ep. ep\<in>get_endpoints_of_domain s d 
+            \<longrightarrow> get_msg_set_from_endpoint_id s ep = get_msg_set_from_endpoint_id s' ep )"
+      proof (cases "rm_cap \<in>  get_domain_cap_set_from_domain_id s did 
+              \<and> REMOVE \<in> rights rm_cap
+              \<and> right_to_rm \<in> rights rm_cap")
+      assume b0: "rm_cap \<in>  get_domain_cap_set_from_domain_id s did 
+              \<and> REMOVE \<in> rights rm_cap
+              \<and> right_to_rm \<in> rights rm_cap"
+      have "(\<forall>ep. ep\<in>get_endpoints_of_domain s d 
+            \<longrightarrow> get_msg_set_from_endpoint_id s ep = get_msg_set_from_endpoint_id s' ep )"
+        proof (cases " REMOVE = right_to_rm
+                  \<and> {REMOVE} = rights rm_cap")
+          assume c0: "REMOVE = right_to_rm
+                  \<and> {REMOVE} = rights rm_cap"
+          let ?cs_dst = "get_domain_cap_set_from_domain_id s did"
+          let ?cs_rest = "{c. c\<in>?cs_dst \<and> c\<noteq>rm_cap}"
+          have c1: "((caps s') did) = ?cs_rest"
+            using b0 c0 p2 remove_cap_right_def by auto
+          have c2: "(\<forall>ep. ep\<in>get_endpoints_of_domain s d 
+            \<longrightarrow> get_msg_set_from_endpoint_id s ep = get_msg_set_from_endpoint_id s' ep )"
+            using b0 c0 p2 remove_cap_right_def get_endpoints_of_domain_def
+                  get_msg_set_from_endpoint_id_def by auto
+          then show ?thesis by auto
+        next
+          assume c0: "\<not>(REMOVE = right_to_rm
+                      \<and> {REMOVE} = rights rm_cap)"
+          let ?cs_dst = "get_domain_cap_set_from_domain_id s did"
+          let ?cs_rest = "{c. c\<in>?cs_dst \<and> c\<noteq>rm_cap}"
+          let ?new_cap = "\<lparr> target = target rm_cap,
+                            rights = (rights rm_cap) - {right_to_rm}\<rparr>"
+          have c1: "((caps s') did) = (insert ?new_cap ?cs_rest)"
+            using b0 c0 p2 remove_cap_right_def by auto
+          have c2: "(\<forall>ep. ep\<in>get_endpoints_of_domain s d 
+            \<longrightarrow> get_msg_set_from_endpoint_id s ep = get_msg_set_from_endpoint_id s' ep )"
+            using b0 c0 p2 remove_cap_right_def get_endpoints_of_domain_def
+                  get_msg_set_from_endpoint_id_def by auto
+          then show ?thesis by auto
+        qed
+      then show ?thesis by auto
+    next
+      assume b0: "\<not>(rm_cap \<in>  get_domain_cap_set_from_domain_id s did 
+                    \<and> REMOVE \<in> rights rm_cap
+                    \<and> right_to_rm \<in> rights rm_cap)"
+      have b1: "s' = s"
+        using b0 p2 remove_cap_right_def by auto
+      have b2: "(\<forall>ep. ep\<in>get_endpoints_of_domain s d 
+            \<longrightarrow> get_msg_set_from_endpoint_id s ep = get_msg_set_from_endpoint_id s' ep )"
+        using b1 get_endpoints_of_domain_def by auto
+      then show ?thesis by auto
+    qed
+    }
+  then show ?thesis by auto
+  qed
+
+  lemma remove_cap_right_lcl_resp:
+  assumes p0: "reachable0 s"
+    and   p1: "\<not>(interferes did s d)"
+    and   p2: "s' = fst (remove_cap_right s did rm_cap right_to_rm)"
+  shows   "s \<sim> d \<sim> s'"
+  proof -
+  {
+    have a0: "did \<noteq> d"
+      using p1 interferes_def by auto
+    have a1: "get_domain_cap_set_from_domain_id s d 
+             = get_domain_cap_set_from_domain_id s' d"
+      using p0 p1 p2 remove_cap_right_notchg_domain_cap_set by auto
+    have a2: "(\<forall>v. interferes v s d \<longleftrightarrow> interferes v s' d)"
+      using p0 p1 p2 remove_cap_right_notchg_policy by auto
+    have a3: "get_endpoints_of_domain s d = get_endpoints_of_domain s' d"
+      using p0 p1 p2 remove_cap_right_notchg_dom_eps by auto
     have a4: "(\<forall>ep. ep\<in>get_endpoints_of_domain s d 
             \<longrightarrow> get_msg_set_from_endpoint_id s ep = get_msg_set_from_endpoint_id s' ep )"
-      using a0 p2 take_endpoint_cap_def get_msg_set_from_endpoint_id_def by auto
-    then show ?thesis by auto
-  next
-    assume a0: "\<not>(take_cap \<in>  get_domain_cap_set_from_domain_id s did 
-              \<and> TAKE \<in> rights take_cap 
-              \<and> interferes did s (target dst_cap)
-              \<and> dst_cap \<in> get_domain_cap_set_from_domain_id s (target take_cap))"
-    have a1: "s = s'"
-      using a0 p2 take_endpoint_cap_def by auto
-    have a2: "get_endpoints_of_domain s d 
-           = get_endpoints_of_domain s' d"
-      using a1 get_endpoints_of_domain_def by auto
-    have a3: "(\<forall>ep. ep\<in>get_endpoints_of_domain s d 
-            \<longrightarrow> get_msg_set_from_endpoint_id s ep = get_msg_set_from_endpoint_id s' ep )"
-      using a1 by auto
+      using p0 p1 p2 remove_cap_right_notchg_ep_msgs by auto
+    have a5: "s \<sim> d \<sim> s'"
+      using a1 a2 a3 a4 by auto
+    }
     then show ?thesis by auto
   qed
+
+subsubsection{*proving the "local respect" property*}
+
 
 subsection{* Concrete unwinding condition of "weakly step consistent" *}
 
@@ -2459,40 +2634,18 @@ subsubsection{*proving "grant endpoint cap" satisfying the "weakly step consiste
   then show ?thesis by auto
   qed
 
-subsubsection{*proving "get takable caps" satisfying the "weakly step consistent" property*}
+subsubsection{*proving "remove cap right" satisfying the "weakly step consistent" property*}
 
-  lemma get_takable_caps_wsc:
+  lemma remove_cap_right_wsc_domain_cap_set:
   assumes p0: "reachable0 s"
     and   p1: "reachable0 t"
     and   p2: "s \<sim> d \<sim> t"
     and   p3: "interferes did s d"
     and   p4: "s \<sim> did \<sim> t "
-    and   p5: "s' = fst (get_takable_caps s did take_cap)"
-    and   p6: "t' = fst (get_takable_caps t did take_cap)"
-  shows   "s' \<sim> d \<sim> t'"
-  proof -
-  {
-    have a0: "s = s'"
-      using p5 get_takable_caps_def by auto
-    have a1: "t = t'"
-      using p6 get_takable_caps_def by auto
-    have a2: "s' \<sim> d \<sim> t'"
-      using a0 a1 p2 by auto
-  }
-  then show ?thesis by auto
-  qed
-
-subsubsection{*proving "take endpoint cap" satisfying the "weakly step consistent" property*}
-
-lemma take_endpoint_cap_wsc_domain_cap_set:
-  assumes p0: "reachable0 s"
-    and   p1: "reachable0 t"
-    and   p2: "s \<sim> d \<sim> t"
-    and   p3: "interferes did s d"
-    and   p4: "s \<sim> did \<sim> t "
-    and   p5: "s' = fst (take_endpoint_cap s did take_cap dst_cap )"
-    and   p6: "t' = fst (take_endpoint_cap t did take_cap dst_cap )"
-  shows   "get_domain_cap_set_from_domain_id s' d = get_domain_cap_set_from_domain_id t' d"
+    and   p5: "s' = fst (remove_cap_right s did rm_cap right_to_rm)"
+    and   p6: "t' = fst (remove_cap_right t did rm_cap right_to_rm)"
+  shows   "get_domain_cap_set_from_domain_id s' d 
+            = get_domain_cap_set_from_domain_id t' d"
   proof -
   {
     have a0: "get_endpoints_of_domain s d = get_endpoints_of_domain t d"
@@ -2501,7 +2654,8 @@ lemma take_endpoint_cap_wsc_domain_cap_set:
       by (meson p2 vpeq1_def)
     have a2: "interferes did t d"
       using p3 a1 by auto
-    have a3: "get_domain_cap_set_from_domain_id s d = get_domain_cap_set_from_domain_id t d"
+    have a3: "get_domain_cap_set_from_domain_id s d 
+              = get_domain_cap_set_from_domain_id t d"
       by (meson p2 vpeq1_def) 
     have a4: "(\<forall>ep. ep\<in>get_endpoints_of_domain s d 
             \<longrightarrow> get_msg_set_from_endpoint_id s ep = get_msg_set_from_endpoint_id t ep )"
@@ -2511,17 +2665,375 @@ lemma take_endpoint_cap_wsc_domain_cap_set:
     have a6: "(\<forall>ep. ep\<in>get_endpoints_of_domain s did 
             \<longrightarrow> get_msg_set_from_endpoint_id s ep = get_msg_set_from_endpoint_id t ep )"
       by (meson p4 vpeq1_def)
-    have a7: "get_domain_cap_set_from_domain_id s did = get_domain_cap_set_from_domain_id t did"
+    have a7: "get_domain_cap_set_from_domain_id s did 
+              = get_domain_cap_set_from_domain_id t did"
       by (meson p4 vpeq1_def) 
-    have "get_domain_cap_set_from_domain_id s' d = get_domain_cap_set_from_domain_id t' d"
-      proof (cases "(take_cap \<in>  get_domain_cap_set_from_domain_id s did 
-                    \<and> TAKE \<in> rights take_cap 
-                    \<and> interferes did s (target dst_cap)
-                    \<and> dst_cap \<in> get_domain_cap_set_from_domain_id s (target take_cap))")
-        assume b0: "(take_cap \<in>  get_domain_cap_set_from_domain_id s did 
-                    \<and> TAKE \<in> rights take_cap 
-                    \<and> interferes did s (target dst_cap)
-                    \<and> dst_cap \<in> get_domain_cap_set_from_domain_id s (target take_cap))"
-        
+    have "get_domain_cap_set_from_domain_id s' d 
+            = get_domain_cap_set_from_domain_id t' d"
+      proof (cases "rm_cap \<in>  get_domain_cap_set_from_domain_id s did 
+              \<and> REMOVE \<in> rights rm_cap
+              \<and> right_to_rm \<in> rights rm_cap")
+      assume b0: "rm_cap \<in>  get_domain_cap_set_from_domain_id s did 
+              \<and> REMOVE \<in> rights rm_cap
+              \<and> right_to_rm \<in> rights rm_cap"
+      have b1: "rm_cap \<in>  get_domain_cap_set_from_domain_id t did 
+              \<and> REMOVE \<in> rights rm_cap
+              \<and> right_to_rm \<in> rights rm_cap"
+        using a7 b0 by auto
+      have "get_domain_cap_set_from_domain_id s' d 
+              = get_domain_cap_set_from_domain_id t' d"
+        proof (cases " REMOVE = right_to_rm
+                  \<and> {REMOVE} = rights rm_cap")
+          assume c0: "REMOVE = right_to_rm
+                  \<and> {REMOVE} = rights rm_cap"
+          let ?cs_dst_s = "get_domain_cap_set_from_domain_id s did"
+          let ?cs_rest_s = "{c. c\<in>?cs_dst_s \<and> c\<noteq>rm_cap}"
+          let ?cs_dst_t = "get_domain_cap_set_from_domain_id t did"
+          let ?cs_rest_t = "{c. c\<in>?cs_dst_t \<and> c\<noteq>rm_cap}"
+          have c1: "((caps s') did) = ?cs_rest_s"
+            using b0 c0 p5 remove_cap_right_def by auto  
+          have c2: "((caps t') did) = ?cs_rest_t"
+            using b1 c0 p6 remove_cap_right_def by auto
+          have c3: "?cs_rest_s = ?cs_rest_t"
+            using a7 by auto
+          have c4: "((caps s') did) = ((caps t') did)"
+            using c1 c2 c3 by auto
+          have c5: "\<forall>v. v\<noteq>did
+                    \<longrightarrow> ((caps s') v) = ((caps s) v)"
+            using b0 c0 p5 remove_cap_right_def by auto
+          have c6: "\<forall>v. v\<noteq>did
+                    \<longrightarrow> ((caps t') v) = ((caps t) v)"
+            using b1 c0 p6 remove_cap_right_def by auto
+          have c7: "\<forall>v. v\<noteq>did \<and> v=d
+                    \<longrightarrow> ((caps s') v) = ((caps t') v)"
+            using c5 c6 a3 get_domain_cap_set_from_domain_id_def by auto
+          have c8: "d\<noteq>did
+                    \<longrightarrow> ((caps s') d) = ((caps t') d)"
+            using c7 by auto
+          have c9: "((caps s') d) = ((caps t') d)"
+            using c4 c8 by auto
+          have c10: "get_domain_cap_set_from_domain_id s' d 
+                    = get_domain_cap_set_from_domain_id t' d"
+            using c9 get_domain_cap_set_from_domain_id_def by auto
+          then show ?thesis by auto
+        next
+          assume c0: "\<not>(REMOVE = right_to_rm
+                      \<and> {REMOVE} = rights rm_cap)"
+          let ?cs_dst_s = "get_domain_cap_set_from_domain_id s did"
+          let ?cs_rest_s = "{c. c\<in>?cs_dst_s \<and> c\<noteq>rm_cap}"
+          let ?cs_dst_t = "get_domain_cap_set_from_domain_id t did"
+          let ?cs_rest_t = "{c. c\<in>?cs_dst_t \<and> c\<noteq>rm_cap}"
+          let ?new_cap = "\<lparr> target = target rm_cap,
+                            rights = (rights rm_cap) - {right_to_rm}\<rparr>"
+          have c1: "((caps s') did) = (insert ?new_cap ?cs_rest_s)"
+            using b0 c0 p5 remove_cap_right_def by auto
+          have c2: "((caps t') did) = (insert ?new_cap ?cs_rest_t)"
+            using b1 c0 p6 remove_cap_right_def by auto
+          have c3: "?cs_rest_s = ?cs_rest_t"
+            using a7 by auto
+          have c4: "((caps s') did) = ((caps t') did)"
+            using c1 c2 c3 by auto
+          have c5: "\<forall>v. v\<noteq>did
+                    \<longrightarrow> ((caps s') v) = ((caps s) v)"
+            using b0 c0 p5 remove_cap_right_def by auto
+          have c6: "\<forall>v. v\<noteq>did
+                    \<longrightarrow> ((caps t') v) = ((caps t) v)"
+            using b1 c0 p6 remove_cap_right_def by auto
+          have c7: "\<forall>v. v\<noteq>did \<and> v=d
+                    \<longrightarrow> ((caps s') v) = ((caps t') v)"
+            using c5 c6 a3 get_domain_cap_set_from_domain_id_def by auto
+          have c8: "d\<noteq>did
+                    \<longrightarrow> ((caps s') d) = ((caps t') d)"
+            using c7 by auto
+          have c9: "((caps s') d) = ((caps t') d)"
+            using c4 c8 by auto
+          have c10: "get_domain_cap_set_from_domain_id s' d 
+                    = get_domain_cap_set_from_domain_id t' d"
+            using c9 get_domain_cap_set_from_domain_id_def by auto
+          then show ?thesis by auto
+        qed
+      then show ?thesis by auto
+    next
+      assume b0: "\<not>(rm_cap \<in>  get_domain_cap_set_from_domain_id s did 
+                    \<and> REMOVE \<in> rights rm_cap
+                    \<and> right_to_rm \<in> rights rm_cap)"
+      have b1: "\<not>(rm_cap \<in>  get_domain_cap_set_from_domain_id t did 
+                    \<and> REMOVE \<in> rights rm_cap
+                    \<and> right_to_rm \<in> rights rm_cap)"
+        using b0 a7 by auto
+      have b2: "s' = s"
+        using b0 p5 remove_cap_right_def by auto
+      have b3: "get_domain_cap_set_from_domain_id s d 
+                = get_domain_cap_set_from_domain_id s' d"
+        using b2 get_domain_cap_set_from_domain_id_def by auto
+      have b4: "t' = t"
+        using b1 p6 remove_cap_right_def by auto
+      have b5: "get_domain_cap_set_from_domain_id t d 
+                = get_domain_cap_set_from_domain_id t' d"
+        using b4 get_domain_cap_set_from_domain_id_def by auto
+      have b6: "get_domain_cap_set_from_domain_id s' d 
+                = get_domain_cap_set_from_domain_id t' d"
+        using a3 b3 b5 by auto
+      then show ?thesis by auto
+    qed
+    }
+  then show ?thesis by auto
+  qed
 
+  lemma remove_cap_right_wsc_policy:
+  assumes p0: "reachable0 s"
+    and   p1: "reachable0 t"
+    and   p2: "s \<sim> d \<sim> t"
+    and   p3: "interferes did s d"
+    and   p4: "s \<sim> did \<sim> t "
+    and   p5: "s' = fst (remove_cap_right s did rm_cap right_to_rm)"
+    and   p6: "t' = fst (remove_cap_right t did rm_cap right_to_rm)"
+  shows   "(\<forall>v. interferes v s' d \<longleftrightarrow> interferes v t' d)"
+  proof -
+  {
+    have a0: "get_endpoints_of_domain s d = get_endpoints_of_domain t d"
+      by (meson p2 vpeq1_def)
+    have a1: "(\<forall>v. interferes v s d \<longleftrightarrow> interferes v t d)"
+      by (meson p2 vpeq1_def)
+    have a2: "interferes did t d"
+      using p3 a1 by auto
+    have a3: "get_domain_cap_set_from_domain_id s d 
+              = get_domain_cap_set_from_domain_id t d"
+      by (meson p2 vpeq1_def) 
+    have a4: "(\<forall>ep. ep\<in>get_endpoints_of_domain s d 
+            \<longrightarrow> get_msg_set_from_endpoint_id s ep = get_msg_set_from_endpoint_id t ep )"
+      by (meson p2 vpeq1_def) 
+    have a5: "get_endpoints_of_domain s did = get_endpoints_of_domain t did"
+      by (meson p4 vpeq1_def)
+    have a6: "(\<forall>ep. ep\<in>get_endpoints_of_domain s did 
+            \<longrightarrow> get_msg_set_from_endpoint_id s ep = get_msg_set_from_endpoint_id t ep )"
+      by (meson p4 vpeq1_def)
+    have a7: "get_domain_cap_set_from_domain_id s did 
+              = get_domain_cap_set_from_domain_id t did"
+      by (meson p4 vpeq1_def) 
+    have "(\<forall>v. interferes v s' d \<longleftrightarrow> interferes v t' d)"
+      proof (cases "rm_cap \<in>  get_domain_cap_set_from_domain_id s did 
+              \<and> REMOVE \<in> rights rm_cap
+              \<and> right_to_rm \<in> rights rm_cap")
+      assume b0: "rm_cap \<in>  get_domain_cap_set_from_domain_id s did 
+              \<and> REMOVE \<in> rights rm_cap
+              \<and> right_to_rm \<in> rights rm_cap"
+      have b1: "rm_cap \<in>  get_domain_cap_set_from_domain_id t did 
+              \<and> REMOVE \<in> rights rm_cap
+              \<and> right_to_rm \<in> rights rm_cap"
+        using a7 b0 by auto
+      have "(\<forall>v. interferes v s' d \<longleftrightarrow> interferes v t' d)"
+        proof (cases " REMOVE = right_to_rm
+                  \<and> {REMOVE} = rights rm_cap")
+          assume c0: "REMOVE = right_to_rm
+                  \<and> {REMOVE} = rights rm_cap"
+          let ?cs_dst_s = "get_domain_cap_set_from_domain_id s did"
+          let ?cs_rest_s = "{c. c\<in>?cs_dst_s \<and> c\<noteq>rm_cap}"
+          let ?cs_dst_t = "get_domain_cap_set_from_domain_id t did"
+          let ?cs_rest_t = "{c. c\<in>?cs_dst_t \<and> c\<noteq>rm_cap}"
+          have c1: "((caps s') did) = ?cs_rest_s"
+            using b0 c0 p5 remove_cap_right_def by auto  
+          have c2: "((caps t') did) = ?cs_rest_t"
+            using b1 c0 p6 remove_cap_right_def by auto
+          have c3: "?cs_rest_s = ?cs_rest_t"
+            using a7 by auto
+          have c4: "((caps s') did) = ((caps t') did)"
+            using c1 c2 c3 by auto
+          have c5: "\<forall>v. v\<noteq>did
+                    \<longrightarrow> ((caps s') v) = ((caps s) v)"
+            using b0 c0 p5 remove_cap_right_def by auto
+          have c6: "\<forall>v. v\<noteq>did
+                    \<longrightarrow> ((caps t') v) = ((caps t) v)"
+            using b1 c0 p6 remove_cap_right_def by auto
+          have c7: "\<forall>v. v\<noteq>did \<and> v=d
+                    \<longrightarrow> ((caps s') v) = ((caps t') v)"
+            using c5 c6 a3 get_domain_cap_set_from_domain_id_def by auto
+          have c8: "d\<noteq>did
+                    \<longrightarrow> ((caps s') d) = ((caps t') d)"
+            using c7 by auto
+          have c9: "((caps s') d) = ((caps t') d)"
+            using c4 c8 by auto
+          have c10: "get_domain_cap_set_from_domain_id s' d 
+                    = get_domain_cap_set_from_domain_id t' d"
+            using c9 get_domain_cap_set_from_domain_id_def by auto
+          have c11: "\<forall>v. v\<noteq>did
+                    \<longrightarrow> interferes v s d \<longleftrightarrow> interferes v s' d"
+            using c5 get_domain_cap_set_from_domain_id_def interferes_def by auto
+          have c12: "\<forall>v. v\<noteq>did
+                    \<longrightarrow> interferes v t d \<longleftrightarrow> interferes v t' d"
+            using c6 get_domain_cap_set_from_domain_id_def interferes_def by auto
+          have c13: "\<forall>v. v\<noteq>did 
+                    \<longrightarrow> interferes v s' d \<longleftrightarrow> interferes v t' d"
+            using c11 c12 a1 by auto
+          have c14: "interferes did s' d \<longleftrightarrow> interferes did t' d"
+            using c4 get_domain_cap_set_from_domain_id_def interferes_def by auto
+          have c15: "(\<forall>v. interferes v s' d \<longleftrightarrow> interferes v t' d)"
+            using c13 c14 by auto
+          then show ?thesis by auto
+        next
+          assume c0: "\<not>(REMOVE = right_to_rm
+                      \<and> {REMOVE} = rights rm_cap)"
+          let ?cs_dst_s = "get_domain_cap_set_from_domain_id s did"
+          let ?cs_rest_s = "{c. c\<in>?cs_dst_s \<and> c\<noteq>rm_cap}"
+          let ?cs_dst_t = "get_domain_cap_set_from_domain_id t did"
+          let ?cs_rest_t = "{c. c\<in>?cs_dst_t \<and> c\<noteq>rm_cap}"
+          let ?new_cap = "\<lparr> target = target rm_cap,
+                            rights = (rights rm_cap) - {right_to_rm}\<rparr>"
+          have c1: "((caps s') did) = (insert ?new_cap ?cs_rest_s)"
+            using b0 c0 p5 remove_cap_right_def by auto
+          have c2: "((caps t') did) = (insert ?new_cap ?cs_rest_t)"
+            using b1 c0 p6 remove_cap_right_def by auto
+          have c3: "?cs_rest_s = ?cs_rest_t"
+            using a7 by auto
+          have c4: "((caps s') did) = ((caps t') did)"
+            using c1 c2 c3 by auto
+          have c5: "\<forall>v. v\<noteq>did
+                    \<longrightarrow> ((caps s') v) = ((caps s) v)"
+            using b0 c0 p5 remove_cap_right_def by auto
+          have c6: "\<forall>v. v\<noteq>did
+                    \<longrightarrow> ((caps t') v) = ((caps t) v)"
+            using b1 c0 p6 remove_cap_right_def by auto
+          have c7: "\<forall>v. v\<noteq>did \<and> v=d
+                    \<longrightarrow> ((caps s') v) = ((caps t') v)"
+            using c5 c6 a3 get_domain_cap_set_from_domain_id_def by auto
+          have c8: "d\<noteq>did
+                    \<longrightarrow> ((caps s') d) = ((caps t') d)"
+            using c7 by auto
+          have c9: "((caps s') d) = ((caps t') d)"
+            using c4 c8 by auto
+          have c10: "get_domain_cap_set_from_domain_id s' d 
+                    = get_domain_cap_set_from_domain_id t' d"
+            using c9 get_domain_cap_set_from_domain_id_def by auto
+          have c11: "\<forall>v. v\<noteq>did
+                    \<longrightarrow> interferes v s d \<longleftrightarrow> interferes v s' d"
+            using c5 get_domain_cap_set_from_domain_id_def interferes_def by auto
+          have c12: "\<forall>v. v\<noteq>did
+                    \<longrightarrow> interferes v t d \<longleftrightarrow> interferes v t' d"
+            using c6 get_domain_cap_set_from_domain_id_def interferes_def by auto
+          have c13: "\<forall>v. v\<noteq>did 
+                    \<longrightarrow> interferes v s' d \<longleftrightarrow> interferes v t' d"
+            using c11 c12 a1 by auto
+          have c14: "interferes did s' d \<longleftrightarrow> interferes did t' d"
+            using c4 c10 get_domain_cap_set_from_domain_id_def interferes_def by auto
+          have c15: "(\<forall>v. interferes v s' d \<longleftrightarrow> interferes v t' d)"
+            using c13 c14 by auto
+          then show ?thesis by auto
+        qed
+      then show ?thesis by auto
+    next
+      assume b0: "\<not>(rm_cap \<in>  get_domain_cap_set_from_domain_id s did 
+                    \<and> REMOVE \<in> rights rm_cap
+                    \<and> right_to_rm \<in> rights rm_cap)"
+      have b1: "\<not>(rm_cap \<in>  get_domain_cap_set_from_domain_id t did 
+                    \<and> REMOVE \<in> rights rm_cap
+                    \<and> right_to_rm \<in> rights rm_cap)"
+        using b0 a7 by auto
+      have b2: "s' = s"
+        using b0 p5 remove_cap_right_def by auto
+      have b3: "(\<forall>v. interferes v s d \<longleftrightarrow> interferes v s' d)"
+        using b2 get_domain_cap_set_from_domain_id_def by auto
+      have b4: "t' = t"
+        using b1 p6 remove_cap_right_def by auto
+      have b5: "(\<forall>v. interferes v t d \<longleftrightarrow> interferes v t' d)"
+        using b4 get_domain_cap_set_from_domain_id_def by auto
+      have b6: "(\<forall>v. interferes v s' d \<longleftrightarrow> interferes v t' d)"
+        using a1 b3 b5 by auto
+      then show ?thesis by auto
+    qed
+    }
+  then show ?thesis by auto
+  qed
+
+  lemma remove_cap_right_wsc_dom_eps:
+  assumes p0: "reachable0 s"
+    and   p1: "reachable0 t"
+    and   p2: "s \<sim> d \<sim> t"
+    and   p3: "interferes did s d"
+    and   p4: "s \<sim> did \<sim> t "
+    and   p5: "s' = fst (remove_cap_right s did rm_cap right_to_rm)"
+    and   p6: "t' = fst (remove_cap_right t did rm_cap right_to_rm)"
+  shows   "get_endpoints_of_domain s' d = get_endpoints_of_domain t' d"
+  proof -
+  {
+    have a0: "get_endpoints_of_domain s d = get_endpoints_of_domain t d"
+      by (meson p2 vpeq1_def)
+    have a1: "(\<forall>v. interferes v s d \<longleftrightarrow> interferes v t d)"
+      by (meson p2 vpeq1_def)
+    have a2: "interferes did t d"
+      using p3 a1 by auto
+    have a4: "get_endpoints_of_domain s d = get_endpoints_of_domain s' d"
+      using p0 p5 remove_cap_right_notchg_dom_eps by auto
+    have a5: "get_endpoints_of_domain t d = get_endpoints_of_domain t' d"
+      using p1 p6 remove_cap_right_notchg_dom_eps by auto
+    have a6: "get_endpoints_of_domain s' d = get_endpoints_of_domain t' d"
+      using a0 a4 a5 by auto
+  }
+  then show ?thesis by auto
+  qed
+
+  lemma remove_cap_right_wsc_ep_msgs:
+  assumes p0: "reachable0 s"
+    and   p1: "reachable0 t"
+    and   p2: "s \<sim> d \<sim> t"
+    and   p3: "interferes did s d"
+    and   p4: "s \<sim> did \<sim> t "
+    and   p5: "s' = fst (remove_cap_right s did rm_cap right_to_rm)"
+    and   p6: "t' = fst (remove_cap_right t did rm_cap right_to_rm)"
+  shows   "(\<forall>ep. ep\<in>get_endpoints_of_domain s' d 
+            \<longrightarrow> get_msg_set_from_endpoint_id s' ep = get_msg_set_from_endpoint_id t' ep )"
+  proof -
+  {
+    have a0: "(\<forall>ep. ep\<in>get_endpoints_of_domain s d 
+            \<longrightarrow> get_msg_set_from_endpoint_id s ep = get_msg_set_from_endpoint_id t ep )"
+      by (meson p2 vpeq1_def)
+    have a1: "(\<forall>v. interferes v s d \<longleftrightarrow> interferes v t d)"
+      by (meson p2 vpeq1_def)
+    have a2: "interferes did t d"
+      using p3 a1 by auto
+    have a4: "(\<forall>ep. ep\<in>get_endpoints_of_domain s d 
+            \<longrightarrow> get_msg_set_from_endpoint_id s ep = get_msg_set_from_endpoint_id s' ep )"
+      using p0 p5 remove_cap_right_notchg_ep_msgs by auto
+    have a5: "(\<forall>ep. ep\<in>get_endpoints_of_domain t d 
+            \<longrightarrow> get_msg_set_from_endpoint_id t ep = get_msg_set_from_endpoint_id t' ep )"
+      using p1 p6 remove_cap_right_notchg_ep_msgs by auto
+    have a6: "get_endpoints_of_domain s d = get_endpoints_of_domain t d"
+      by (meson p2 vpeq1_def)
+    have a7: "(\<forall>ep. ep\<in>get_endpoints_of_domain s d 
+            \<longrightarrow> get_msg_set_from_endpoint_id s' ep = get_msg_set_from_endpoint_id t' ep )"
+      using a0 a4 a5 a6 by auto
+    have a8: "get_endpoints_of_domain s d = get_endpoints_of_domain s' d"
+      using p0 p5 remove_cap_right_notchg_dom_eps by auto 
+    have a9: "(\<forall>ep. ep\<in>get_endpoints_of_domain s' d 
+            \<longrightarrow> get_msg_set_from_endpoint_id s' ep = get_msg_set_from_endpoint_id t' ep )"
+      using a7 a8 by auto
+  }
+  then show ?thesis by auto
+  qed
+
+  lemma remove_cap_right_wsc:
+  assumes p0: "reachable0 s"
+    and   p1: "reachable0 t"
+    and   p2: "s \<sim> d \<sim> t"
+    and   p3: "interferes did s d"
+    and   p4: "s \<sim> did \<sim> t "
+    and   p5: "s' = fst (remove_cap_right s did rm_cap right_to_rm)"
+    and   p6: "t' = fst (remove_cap_right t did rm_cap right_to_rm)"
+  shows   "s' \<sim> d \<sim> t'"
+  proof -
+  {
+    have a0: "get_domain_cap_set_from_domain_id s' d = get_domain_cap_set_from_domain_id t' d"
+      using p0 p1 p2 p3 p4 p5 p6 remove_cap_right_wsc_domain_cap_set by blast
+    have a1: "(\<forall>v. interferes v s' d \<longleftrightarrow> interferes v t' d)"
+      using p0 p1 p2 p3 p4 p5 p6 remove_cap_right_wsc_policy by blast
+    have a2: "get_endpoints_of_domain s' d = get_endpoints_of_domain t' d"
+      using p0 p1 p2 p3 p4 p5 p6 remove_cap_right_wsc_dom_eps by blast
+    have a3: "(\<forall>ep. ep\<in>get_endpoints_of_domain s' d 
+            \<longrightarrow> get_msg_set_from_endpoint_id s' ep = get_msg_set_from_endpoint_id t' ep )"
+      using p0 p1 p2 p3 p4 p5 p6 remove_cap_right_wsc_ep_msgs by blast
+    have a4: "s' \<sim> d \<sim> t'"
+      using a0 a1 a2 a3 vpeq1_def by auto
+  }
+  then show ?thesis by auto
+  qed
+         
 end
