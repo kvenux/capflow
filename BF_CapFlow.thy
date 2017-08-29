@@ -5,6 +5,9 @@ imports Dynamic_model_v6 CapFlow_v6_0
 begin
 
 type_synonym systime_t = nat
+type_synonym cte = nat
+type_synonym lpaddr_t = nat
+type_synonym dispatcher_handle_t = nat
 
 datatype
   task_type =  TASK_TYPE_BEST_EFFORT
@@ -29,6 +32,9 @@ record dcb = disabled :: bool
              period :: systime_t
              deadline :: systime_t
              weight :: nat
+             cspace :: cte
+             vspace :: lpaddr_t
+             disp :: dispatcher_handle_t
 
 
 record StateR = State + 
@@ -49,13 +55,21 @@ definition abstract_state_rev :: "StateR \<Rightarrow> State \<Rightarrow> State
                             e_buf_size := e_buf_size r,
                             domain_endpoint := domain_endpoint r\<rparr>"
 
-definition sys_dispatcher_properties :: "StateR \<Rightarrow> domain_id \<Rightarrow> systime_t \<Rightarrow> (StateR \<times> bool )" where
-  "sys_dispatcher_properties sr did p_type p_deadline p_wcet p_period p_release p_weight p_wcet \<equiv>   
+subsubsection {* Events Definition *}
+
+definition sys_dispatcher_properties :: "StateR \<Rightarrow> domain_id \<Rightarrow> task_type \<Rightarrow> systime_t  \<Rightarrow> systime_t 
+                                        \<Rightarrow> systime_t \<Rightarrow> nat \<Rightarrow> systime_t \<Rightarrow> (StateR \<times> bool )" where
+  "sys_dispatcher_properties sr did p_type p_deadline p_wcet p_period p_release p_weight \<equiv>   
                   let
                     new_dispatchers = dispatchers sr;
                     t_dcb = new_dispatchers did;
                     new_dcb = t_dcb
                                 \<lparr> wcet := p_wcet,
+                                  type := p_type,
+                                  deadline := p_deadline,
+                                  period := p_period,
+                                  release_time := p_release,
+                                  weight := p_weight,
                                   is_vm_guest := is_vm_guest t_dcb,
                                   domain_id_dcb := domain_id_dcb t_dcb,
                                   wakeup_time := wakeup_time t_dcb,
@@ -64,5 +78,45 @@ definition sys_dispatcher_properties :: "StateR \<Rightarrow> domain_id \<Righta
                     (sr\<lparr>
                       dispatchers := new_dispatchers(did := new_dcb)
                       \<rparr>, True)"
+
+definition sys_dispatcher_setup :: "StateR \<Rightarrow> domain_id \<Rightarrow> cte \<Rightarrow> lpaddr_t  \<Rightarrow> dispatcher_handle_t 
+                                        \<Rightarrow> bool \<Rightarrow> (StateR \<times> bool )" where
+  "sys_dispatcher_setup sr did p_cptr p_vptr p_dptr p_run \<equiv>
+                  if(p_run = True)
+                  then
+                    let
+                      new_dispatchers = dispatchers sr;
+                      t_dcb = new_dispatchers did;
+                      new_dcb = t_dcb
+                                  \<lparr> 
+                                    cspace := p_cptr,
+                                    vspace := p_vptr,
+                                    disp := p_dptr,
+                                    disabled := True
+                                  \<rparr>
+                    in
+                      (sr\<lparr>
+                        dispatchers := new_dispatchers(did := new_dcb)
+                        \<rparr>, True)
+                  else
+                    let
+                      new_dispatchers = dispatchers sr;
+                      t_dcb = new_dispatchers did;
+                      new_dcb = t_dcb
+                                  \<lparr> 
+                                    cspace := p_cptr,
+                                    vspace := p_vptr,
+                                    disp := p_dptr
+                                  \<rparr>
+                    in
+                      (sr\<lparr>
+                        dispatchers := new_dispatchers(did := new_dcb)
+                        \<rparr>, True)"
+
+definition dispatcher_dump_ptables :: "StateR \<Rightarrow> domain_id \<Rightarrow> (StateR \<times> bool )" where
+  "dispatcher_dump_ptables sr did  \<equiv> (sr, True)"
+
+definition dispatcher_dump_capabilities :: "StateR \<Rightarrow> domain_id \<Rightarrow> (StateR \<times> cap set )" where
+  "dispatcher_dump_capabilities sr did  \<equiv> (sr, True)"
 
 end
