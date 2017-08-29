@@ -22,9 +22,8 @@ datatype
           |GRANT
           |REMOVE
 
-record cap = 
-  target :: domain_id
-  rights :: "right set"
+record cap =  target :: domain_id
+              rights :: "right set"    
 
 record Endpoint_Concig = 
   e_max_buf_size :: "endpoint_id \<rightharpoonup> max_buffer_size"
@@ -269,8 +268,8 @@ definition send_queuing_message :: "State \<Rightarrow> domain_id \<Rightarrow> 
             then
               (s\<lparr>
                   e_msgs := emsgs(eid := new_msg_set)
-                \<rparr>, False)
-            else
+                \<rparr>, False)                                       
+            else                                                   
               (s, False)"
 
 definition receive_queuing_message :: "State \<Rightarrow> domain_id \<Rightarrow> endpoint_id \<Rightarrow> (State \<times> Message option)"
@@ -309,7 +308,7 @@ definition grant_endpoint_cap :: "State \<Rightarrow> domain_id \<Rightarrow> ca
               \<and> GRANT\<in>rights grant_cap
               \<and> target grant_cap \<noteq> target dst_cap
               \<and> dst_cap\<in>get_domain_cap_set_from_domain_id s did)
-           then
+           then                                                                        
              let                                                     
                did_dst = target grant_cap;
                caps0 = caps s;
@@ -544,6 +543,47 @@ subsubsection{*proving "client lookup endpoint name" satisfying the "local respe
   then show ?thesis by auto
   qed
 
+  lemma client_lookup_endpoint_name_lcl_resp_e:
+  assumes p0: "reachable0 s"
+    and   p1: "a = (Client_Lookup_Endpoint_Name did ename)"
+    and   p2: "\<not>(interferes (the (domain_of_event a)) s d)"
+    and   p3: "s' = exec_event s a"
+  shows   "s \<sim> d \<sim> s'"
+  proof -
+  {
+    have a0: "(the (domain_of_event a)) = did"
+      using p1 domain_of_event_def by auto
+    have a1: "s' = fst (client_lookup_endpoint_name sysconf s did ename)"
+      using p1 p3 exec_event_def by auto
+    have a2: "\<not>(interferes did s d)"
+      using p2 a0 by auto
+    have a3: "s \<sim> d \<sim> s'"
+      using a1 a2 p0 client_lookup_endpoint_name_lcl_resp by blast
+  }
+  then show ?thesis by auto
+  qed
+
+  lemma client_lookup_endpoint_name_lcrsp_e: "dynamic_local_respect_e (Client_Lookup_Endpoint_Name did ename)"
+  proof -
+    { 
+      have "\<forall>d s. reachable0 s 
+            \<and> \<not>(interferes (the (domain_of_event (Client_Lookup_Endpoint_Name did ename))) s d) 
+            \<longrightarrow> (s \<sim> d \<sim> (exec_event s (Client_Lookup_Endpoint_Name did ename)))"
+        proof -
+        {
+          fix d s
+          assume p1: "reachable0 s "
+          assume p2: " \<not>(interferes (the (domain_of_event (Client_Lookup_Endpoint_Name did ename))) s d)"
+          have "(s \<sim> d \<sim> (exec_event s (Client_Lookup_Endpoint_Name did ename)))"
+            using p1 p2 client_lookup_endpoint_name_lcl_resp_e by blast
+        }
+        then show ?thesis by blast
+        qed
+      }
+    then show ?thesis 
+      using dynamic_local_respect_e_def by blast
+  qed
+                                            
 subsubsection{*proving "send queuing message" satisfying the "local respect" property*}
 
   lemma send_queuing_message_notchg_domain_cap_set:
@@ -698,6 +738,48 @@ subsubsection{*proving "send queuing message" satisfying the "local respect" pro
     then show ?thesis by auto
   qed
 
+
+  lemma send_queuing_message_lcl_resp_e:
+  assumes p0: "reachable0 s"
+    and   p1: "a = Send_Queuing_Message did eid m"
+    and   p2: "\<not>(interferes (the (domain_of_event a)) s d)"
+    and   p3: "s' = exec_event s a"
+  shows   "s \<sim> d \<sim> s'"
+  proof -
+  {
+    have a0: "(the (domain_of_event a)) = did"
+      using p1 domain_of_event_def by auto
+    have a1: "s' = fst (send_queuing_message s did eid m)"
+      using p1 p3 exec_event_def by auto
+    have a2: "\<not>(interferes did s d)"
+      using p2 a0 by auto
+    have a3: "s \<sim> d \<sim> s'"
+      using a1 a2 p0 send_queuing_message_lcl_resp by blast
+  }
+  then show ?thesis by auto
+  qed
+
+  lemma send_queuing_message_lcl_lcrsp_e: "dynamic_local_respect_e (Send_Queuing_Message did eid m)"
+  proof -
+    { 
+      have "\<forall>d s. reachable0 s 
+            \<and> \<not>(interferes (the (domain_of_event (Send_Queuing_Message did eid m))) s d) 
+            \<longrightarrow> (s \<sim> d \<sim> (exec_event s (Send_Queuing_Message did eid m)))"
+        proof -
+        {
+          fix d s
+          assume p1: "reachable0 s "
+          assume p2: " \<not>(interferes (the (domain_of_event (Send_Queuing_Message did eid m))) s d)"
+          have "(s \<sim> d \<sim> (exec_event s (Send_Queuing_Message did eid m)))"
+            using p1 p2 send_queuing_message_lcl_resp_e by blast
+        }
+        then show ?thesis by blast
+        qed
+      }
+    then show ?thesis 
+      using dynamic_local_respect_e_def by blast
+  qed
+
 subsubsection{*proving "receive queuing message" satisfying the "local respect" property*}
 
 lemma receive_queuing_message_notchg_domain_cap_set:
@@ -839,6 +921,47 @@ lemma receive_queuing_message_notchg_ep_msgs:
     then show ?thesis by auto
   qed
 
+  lemma receive_queuing_message_lcl_resp_e:
+  assumes p0: "reachable0 s"
+    and   p1: "a = (Receive_Queuing_Message did eid)"
+    and   p2: "\<not>(interferes (the (domain_of_event a)) s d)"
+    and   p3: "s' = exec_event s a"
+  shows   "s \<sim> d \<sim> s'"
+  proof -
+  {
+    have a0: "(the (domain_of_event a)) = did"
+      using p1 domain_of_event_def by auto
+    have a1: "s' = fst (receive_queuing_message s did eid)"
+      using p1 p3 exec_event_def by auto
+    have a2: "\<not>(interferes did s d)"
+      using p2 a0 by auto
+    have a3: "s \<sim> d \<sim> s'"
+      using a1 a2 p0 receive_queuing_message_lcl_resp by blast
+  }
+  then show ?thesis by auto
+  qed
+
+  lemma receive_queuing_message_lcrsp_e: "dynamic_local_respect_e (Receive_Queuing_Message did eid)"
+  proof -
+    { 
+      have "\<forall>d s. reachable0 s 
+            \<and> \<not>(interferes (the (domain_of_event (Receive_Queuing_Message did eid))) s d) 
+            \<longrightarrow> (s \<sim> d \<sim> (exec_event s (Receive_Queuing_Message did eid)))"
+        proof -
+        {
+          fix d s
+          assume p1: "reachable0 s "
+          assume p2: " \<not>(interferes (the (domain_of_event (Receive_Queuing_Message did eid))) s d)"
+          have "(s \<sim> d \<sim> (exec_event s (Receive_Queuing_Message did eid)))"
+            using p1 p2 receive_queuing_message_lcl_resp_e by blast
+        }
+        then show ?thesis by blast
+        qed
+      }
+    then show ?thesis 
+      using dynamic_local_respect_e_def by blast
+  qed
+
 subsubsection{*proving "get my endpoints set" satisfying the "local respect" property*}
 
   lemma get_my_endpoints_set_lcl_resp:
@@ -852,6 +975,47 @@ subsubsection{*proving "get my endpoints set" satisfying the "local respect" pro
       by (simp add: p2 get_my_endpoints_set_def p1)
   }
   then show ?thesis by auto
+  qed
+
+  lemma get_my_endpoints_set_lcl_resp_e:
+  assumes p0: "reachable0 s"
+    and   p1: "a = (Get_My_Endpoints_Set did)"
+    and   p2: "\<not>(interferes (the (domain_of_event a)) s d)"
+    and   p3: "s' = exec_event s a"
+  shows   "s \<sim> d \<sim> s'"
+  proof -
+  {
+    have a0: "(the (domain_of_event a)) = did"
+      using p1 domain_of_event_def by auto
+    have a1: "s' = fst (get_my_endpoints_set s did)"
+      using p1 p3 exec_event_def by auto
+    have a2: "\<not>(interferes did s d)"
+      using p2 a0 by auto
+    have a3: "s \<sim> d \<sim> s'"
+      using a1 a2 p0 get_my_endpoints_set_lcl_resp by blast
+  }
+  then show ?thesis by auto
+  qed
+
+  lemma get_my_endpoints_set_lcrsp_e: "dynamic_local_respect_e (Get_My_Endpoints_Set did)"
+  proof -
+    { 
+      have "\<forall>d s. reachable0 s 
+            \<and> \<not>(interferes (the (domain_of_event (Get_My_Endpoints_Set did))) s d) 
+            \<longrightarrow> (s \<sim> d \<sim> (exec_event s (Get_My_Endpoints_Set did)))"
+        proof -
+        {
+          fix d s
+          assume p1: "reachable0 s "
+          assume p2: " \<not>(interferes (the (domain_of_event (Get_My_Endpoints_Set did))) s d)"
+          have "(s \<sim> d \<sim> (exec_event s (Get_My_Endpoints_Set did)))"
+            using p1 p2 get_my_endpoints_set_lcl_resp_e by blast
+        }
+        then show ?thesis by blast
+        qed
+      }
+    then show ?thesis 
+      using dynamic_local_respect_e_def by blast
   qed
 
 subsubsection{*proving "get caps" satisfying the "local respect" property*}
@@ -868,6 +1032,47 @@ subsubsection{*proving "get caps" satisfying the "local respect" property*}
   }
   then show ?thesis by auto
   qed
+
+  lemma get_caps_lcl_resp_e:
+  assumes p0: "reachable0 s"
+    and   p1: "a = (Get_Caps did)"
+    and   p2: "\<not>(interferes (the (domain_of_event a)) s d)"
+    and   p3: "s' = exec_event s a"
+  shows   "s \<sim> d \<sim> s'"
+  proof -
+  {
+    have a0: "(the (domain_of_event a)) = did"
+      using p1 domain_of_event_def by auto
+    have a1: "s' = fst (get_caps s did)"
+      using p1 p3 exec_event_def by auto
+    have a2: "\<not>(interferes did s d)"
+      using p2 a0 by auto
+    have a3: "s \<sim> d \<sim> s'"
+      using a1 a2 p0 get_caps_lcl_resp by blast
+  }
+  then show ?thesis by auto
+  qed
+
+  lemma get_caps_lcrsp_e: "dynamic_local_respect_e (Get_Caps did)"
+  proof -
+    { 
+      have "\<forall>d s. reachable0 s 
+            \<and> \<not>(interferes (the (domain_of_event (Get_Caps did))) s d) 
+            \<longrightarrow> (s \<sim> d \<sim> (exec_event s (Get_Caps did)))"
+        proof -
+        {
+          fix d s
+          assume p1: "reachable0 s "
+          assume p2: " \<not>(interferes (the (domain_of_event (Get_Caps did))) s d)"
+          have "(s \<sim> d \<sim> (exec_event s (Get_Caps did)))"
+            using p1 p2 get_caps_lcl_resp_e by blast
+        }
+        then show ?thesis by blast
+        qed
+      }
+    then show ?thesis 
+      using dynamic_local_respect_e_def by blast
+    qed
 
 subsubsection{*proving "grant endpoint cap" satisfying the "local respect" property*}
 
@@ -1070,6 +1275,47 @@ subsubsection{*proving "grant endpoint cap" satisfying the "local respect" prope
       using a1 a2 a3 a4 by auto
     }
     then show ?thesis by auto
+  qed
+
+  lemma grant_endpoint_cap_lcl_resp_e:
+  assumes p0: "reachable0 s"
+    and   p1: "a = (Grant_Endpoint_Cap did grant_cap dst_cap)"
+    and   p2: "\<not>(interferes (the (domain_of_event a)) s d)"
+    and   p3: "s' = exec_event s a"
+  shows   "s \<sim> d \<sim> s'"
+  proof -
+  {
+    have a0: "(the (domain_of_event a)) = did"
+      using p1 domain_of_event_def by auto
+    have a1: "s' = fst (grant_endpoint_cap s did grant_cap dst_cap)"
+      using p1 p3 exec_event_def by auto
+    have a2: "\<not>(interferes did s d)"
+      using p2 a0 by auto
+    have a3: "s \<sim> d \<sim> s'"
+      using a1 a2 p0 grant_endpoint_cap_lcl_resp by blast
+  }
+  then show ?thesis by auto
+  qed
+
+  lemma grant_endpoint_cap_lcrsp_e: "dynamic_local_respect_e (Grant_Endpoint_Cap did grant_cap dst_cap)"
+  proof -
+    { 
+      have "\<forall>d s. reachable0 s 
+            \<and> \<not>(interferes (the (domain_of_event (Grant_Endpoint_Cap did grant_cap dst_cap))) s d) 
+            \<longrightarrow> (s \<sim> d \<sim> (exec_event s (Grant_Endpoint_Cap did grant_cap dst_cap)))"
+        proof -
+        {
+          fix d s
+          assume p1: "reachable0 s "
+          assume p2: " \<not>(interferes (the (domain_of_event (Grant_Endpoint_Cap did grant_cap dst_cap))) s d)"
+          have "(s \<sim> d \<sim> (exec_event s (Grant_Endpoint_Cap did grant_cap dst_cap)))"
+            using p1 p2 grant_endpoint_cap_lcl_resp_e by blast
+        }
+        then show ?thesis by blast
+        qed
+      }
+    then show ?thesis 
+      using dynamic_local_respect_e_def by blast
   qed
 
 subsubsection{*proving "remove cap right" satisfying the "local respect" property*}
@@ -1406,9 +1652,87 @@ subsubsection{*proving "remove cap right" satisfying the "local respect" propert
     then show ?thesis by auto
   qed
 
-subsubsection{*proving the "local respect" property*}
+  lemma remove_cap_right_lcl_resp_e:
+  assumes p0: "reachable0 s"
+    and   p1: "a = (Remove_Cap_Right did dst_cap right_to_rm)"
+    and   p2: "\<not>(interferes (the (domain_of_event a)) s d)"
+    and   p3: "s' = exec_event s a"
+  shows   "s \<sim> d \<sim> s'"
+  proof -
+  {
+    have a0: "(the (domain_of_event a)) = did"
+      using p1 domain_of_event_def by auto
+    have a1: "s' = fst (remove_cap_right s did dst_cap right_to_rm)"
+      using p1 p3 exec_event_def by auto
+    have a2: "\<not>(interferes did s d)"
+      using p2 a0 by auto
+    have a3: "s \<sim> d \<sim> s'"
+      using a1 a2 p0 remove_cap_right_lcl_resp by blast
+  }
+  then show ?thesis by auto
+  qed
 
+  lemma remove_cap_right_lcrsp_e: "dynamic_local_respect_e (Remove_Cap_Right did dst_cap right_to_rm)"
+  proof -
+    { 
+      have "\<forall>d s. reachable0 s 
+            \<and> \<not>(interferes (the (domain_of_event (Remove_Cap_Right did dst_cap right_to_rm))) s d) 
+            \<longrightarrow> (s \<sim> d \<sim> (exec_event s (Remove_Cap_Right did dst_cap right_to_rm)))"
+        proof -
+        {
+          fix d s
+          assume p1: "reachable0 s "
+          assume p2: " \<not>(interferes (the (domain_of_event (Remove_Cap_Right did dst_cap right_to_rm))) s d)"
+          have "(s \<sim> d \<sim> (exec_event s (Remove_Cap_Right did dst_cap right_to_rm)))"
+            using p1 p2 remove_cap_right_lcl_resp_e by blast
+        }
+        then show ?thesis by blast
+        qed
+      }
+    then show ?thesis 
+      using dynamic_local_respect_e_def by blast
+  qed
 
+subsubsection{*proving the "dynamic local respect" property*}
+
+  definition dynamic_local_respect_c :: "bool" where
+        "dynamic_local_respect_c \<equiv> \<forall>a d s. reachable0 s 
+                                  \<and> \<not>(interferes (the (domain_of_event a)) s d) 
+                                  \<longrightarrow> (s \<sim> d \<sim> (exec_event s a))"
+
+  theorem dynamic_local_respect:dynamic_local_respect
+    proof -
+      {
+        fix e
+        have "dynamic_local_respect_e e"
+          proof (induct e)
+            case (Client_Lookup_Endpoint_Name x x1)
+              show ?case
+              using client_lookup_endpoint_name_lcrsp_e by blast
+            case (Send_Queuing_Message x1a x2 x3a) 
+              show ?case
+              using send_queuing_message_lcl_lcrsp_e by blast
+            case (Receive_Queuing_Message x) 
+              show ?case
+              using receive_queuing_message_lcrsp_e by blast
+            case (Get_My_Endpoints_Set x) 
+              show ?case
+              using get_my_endpoints_set_lcrsp_e by blast
+            case (Get_Caps x) 
+              show ?case
+              using get_caps_lcrsp_e by blast
+            case (Grant_Endpoint_Cap x1a x2 x3a) 
+              show ?case
+              using grant_endpoint_cap_lcrsp_e by blast
+            case (Remove_Cap_Right x1a x2 x3a) 
+              show ?case
+              using remove_cap_right_lcrsp_e by blast
+            qed
+        }
+    then show ?thesis 
+      using dynamic_local_respect_all_evt by blast
+    qed
+                                                                           
 subsection{* Concrete unwinding condition of "weakly step consistent" *}
 
 subsubsection{*proving "client lookup endpoint name" satisfying the "weakly step consistent" property*}  
@@ -1432,6 +1756,58 @@ subsubsection{*proving "client lookup endpoint name" satisfying the "weakly step
       using a0 a1 p2 by auto
   }
   then show ?thesis by auto
+  qed
+
+  lemma client_lookup_endpoint_name_wsc_e:
+  assumes p0: "reachable0 s"
+    and   p1: "reachable0 t"
+    and   p2: "a = (Client_Lookup_Endpoint_Name did ename)"
+    and   p3: "s \<sim> d \<sim> t"
+    and   p4: "interferes (the (domain_of_event a)) s d"
+    and   p5: "s \<sim> did \<sim> t "
+    and   p6: "s' = exec_event s a"
+    and   p7: "t' = exec_event t a" 
+  shows   "s' \<sim> d \<sim> t'"
+  proof -
+  {
+    have a0: "(the (domain_of_event a)) = did"
+      using p2 domain_of_event_def by auto
+    have a1: "s' = fst (client_lookup_endpoint_name sysconf s did ename)"
+      using p2 p6 exec_event_def by auto
+    have a2: "t' = fst (client_lookup_endpoint_name sysconf t did ename)"
+      using p2 p7 exec_event_def by auto
+    have a3: "(interferes did s d)"
+      using p4 a0 by auto
+    have a4: "s' \<sim> d \<sim> t'"
+      using a1 a2 a3 p0 p1 p3 p5 client_lookup_endpoint_name_wsc by blast
+  }
+  then show ?thesis by auto
+  qed
+
+  lemma client_lookup_endpoint_name_dwsc_e: "dynamic_weakly_step_consistent_e (Client_Lookup_Endpoint_Name did ename)"
+  proof -
+    { 
+      have "\<forall>d s t. reachable0 s \<and> reachable0 t 
+            \<and> (s \<sim> d \<sim> t) 
+            \<and> (interferes (the (domain_of_event (Client_Lookup_Endpoint_Name did ename))) s d) 
+            \<and> (s \<sim> (the (domain_of_event (Client_Lookup_Endpoint_Name did ename))) \<sim> t) 
+            \<longrightarrow> ((exec_event s (Client_Lookup_Endpoint_Name did ename)) \<sim> d \<sim> (exec_event t (Client_Lookup_Endpoint_Name did ename)))"
+        proof -
+        {
+          fix d s t
+          assume p1: "reachable0 s "
+          assume p2: "reachable0 t "
+          assume p3: "(s \<sim> d \<sim> t) "
+          assume p4: "(interferes (the (domain_of_event (Client_Lookup_Endpoint_Name did ename))) s d) "
+          assume p5: "(s \<sim> (the (domain_of_event (Client_Lookup_Endpoint_Name did ename))) \<sim> t) "
+          have "((exec_event s (Client_Lookup_Endpoint_Name did ename)) \<sim> d \<sim> (exec_event t (Client_Lookup_Endpoint_Name did ename)))"
+            by (metis Event.simps(50) client_lookup_endpoint_name_wsc_e domain_of_event_def option.sel p1 p2 p3 p4 p5)
+        }
+        then show ?thesis by blast
+        qed
+      }
+    then show ?thesis 
+      using dynamic_weakly_step_consistent_e_def by blast
   qed
 
 subsubsection{*proving "send queuing message" satisfying the "weakly step consistent" property*}
@@ -1704,6 +2080,59 @@ subsubsection{*proving "send queuing message" satisfying the "weakly step consis
       using a0 a1 a2 a3 vpeq1_def by auto
   }
   then show ?thesis by auto
+  qed
+
+
+  lemma send_queuing_message_wsc_e:
+  assumes p0: "reachable0 s"
+    and   p1: "reachable0 t"
+    and   p2: "a = (Send_Queuing_Message did eid m)"
+    and   p3: "s \<sim> d \<sim> t"
+    and   p4: "interferes (the (domain_of_event a)) s d"
+    and   p5: "s \<sim> did \<sim> t "
+    and   p6: "s' = exec_event s a"
+    and   p7: "t' = exec_event t a" 
+  shows   "s' \<sim> d \<sim> t'"
+  proof -
+  {
+    have a0: "(the (domain_of_event a)) = did"
+      using p2 domain_of_event_def by auto
+    have a1: "s' = fst (send_queuing_message s did eid m)"
+      using p2 p6 exec_event_def by auto
+    have a2: "t' = fst (send_queuing_message t did eid m)"
+      using p2 p7 exec_event_def by auto
+    have a3: "(interferes did s d)"
+      using p4 a0 by auto
+    have a4: "s' \<sim> d \<sim> t'"
+      using a1 a2 a3 p0 p1 p3 p5 send_queuing_message_wsc by blast
+  }
+  then show ?thesis by auto
+  qed
+
+  lemma send_queuing_message_dwsc_e: "dynamic_weakly_step_consistent_e (Send_Queuing_Message did eid m)"
+  proof -
+    { 
+      have "\<forall>d s t. reachable0 s \<and> reachable0 t 
+            \<and> (s \<sim> d \<sim> t) 
+            \<and> (interferes (the (domain_of_event (Send_Queuing_Message did eid m))) s d) 
+            \<and> (s \<sim> (the (domain_of_event (Send_Queuing_Message did eid m))) \<sim> t) 
+            \<longrightarrow> ((exec_event s (Send_Queuing_Message did eid m)) \<sim> d \<sim> (exec_event t (Send_Queuing_Message did eid m)))"
+        proof -
+        {
+          fix d s t
+          assume p1: "reachable0 s "
+          assume p2: "reachable0 t "
+          assume p3: "(s \<sim> d \<sim> t) "
+          assume p4: "(interferes (the (domain_of_event (Send_Queuing_Message did eid m))) s d) "
+          assume p5: "(s \<sim> (the (domain_of_event (Send_Queuing_Message did eid m))) \<sim> t) "
+          have "((exec_event s (Send_Queuing_Message did eid m)) \<sim> d \<sim> (exec_event t (Send_Queuing_Message did eid m)))"
+            by (metis Event.simps(51) domain_of_event_def option.sel p1 p2 p3 p4 p5 send_queuing_message_wsc_e)
+        }
+        then show ?thesis by blast
+        qed
+      }
+    then show ?thesis 
+      using dynamic_weakly_step_consistent_e_def by blast
   qed
 
 subsubsection{*proving "receive queuing message" satisfying the "weakly step consistent" property*}
@@ -2128,6 +2557,59 @@ subsubsection{*proving "receive queuing message" satisfying the "weakly step con
   then show ?thesis by auto
   qed
 
+
+  lemma receive_queuing_message_wsc_e:
+  assumes p0: "reachable0 s"
+    and   p1: "reachable0 t"
+    and   p2: "a = (Receive_Queuing_Message did eid)"
+    and   p3: "s \<sim> d \<sim> t"
+    and   p4: "interferes (the (domain_of_event a)) s d"
+    and   p5: "s \<sim> did \<sim> t "
+    and   p6: "s' = exec_event s a"
+    and   p7: "t' = exec_event t a" 
+  shows   "s' \<sim> d \<sim> t'"
+  proof -
+  {
+    have a0: "(the (domain_of_event a)) = did"
+      using p2 domain_of_event_def by auto
+    have a1: "s' = fst (receive_queuing_message s did eid)"
+      using p2 p6 exec_event_def by auto
+    have a2: "t' = fst (receive_queuing_message t did eid)"
+      using p2 p7 exec_event_def by auto
+    have a3: "(interferes did s d)"
+      using p4 a0 by auto
+    have a4: "s' \<sim> d \<sim> t'"
+      using a1 a2 a3 p0 p1 p3 p5 receive_queuing_message_wsc by blast
+  }
+  then show ?thesis by auto
+  qed
+
+  lemma receive_queuing_message_dwsc_e: "dynamic_weakly_step_consistent_e (Receive_Queuing_Message did eid)"
+  proof -
+    { 
+      have "\<forall>d s t. reachable0 s \<and> reachable0 t 
+            \<and> (s \<sim> d \<sim> t) 
+            \<and> (interferes (the (domain_of_event (Receive_Queuing_Message did eid))) s d) 
+            \<and> (s \<sim> (the (domain_of_event (Receive_Queuing_Message did eid))) \<sim> t) 
+            \<longrightarrow> ((exec_event s (Receive_Queuing_Message did eid)) \<sim> d \<sim> (exec_event t (Receive_Queuing_Message did eid)))"
+        proof -
+        {
+          fix d s t
+          assume p1: "reachable0 s "
+          assume p2: "reachable0 t "
+          assume p3: "(s \<sim> d \<sim> t) "
+          assume p4: "(interferes (the (domain_of_event (Receive_Queuing_Message did eid))) s d) "
+          assume p5: "(s \<sim> (the (domain_of_event (Receive_Queuing_Message did eid))) \<sim> t) "
+          have "((exec_event s (Receive_Queuing_Message did eid)) \<sim> d \<sim> (exec_event t (Receive_Queuing_Message did eid)))"
+            by (metis Event.simps(52) domain_of_event_def option.sel p1 p2 p3 p4 p5 receive_queuing_message_wsc_e)
+        }
+        then show ?thesis by blast
+        qed
+      }
+    then show ?thesis 
+      using dynamic_weakly_step_consistent_e_def by blast
+  qed
+
 subsubsection{*proving "get my endpoints set" satisfying the "weakly step consistent" property*}
 
   lemma get_my_endpoints_set_wsc:
@@ -2151,6 +2633,60 @@ subsubsection{*proving "get my endpoints set" satisfying the "weakly step consis
   then show ?thesis by auto
   qed
 
+
+  lemma get_my_endpoints_set_wsc_e:
+  assumes p0: "reachable0 s"
+    and   p1: "reachable0 t"
+    and   p2: "a = (Get_My_Endpoints_Set did)"
+    and   p3: "s \<sim> d \<sim> t"
+    and   p4: "interferes (the (domain_of_event a)) s d"
+    and   p5: "s \<sim> did \<sim> t "
+    and   p6: "s' = exec_event s a"
+    and   p7: "t' = exec_event t a" 
+  shows   "s' \<sim> d \<sim> t'"
+  proof -
+  {
+    have a0: "(the (domain_of_event a)) = did"
+      using p2 domain_of_event_def by auto
+    have a1: "s' = fst (get_my_endpoints_set s did)"
+      using p2 p6 exec_event_def by auto
+    have a2: "t' = fst (get_my_endpoints_set t did)"
+      using p2 p7 exec_event_def by auto
+    have a3: "(interferes did s d)"
+      using p4 a0 by auto
+    have a4: "s' \<sim> d \<sim> t'"
+      using a1 a2 a3 p0 p1 p3 p5 get_my_endpoints_set_wsc by blast
+  }
+  then show ?thesis by auto
+  qed
+
+  lemma get_my_endpoints_set_dwsc_e: "dynamic_weakly_step_consistent_e (Get_My_Endpoints_Set did)"
+  proof -
+    { 
+      have "\<forall>d s t. reachable0 s \<and> reachable0 t 
+            \<and> (s \<sim> d \<sim> t) 
+            \<and> (interferes (the (domain_of_event (Get_My_Endpoints_Set did))) s d) 
+            \<and> (s \<sim> (the (domain_of_event (Get_My_Endpoints_Set did))) \<sim> t) 
+            \<longrightarrow> ((exec_event s (Get_My_Endpoints_Set did)) \<sim> d \<sim> (exec_event t (Get_My_Endpoints_Set did)))"
+        proof -
+        {
+          fix d s t
+          assume p1: "reachable0 s "
+          assume p2: "reachable0 t "
+          assume p3: "(s \<sim> d \<sim> t) "
+          assume p4: "(interferes (the (domain_of_event (Get_My_Endpoints_Set did))) s d) "
+          assume p5: "(s \<sim> (the (domain_of_event (Get_My_Endpoints_Set did))) \<sim> t) "
+          have "((exec_event s (Get_My_Endpoints_Set did)) \<sim> d \<sim> (exec_event t (Get_My_Endpoints_Set did)))"
+            by (metis Event.simps(53) domain_of_event_def option.sel p1 p2 p3 p4 p5 get_my_endpoints_set_wsc_e)
+        }
+        then show ?thesis by blast
+        qed
+      }
+    then show ?thesis 
+      using dynamic_weakly_step_consistent_e_def by blast
+  qed
+
+
 subsubsection{*proving "get caps" satisfying the "weakly step consistent" property*}
 
   lemma get_caps_wsc:
@@ -2172,6 +2708,59 @@ subsubsection{*proving "get caps" satisfying the "weakly step consistent" proper
       using a0 a1 p2 by auto
   }
   then show ?thesis by auto
+  qed
+
+
+  lemma get_caps_wsc_e:
+  assumes p0: "reachable0 s"
+    and   p1: "reachable0 t"
+    and   p2: "a = (Get_Caps did)"
+    and   p3: "s \<sim> d \<sim> t"
+    and   p4: "interferes (the (domain_of_event a)) s d"
+    and   p5: "s \<sim> did \<sim> t "
+    and   p6: "s' = exec_event s a"
+    and   p7: "t' = exec_event t a" 
+  shows   "s' \<sim> d \<sim> t'"
+  proof -
+  {
+    have a0: "(the (domain_of_event a)) = did"
+      using p2 domain_of_event_def by auto
+    have a1: "s' = fst (get_caps s did)"
+      using p2 p6 exec_event_def by auto
+    have a2: "t' = fst (get_caps t did)"
+      using p2 p7 exec_event_def by auto
+    have a3: "(interferes did s d)"
+      using p4 a0 by auto
+    have a4: "s' \<sim> d \<sim> t'"
+      using a1 a2 a3 p0 p1 p3 p5 get_caps_wsc by blast
+  }
+  then show ?thesis by auto
+  qed
+
+  lemma get_caps_dwsc_e: "dynamic_weakly_step_consistent_e (Get_Caps did)"
+  proof -
+    { 
+      have "\<forall>d s t. reachable0 s \<and> reachable0 t 
+            \<and> (s \<sim> d \<sim> t) 
+            \<and> (interferes (the (domain_of_event (Get_Caps did))) s d) 
+            \<and> (s \<sim> (the (domain_of_event (Get_Caps did))) \<sim> t) 
+            \<longrightarrow> ((exec_event s (Get_Caps did)) \<sim> d \<sim> (exec_event t (Get_Caps did)))"
+        proof -
+        {
+          fix d s t
+          assume p1: "reachable0 s "
+          assume p2: "reachable0 t "
+          assume p3: "(s \<sim> d \<sim> t) "
+          assume p4: "(interferes (the (domain_of_event (Get_Caps did))) s d) "
+          assume p5: "(s \<sim> (the (domain_of_event (Get_Caps did))) \<sim> t) "
+          have "((exec_event s (Get_Caps did)) \<sim> d \<sim> (exec_event t (Get_Caps did)))"
+            by (metis Event.simps(54) domain_of_event_def option.sel p1 p2 p3 p4 p5 get_caps_wsc_e)
+        }
+        then show ?thesis by blast
+        qed
+      }
+    then show ?thesis 
+      using dynamic_weakly_step_consistent_e_def by blast
   qed
 
 subsubsection{*proving "grant endpoint cap" satisfying the "weakly step consistent" property*}
@@ -2634,6 +3223,58 @@ subsubsection{*proving "grant endpoint cap" satisfying the "weakly step consiste
   then show ?thesis by auto
   qed
 
+  lemma grant_endpoint_cap_wsc_e:
+  assumes p0: "reachable0 s"
+    and   p1: "reachable0 t"
+    and   p2: "a = (Grant_Endpoint_Cap did grant_cap dst_cap)"
+    and   p3: "s \<sim> d \<sim> t"
+    and   p4: "interferes (the (domain_of_event a)) s d"
+    and   p5: "s \<sim> did \<sim> t "
+    and   p6: "s' = exec_event s a"
+    and   p7: "t' = exec_event t a" 
+  shows   "s' \<sim> d \<sim> t'"
+  proof -
+  {
+    have a0: "(the (domain_of_event a)) = did"
+      using p2 domain_of_event_def by auto
+    have a1: "s' = fst (grant_endpoint_cap s did grant_cap dst_cap)"
+      using p2 p6 exec_event_def by auto
+    have a2: "t' = fst (grant_endpoint_cap t did grant_cap dst_cap)"
+      using p2 p7 exec_event_def by auto
+    have a3: "(interferes did s d)"
+      using p4 a0 by auto
+    have a4: "s' \<sim> d \<sim> t'"
+      using a1 a2 a3 p0 p1 p3 p5 grant_endpoint_cap_wsc by blast
+  }
+  then show ?thesis by auto
+  qed
+
+  lemma grant_endpoint_cap_dwsc_e: "dynamic_weakly_step_consistent_e (Grant_Endpoint_Cap did grant_cap dst_cap)"
+  proof -
+    { 
+      have "\<forall>d s t. reachable0 s \<and> reachable0 t 
+            \<and> (s \<sim> d \<sim> t) 
+            \<and> (interferes (the (domain_of_event (Grant_Endpoint_Cap did grant_cap dst_cap))) s d) 
+            \<and> (s \<sim> (the (domain_of_event (Grant_Endpoint_Cap did grant_cap dst_cap))) \<sim> t) 
+            \<longrightarrow> ((exec_event s (Grant_Endpoint_Cap did grant_cap dst_cap)) \<sim> d \<sim> (exec_event t (Grant_Endpoint_Cap did grant_cap dst_cap)))"
+        proof -
+        {
+          fix d s t
+          assume p1: "reachable0 s "
+          assume p2: "reachable0 t "
+          assume p3: "(s \<sim> d \<sim> t) "
+          assume p4: "(interferes (the (domain_of_event (Grant_Endpoint_Cap did grant_cap dst_cap))) s d) "
+          assume p5: "(s \<sim> (the (domain_of_event (Grant_Endpoint_Cap did grant_cap dst_cap))) \<sim> t) "
+          have "((exec_event s (Grant_Endpoint_Cap did grant_cap dst_cap)) \<sim> d \<sim> (exec_event t (Grant_Endpoint_Cap did grant_cap dst_cap)))"
+            by (metis Event.simps(55) domain_of_event_def option.sel p1 p2 p3 p4 p5 grant_endpoint_cap_wsc_e)
+        }
+        then show ?thesis by blast
+        qed
+      }
+    then show ?thesis 
+      using dynamic_weakly_step_consistent_e_def by blast
+  qed
+
 subsubsection{*proving "remove cap right" satisfying the "weakly step consistent" property*}
 
   lemma remove_cap_right_wsc_domain_cap_set:
@@ -3035,5 +3676,112 @@ subsubsection{*proving "remove cap right" satisfying the "weakly step consistent
   }
   then show ?thesis by auto
   qed
+
+  lemma remove_cap_right_wsc_e:
+  assumes p0: "reachable0 s"
+    and   p1: "reachable0 t"
+    and   p2: "a = (Remove_Cap_Right did dst_cap right_to_rm)"
+    and   p3: "s \<sim> d \<sim> t"
+    and   p4: "interferes (the (domain_of_event a)) s d"
+    and   p5: "s \<sim> did \<sim> t "
+    and   p6: "s' = exec_event s a"
+    and   p7: "t' = exec_event t a" 
+  shows   "s' \<sim> d \<sim> t'"
+  proof -
+  {
+    have a0: "(the (domain_of_event a)) = did"
+      using p2 domain_of_event_def by auto
+    have a1: "s' = fst (remove_cap_right s did dst_cap right_to_rm)"
+      using p2 p6 exec_event_def by auto
+    have a2: "t' = fst (remove_cap_right t did dst_cap right_to_rm)"
+      using p2 p7 exec_event_def by auto
+    have a3: "(interferes did s d)"
+      using p4 a0 by auto
+    have a4: "s' \<sim> d \<sim> t'"
+      using a1 a2 a3 p0 p1 p3 p5 remove_cap_right_wsc by blast
+  }
+  then show ?thesis by auto
+  qed
+
+  lemma remove_cap_right_dwsc_e: "dynamic_weakly_step_consistent_e (Remove_Cap_Right did dst_cap right_to_rm)"
+  proof -
+    { 
+      have "\<forall>d s t. reachable0 s \<and> reachable0 t 
+            \<and> (s \<sim> d \<sim> t) 
+            \<and> (interferes (the (domain_of_event (Remove_Cap_Right did dst_cap right_to_rm))) s d) 
+            \<and> (s \<sim> (the (domain_of_event (Remove_Cap_Right did dst_cap right_to_rm))) \<sim> t) 
+            \<longrightarrow> ((exec_event s (Remove_Cap_Right did dst_cap right_to_rm)) \<sim> d \<sim> (exec_event t (Remove_Cap_Right did dst_cap right_to_rm)))"
+        proof -
+        {
+          fix d s t
+          assume p1: "reachable0 s "
+          assume p2: "reachable0 t "
+          assume p3: "(s \<sim> d \<sim> t) "
+          assume p4: "(interferes (the (domain_of_event (Remove_Cap_Right did dst_cap right_to_rm))) s d) "
+          assume p5: "(s \<sim> (the (domain_of_event (Remove_Cap_Right did dst_cap right_to_rm))) \<sim> t) "
+          have "((exec_event s (Remove_Cap_Right did dst_cap right_to_rm)) \<sim> d \<sim> (exec_event t (Remove_Cap_Right did dst_cap right_to_rm)))"
+            by (metis Event.simps(56) domain_of_event_def option.sel p1 p2 p3 p4 p5 remove_cap_right_wsc_e)
+        }
+        then show ?thesis by blast
+        qed
+      }
+    then show ?thesis 
+      using dynamic_weakly_step_consistent_e_def by blast
+  qed
          
+subsubsection{*proving the "dynamic step consistent" property*}
+
+
+  theorem dynamic_weakly_step_consistent:dynamic_weakly_step_consistent
+    proof -
+      {
+        fix e
+        have "dynamic_weakly_step_consistent_e e"
+          proof (induct e)
+            case (Client_Lookup_Endpoint_Name x x1)
+              show ?case
+              using client_lookup_endpoint_name_dwsc_e by blast
+            case (Send_Queuing_Message x1a x2 x3a) 
+              show ?case
+              using send_queuing_message_dwsc_e by blast
+            case (Receive_Queuing_Message x) 
+              show ?case
+              using receive_queuing_message_dwsc_e by blast
+            case (Get_My_Endpoints_Set x) 
+              show ?case
+              using get_my_endpoints_set_dwsc_e by blast
+            case (Get_Caps x) 
+              show ?case
+              using get_caps_dwsc_e by blast
+            case (Grant_Endpoint_Cap x1a x2 x3a) 
+              show ?case
+              using grant_endpoint_cap_dwsc_e by blast
+            case (Remove_Cap_Right x1a x2 x3a) 
+              show ?case
+              using remove_cap_right_dwsc_e by blast
+            qed
+        }
+    then show ?thesis 
+      using dynamic_weakly_step_consistent_all_evt by blast
+    qed
+
+  theorem noninfluence_sat: noninfluence
+    using dynamic_local_respect uc_eq_noninf dynamic_weakly_step_consistent weak_with_step_cons by blast
+
+  theorem weak_noninfluence_sat: weak_noninfluence using noninf_impl_weak noninfluence_sat by blast
+
+  theorem nonleakage_sat: nonleakage
+    using noninf_impl_nonlk noninfluence_sat by blast
+
+  theorem noninterference_r_sat: noninterference_r
+    using noninf_impl_nonintf_r noninfluence_sat by blast
+    
+  theorem noninterference_sat: noninterference
+    using noninterference_r_sat nonintf_r_impl_noninterf by blast
+    
+  theorem weak_noninterference_r_sat: weak_noninterference_r
+    using noninterference_r_sat nonintf_r_impl_wk_nonintf_r by blast
+    
+  theorem weak_noninterference_sat: weak_noninterference
+    using noninterference_sat nonintf_impl_weak by blast
 end

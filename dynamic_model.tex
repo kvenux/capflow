@@ -1,0 +1,1131 @@
+\documentclass{article}      
+\usepackage{color}           
+\usepackage{alltt}           
+\usepackage[latin1]{inputenc}
+\usepackage{hyperref}
+\title{Dynamic_model_v6.thy}
+
+\newcommand{\syntaxNULL}[1]{\textcolor[rgb]{0.0,0.0,0.0}{#1}}
+\newcommand{\syntaxCOMMENTA}[1]{\textcolor[rgb]{0.8,0.0,0.0}{#1}}
+\newcommand{\syntaxCOMMENTB}[1]{\textcolor[rgb]{1.0,0.5176470588235295,0.0}{#1}}
+\newcommand{\syntaxCOMMENTC}[1]{\textcolor[rgb]{0.4,0.0,0.8}{#1}}
+\newcommand{\syntaxCOMMENTD}[1]{\textcolor[rgb]{0.8,0.4,0.0}{#1}}
+\newcommand{\syntaxDIGIT}[1]{\textcolor[rgb]{1.0,0.0,0.0}{#1}}
+\newcommand{\syntaxFUNCTION}[1]{\textcolor[rgb]{0.6,0.4,1.0}{#1}}
+\newcommand{\syntaxINVALID}[1]{\colorbox[rgb]{1.0,1.0,0.8}{\textcolor[rgb]{1.0,0.0,0.4}{#1}}}
+\newcommand{\syntaxKEYWORDA}[1]{\textcolor[rgb]{0.0,0.4,0.6}{\textbf{#1}}}
+\newcommand{\syntaxKEYWORDB}[1]{\textcolor[rgb]{0.0,0.6,0.4}{\textbf{#1}}}
+\newcommand{\syntaxKEYWORDC}[1]{\textcolor[rgb]{0.0,0.6,1.0}{\textbf{#1}}}
+\newcommand{\syntaxKEYWORDD}[1]{\textcolor[rgb]{0.4,0.8,1.0}{\textbf{#1}}}
+\newcommand{\syntaxLABEL}[1]{\textcolor[rgb]{0.00784313725490196,0.7254901960784313,0.00784313725490196}{#1}}
+\newcommand{\syntaxLITERALA}[1]{\textcolor[rgb]{1.0,0.0,0.8}{#1}}
+\newcommand{\syntaxLITERALB}[1]{\textcolor[rgb]{0.8,0.0,0.8}{#1}}
+\newcommand{\syntaxLITERALC}[1]{\textcolor[rgb]{0.6,0.0,0.8}{#1}}
+\newcommand{\syntaxLITERALD}[1]{\textcolor[rgb]{0.4,0.0,0.8}{#1}}
+\newcommand{\syntaxMARKUP}[1]{\textcolor[rgb]{0.0,0.0,1.0}{#1}}
+\newcommand{\syntaxOPERATOR}[1]{\textcolor[rgb]{0.0,0.0,0.0}{\textbf{#1}}}
+\newcommand{\syntaxNULL}[1]{\textcolor[rgb]{0.0,0.0,0.0}{#1}}
+\newcommand{\syntaxCOMMENTA}[1]{\textcolor[rgb]{0.8,0.0,0.0}{#1}}
+\newcommand{\syntaxCOMMENTB}[1]{\textcolor[rgb]{1.0,0.5176470588235295,0.0}{#1}}
+\newcommand{\syntaxCOMMENTC}[1]{\textcolor[rgb]{0.4,0.0,0.8}{#1}}
+\newcommand{\syntaxCOMMENTD}[1]{\textcolor[rgb]{0.8,0.4,0.0}{#1}}
+\newcommand{\syntaxDIGIT}[1]{\textcolor[rgb]{1.0,0.0,0.0}{#1}}
+\newcommand{\syntaxFUNCTION}[1]{\textcolor[rgb]{0.6,0.4,1.0}{#1}}
+\newcommand{\syntaxINVALID}[1]{\colorbox[rgb]{1.0,1.0,0.8}{\textcolor[rgb]{1.0,0.0,0.4}{#1}}}
+\newcommand{\syntaxKEYWORDA}[1]{\textcolor[rgb]{0.0,0.4,0.6}{\textbf{#1}}}
+\newcommand{\syntaxKEYWORDB}[1]{\textcolor[rgb]{0.0,0.6,0.4}{\textbf{#1}}}
+\newcommand{\syntaxKEYWORDC}[1]{\textcolor[rgb]{0.0,0.6,1.0}{\textbf{#1}}}
+\newcommand{\syntaxKEYWORDD}[1]{\textcolor[rgb]{0.4,0.8,1.0}{\textbf{#1}}}
+\newcommand{\syntaxLABEL}[1]{\textcolor[rgb]{0.00784313725490196,0.7254901960784313,0.00784313725490196}{#1}}
+\newcommand{\syntaxLITERALA}[1]{\textcolor[rgb]{1.0,0.0,0.8}{#1}}
+\newcommand{\syntaxLITERALB}[1]{\textcolor[rgb]{0.8,0.0,0.8}{#1}}
+\newcommand{\syntaxLITERALC}[1]{\textcolor[rgb]{0.6,0.0,0.8}{#1}}
+\newcommand{\syntaxLITERALD}[1]{\textcolor[rgb]{0.4,0.0,0.8}{#1}}
+\newcommand{\syntaxMARKUP}[1]{\textcolor[rgb]{0.0,0.0,1.0}{#1}}
+\newcommand{\syntaxOPERATOR}[1]{\textcolor[rgb]{0.0,0.0,0.0}{\textbf{#1}}}
+\newcommand{\syntaxNULL}[1]{\textcolor[rgb]{0.0,0.0,0.0}{#1}}
+\newcommand{\syntaxCOMMENTA}[1]{\textcolor[rgb]{0.8,0.0,0.0}{#1}}
+\newcommand{\syntaxCOMMENTB}[1]{\textcolor[rgb]{1.0,0.5176470588235295,0.0}{#1}}
+\newcommand{\syntaxCOMMENTC}[1]{\textcolor[rgb]{0.4,0.0,0.8}{#1}}
+\newcommand{\syntaxCOMMENTD}[1]{\textcolor[rgb]{0.8,0.4,0.0}{#1}}
+\newcommand{\syntaxDIGIT}[1]{\textcolor[rgb]{1.0,0.0,0.0}{#1}}
+\newcommand{\syntaxFUNCTION}[1]{\textcolor[rgb]{0.6,0.4,1.0}{#1}}
+\newcommand{\syntaxINVALID}[1]{\colorbox[rgb]{1.0,1.0,0.8}{\textcolor[rgb]{1.0,0.0,0.4}{#1}}}
+\newcommand{\syntaxKEYWORDA}[1]{\textcolor[rgb]{0.0,0.4,0.6}{\textbf{#1}}}
+\newcommand{\syntaxKEYWORDB}[1]{\textcolor[rgb]{0.0,0.6,0.4}{\textbf{#1}}}
+\newcommand{\syntaxKEYWORDC}[1]{\textcolor[rgb]{0.0,0.6,1.0}{\textbf{#1}}}
+\newcommand{\syntaxKEYWORDD}[1]{\textcolor[rgb]{0.4,0.8,1.0}{\textbf{#1}}}
+\newcommand{\syntaxLABEL}[1]{\textcolor[rgb]{0.00784313725490196,0.7254901960784313,0.00784313725490196}{#1}}
+\newcommand{\syntaxLITERALA}[1]{\textcolor[rgb]{1.0,0.0,0.8}{#1}}
+\newcommand{\syntaxLITERALB}[1]{\textcolor[rgb]{0.8,0.0,0.8}{#1}}
+\newcommand{\syntaxLITERALC}[1]{\textcolor[rgb]{0.6,0.0,0.8}{#1}}
+\newcommand{\syntaxLITERALD}[1]{\textcolor[rgb]{0.4,0.0,0.8}{#1}}
+\newcommand{\syntaxMARKUP}[1]{\textcolor[rgb]{0.0,0.0,1.0}{#1}}
+\newcommand{\syntaxOPERATOR}[1]{\textcolor[rgb]{0.0,0.0,0.0}{\textbf{#1}}}
+\newcommand{\syntaxNULL}[1]{\textcolor[rgb]{0.0,0.0,0.0}{\textbf{#1}}}
+\newcommand{\syntaxCOMMENTA}[1]{\textcolor[rgb]{0.8,0.0,0.0}{\textbf{#1}}}
+\newcommand{\syntaxCOMMENTB}[1]{\textcolor[rgb]{1.0,0.5176470588235295,0.0}{\textbf{#1}}}
+\newcommand{\syntaxCOMMENTC}[1]{\textcolor[rgb]{0.4,0.0,0.8}{\textbf{#1}}}
+\newcommand{\syntaxCOMMENTD}[1]{\textcolor[rgb]{0.8,0.4,0.0}{\textbf{#1}}}
+\newcommand{\syntaxDIGIT}[1]{\textcolor[rgb]{1.0,0.0,0.0}{\textbf{#1}}}
+\newcommand{\syntaxFUNCTION}[1]{\textcolor[rgb]{0.6,0.4,1.0}{\textbf{#1}}}
+\newcommand{\syntaxINVALID}[1]{\colorbox[rgb]{1.0,1.0,0.8}{\textcolor[rgb]{1.0,0.0,0.4}{\textbf{#1}}}}
+\newcommand{\syntaxKEYWORDA}[1]{\textcolor[rgb]{0.0,0.4,0.6}{#1}}
+\newcommand{\syntaxKEYWORDB}[1]{\textcolor[rgb]{0.0,0.6,0.4}{#1}}
+\newcommand{\syntaxKEYWORDC}[1]{\textcolor[rgb]{0.0,0.6,1.0}{#1}}
+\newcommand{\syntaxKEYWORDD}[1]{\textcolor[rgb]{0.4,0.8,1.0}{#1}}
+\newcommand{\syntaxLABEL}[1]{\textcolor[rgb]{0.00784313725490196,0.7254901960784313,0.00784313725490196}{\textbf{#1}}}
+\newcommand{\syntaxLITERALA}[1]{\textcolor[rgb]{1.0,0.0,0.8}{\textbf{#1}}}
+\newcommand{\syntaxLITERALB}[1]{\textcolor[rgb]{0.8,0.0,0.8}{\textbf{#1}}}
+\newcommand{\syntaxLITERALC}[1]{\textcolor[rgb]{0.6,0.0,0.8}{\textbf{#1}}}
+\newcommand{\syntaxLITERALD}[1]{\textcolor[rgb]{0.4,0.0,0.8}{\textbf{#1}}}
+\newcommand{\syntaxMARKUP}[1]{\textcolor[rgb]{0.0,0.0,1.0}{\textbf{#1}}}
+\newcommand{\syntaxOPERATOR}[1]{\textcolor[rgb]{0.0,0.0,0.0}{#1}}
+\newcommand{\syntaxNULL}[1]{\textcolor[rgb]{0.0,0.0,0.0}{#1}}
+\newcommand{\syntaxCOMMENTA}[1]{\textcolor[rgb]{0.8,0.0,0.0}{#1}}
+\newcommand{\syntaxCOMMENTB}[1]{\textcolor[rgb]{1.0,0.5176470588235295,0.0}{#1}}
+\newcommand{\syntaxCOMMENTC}[1]{\textcolor[rgb]{0.4,0.0,0.8}{#1}}
+\newcommand{\syntaxCOMMENTD}[1]{\textcolor[rgb]{0.8,0.4,0.0}{#1}}
+\newcommand{\syntaxDIGIT}[1]{\textcolor[rgb]{1.0,0.0,0.0}{#1}}
+\newcommand{\syntaxFUNCTION}[1]{\textcolor[rgb]{0.6,0.4,1.0}{#1}}
+\newcommand{\syntaxINVALID}[1]{\colorbox[rgb]{1.0,1.0,0.8}{\textcolor[rgb]{1.0,0.0,0.4}{#1}}}
+\newcommand{\syntaxKEYWORDA}[1]{\textcolor[rgb]{0.0,0.4,0.6}{\textbf{#1}}}
+\newcommand{\syntaxKEYWORDB}[1]{\textcolor[rgb]{0.0,0.6,0.4}{\textbf{#1}}}
+\newcommand{\syntaxKEYWORDC}[1]{\textcolor[rgb]{0.0,0.6,1.0}{\textbf{#1}}}
+\newcommand{\syntaxKEYWORDD}[1]{\textcolor[rgb]{0.4,0.8,1.0}{\textbf{#1}}}
+\newcommand{\syntaxLABEL}[1]{\textcolor[rgb]{0.00784313725490196,0.7254901960784313,0.00784313725490196}{#1}}
+\newcommand{\syntaxLITERALA}[1]{\textcolor[rgb]{1.0,0.0,0.8}{#1}}
+\newcommand{\syntaxLITERALB}[1]{\textcolor[rgb]{0.8,0.0,0.8}{#1}}
+\newcommand{\syntaxLITERALC}[1]{\textcolor[rgb]{0.6,0.0,0.8}{#1}}
+\newcommand{\syntaxLITERALD}[1]{\textcolor[rgb]{0.4,0.0,0.8}{#1}}
+\newcommand{\syntaxMARKUP}[1]{\textcolor[rgb]{0.0,0.0,1.0}{#1}}
+\newcommand{\syntaxOPERATOR}[1]{\textcolor[rgb]{0.0,0.0,0.0}{\textbf{#1}}}
+\newcommand{\syntaxNULL}[1]{\textcolor[rgb]{0.0,0.0,0.0}{#1}}
+\newcommand{\syntaxCOMMENTA}[1]{\textcolor[rgb]{0.8,0.0,0.0}{#1}}
+\newcommand{\syntaxCOMMENTB}[1]{\textcolor[rgb]{1.0,0.5176470588235295,0.0}{#1}}
+\newcommand{\syntaxCOMMENTC}[1]{\textcolor[rgb]{0.4,0.0,0.8}{#1}}
+\newcommand{\syntaxCOMMENTD}[1]{\textcolor[rgb]{0.8,0.4,0.0}{#1}}
+\newcommand{\syntaxDIGIT}[1]{\textcolor[rgb]{1.0,0.0,0.0}{#1}}
+\newcommand{\syntaxFUNCTION}[1]{\textcolor[rgb]{0.6,0.4,1.0}{#1}}
+\newcommand{\syntaxINVALID}[1]{\colorbox[rgb]{1.0,1.0,0.8}{\textcolor[rgb]{1.0,0.0,0.4}{#1}}}
+\newcommand{\syntaxKEYWORDA}[1]{\textcolor[rgb]{0.0,0.4,0.6}{\textbf{#1}}}
+\newcommand{\syntaxKEYWORDB}[1]{\textcolor[rgb]{0.0,0.6,0.4}{\textbf{#1}}}
+\newcommand{\syntaxKEYWORDC}[1]{\textcolor[rgb]{0.0,0.6,1.0}{\textbf{#1}}}
+\newcommand{\syntaxKEYWORDD}[1]{\textcolor[rgb]{0.4,0.8,1.0}{\textbf{#1}}}
+\newcommand{\syntaxLABEL}[1]{\textcolor[rgb]{0.00784313725490196,0.7254901960784313,0.00784313725490196}{#1}}
+\newcommand{\syntaxLITERALA}[1]{\textcolor[rgb]{1.0,0.0,0.8}{#1}}
+\newcommand{\syntaxLITERALB}[1]{\textcolor[rgb]{0.8,0.0,0.8}{#1}}
+\newcommand{\syntaxLITERALC}[1]{\textcolor[rgb]{0.6,0.0,0.8}{#1}}
+\newcommand{\syntaxLITERALD}[1]{\textcolor[rgb]{0.4,0.0,0.8}{#1}}
+\newcommand{\syntaxMARKUP}[1]{\textcolor[rgb]{0.0,0.0,1.0}{#1}}
+\newcommand{\syntaxOPERATOR}[1]{\textcolor[rgb]{0.0,0.0,0.0}{\textbf{#1}}}
+\newcommand{\syntaxNULL}[1]{\textcolor[rgb]{1.0,1.0,1.0}{#1}}
+
+
+\definecolor{bgcolor}{rgb}{1.0,1.0,1.0}
+\newsavebox{\opencurlybracket}%
+\newsavebox{\closecurlybracket}%
+\newsavebox{\lessthan}%
+\newsavebox{\greaterthan}%
+\newsavebox{\dollarbox}%
+\newsavebox{\underscorebox}%
+\newsavebox{\andbox}%
+\newsavebox{\hashbox}%
+\newsavebox{\backslashbox}%
+\newsavebox{\atbox}%
+\newsavebox{\percentbox}%
+\newsavebox{\hatbox}%
+\setbox\opencurlybracket=\hbox{\verb.{.}%
+\setbox\closecurlybracket=\hbox{\verb.}.}%
+\setbox\lessthan=\hbox{\verb.<.}%
+\setbox\dollarbox=\hbox{\verb.$.}%
+\setbox\underscorebox=\hbox{\verb._.}%
+\setbox\andbox=\hbox{\verb.&.}%
+\setbox\hashbox=\hbox{\verb.#.}%
+\setbox\atbox=\hbox{\verb.@.}%
+\setbox\backslashbox=\hbox{\verb.\.}%
+\setbox\greaterthan=\hbox{\verb.>.}%
+\setbox\percentbox=\hbox{\verb.\%.}%
+\setbox\hatbox=\hbox{\verb.^.}%
+\def\urltilda{\kern -.15em\lower .7ex\hbox{\~{}}\kern .04em}
+\begin{document}
+\pagecolor{bgcolor}
+\noindent
+\ttfamily
+\syntaxNULL{}\syntaxKEYWORDA{theory}{\ }Dynamic\usebox{\underscorebox}model\usebox{\underscorebox}v6\hspace*{\fill}\\
+\syntaxKEYWORDB{imports}{\ }Main\hspace*{\fill}\\
+\syntaxKEYWORDB{begin}\hspace*{\fill}\\
+\syntaxKEYWORDA{subsection}{\ }\syntaxCOMMENTC{\usebox{\opencurlybracket}*{\ }Security{\ }State{\ }Machine{\ }*\usebox{\closecurlybracket}}\hspace*{\fill}\\
+\syntaxKEYWORDA{locale}{\ }SM{\ }\syntaxOPERATOR{=}\hspace*{\fill}\\
+{\ }{\ }\syntaxKEYWORDB{fixes}{\ }s0{\ }\syntaxOPERATOR{::}{\ }'s\hspace*{\fill}\\
+{\ }{\ }\syntaxKEYWORDB{fixes}{\ }step{\ }\syntaxOPERATOR{::}{\ }\syntaxLITERALA{"'s{\ }\<Rightarrow>{\ }'e{\ }\<Rightarrow>{\ }'s"}\hspace*{\fill}\\
+{\ }{\ }\syntaxKEYWORDB{fixes}{\ }domain{\ }\syntaxOPERATOR{::}{\ }\syntaxLITERALA{"'e{\ }\<Rightarrow>{\ }('d{\ }option)"}\hspace*{\fill}\\
+{\ }{\ }\syntaxKEYWORDB{fixes}{\ }vpeq{\ }\syntaxOPERATOR{::}{\ }\syntaxLITERALA{"'s{\ }\<Rightarrow>{\ }'d{\ }\<Rightarrow>{\ }'s{\ }\<Rightarrow>{\ }bool"}{\ }{\ }\syntaxOPERATOR{(}\syntaxLITERALA{"(\usebox{\underscorebox}{\ }\<sim>{\ }\usebox{\underscorebox}{\ }\<sim>{\ }\usebox{\underscorebox})"}\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }\syntaxKEYWORDB{fixes}{\ }interferes{\ }\syntaxOPERATOR{::}{\ }\syntaxLITERALA{"'d{\ }\<Rightarrow>{\ }'s{\ }\<Rightarrow>{\ }'d{\ }\<Rightarrow>{\ }bool"}{\ }\syntaxOPERATOR{(}\syntaxLITERALA{"(\usebox{\underscorebox}{\ }\usebox{\atbox}{\ }\usebox{\underscorebox}{\ }\<leadsto>\usebox{\underscorebox})"}\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }\syntaxKEYWORDB{assumes}{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }vpeq\usebox{\underscorebox}transitive\usebox{\underscorebox}lemma{\ }\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>{\ }s{\ }t{\ }r{\ }d.{\ }(s{\ }\<sim>{\ }d{\ }\<sim>{\ }t){\ }\<and>{\ }(t{\ }\<sim>{\ }d{\ }\<sim>{\ }r){\ }\<longrightarrow>{\ }(s{\ }\<sim>{\ }d{\ }\<sim>{\ }r)"}{\ }\syntaxKEYWORDB{and}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }vpeq\usebox{\underscorebox}symmetric\usebox{\underscorebox}lemma{\ }\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>{\ }s{\ }t{\ }d.{\ }(s{\ }\<sim>{\ }d{\ }\<sim>{\ }t){\ }\<longrightarrow>{\ }(t{\ }\<sim>{\ }d{\ }\<sim>{\ }s)"}{\ }\syntaxKEYWORDB{and}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }vpeq\usebox{\underscorebox}reflexive\usebox{\underscorebox}lemma{\ }\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>{\ }s{\ }d.{\ }(s{\ }\<sim>{\ }d{\ }\<sim>{\ }s)"}{\ }\syntaxKEYWORDB{and}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }interf\usebox{\underscorebox}reflexive\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>d{\ }s.{\ }(d{\ }\usebox{\atbox}{\ }s{\ }\<leadsto>{\ }d)"}{\ }\hspace*{\fill}\\
+\syntaxKEYWORDB{begin}\hspace*{\fill}\\
+{\ }{\ }{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{definition}{\ }non\usebox{\underscorebox}interferes{\ }\syntaxOPERATOR{::}{\ }{\ }\syntaxLITERALA{"'d{\ }\<Rightarrow>{\ }'s{\ }\<Rightarrow>{\ }'d{\ }\<Rightarrow>{\ }bool"}{\ }\syntaxOPERATOR{(}\syntaxLITERALA{"(\usebox{\underscorebox}{\ }\usebox{\atbox}{\ }\usebox{\underscorebox}{\ }\<setminus>\<leadsto>{\ }\usebox{\underscorebox})"}\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDB{where}{\ }\syntaxLITERALA{"(u{\ }\usebox{\atbox}{\ }s{\ }\<setminus>\<leadsto>{\ }v){\ }\<equiv>{\ }(u{\ }\usebox{\atbox}{\ }s{\ }\<leadsto>{\ }v)"}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{definition}{\ }ivpeq{\ }\syntaxOPERATOR{::}{\ }\syntaxLITERALA{"'s{\ }\<Rightarrow>{\ }'d{\ }set{\ }\<Rightarrow>{\ }'s{\ }\<Rightarrow>{\ }bool"}{\ }\syntaxOPERATOR{(}\syntaxLITERALA{"(\usebox{\underscorebox}{\ }\<approx>{\ }\usebox{\underscorebox}{\ }\<approx>{\ }\usebox{\underscorebox})"}\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDB{where}{\ }\syntaxLITERALA{"ivpeq{\ }s{\ }D{\ }t{\ }\<equiv>{\ }\<forall>{\ }d{\ }\<in>{\ }D.{\ }(s{\ }\<sim>{\ }d{\ }\<sim>{\ }t)"}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{primrec}{\ }run{\ }\syntaxOPERATOR{::}{\ }\syntaxLITERALA{"'s{\ }\<Rightarrow>{\ }'e{\ }list{\ }\<Rightarrow>{\ }'s"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDB{where}{\ }run\usebox{\underscorebox}Nil\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"run{\ }s{\ }{[}{]}{\ }={\ }s"}{\ }\syntaxOPERATOR{|}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }run\usebox{\underscorebox}Cons\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"run{\ }s{\ }(a\usebox{\hashbox}as){\ }={\ }run{\ }(step{\ }s{\ }a){\ }as{\ }"}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{definition}{\ }reachable{\ }\syntaxOPERATOR{::}{\ }\syntaxLITERALA{"'s{\ }\<Rightarrow>{\ }'s{\ }\<Rightarrow>{\ }bool"}{\ }\syntaxOPERATOR{(}\syntaxLITERALA{"(\usebox{\underscorebox}{\ }\<hookrightarrow>{\ }\usebox{\underscorebox})"}{\ }\syntaxOPERATOR{{[}}70\syntaxOPERATOR{,}71\syntaxOPERATOR{{]}}{\ }60\syntaxOPERATOR{)}{\ }\syntaxKEYWORDB{where}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxLITERALA{"reachable{\ }s1{\ }s2{\ }\<equiv>{\ }{\ }(\<exists>as.{\ }run{\ }s1{\ }as{\ }={\ }s2{\ })"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{definition}{\ }reachable0{\ }\syntaxOPERATOR{::}{\ }\syntaxLITERALA{"'s{\ }\<Rightarrow>{\ }bool"}{\ }{\ }\syntaxKEYWORDB{where}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxLITERALA{"reachable0{\ }s{\ }\<equiv>{\ }reachable{\ }s0{\ }s"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{declare}{\ }non\usebox{\underscorebox}interferes\usebox{\underscorebox}def\syntaxOPERATOR{{[}}cong\syntaxOPERATOR{{]}}{\ }\syntaxKEYWORDB{and}{\ }ivpeq\usebox{\underscorebox}def\syntaxOPERATOR{{[}}cong\syntaxOPERATOR{{]}}{\ }\syntaxKEYWORDB{and}{\ }reachable\usebox{\underscorebox}def\syntaxOPERATOR{{[}}cong\syntaxOPERATOR{{]}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDB{and}{\ }reachable0\usebox{\underscorebox}def\syntaxOPERATOR{{[}}cong\syntaxOPERATOR{{]}}{\ }\syntaxKEYWORDB{and}{\ }run.simps\syntaxOPERATOR{(}1\syntaxOPERATOR{)}\syntaxOPERATOR{{[}}cong\syntaxOPERATOR{{]}}{\ }\syntaxKEYWORDB{and}{\ }run.simps\syntaxOPERATOR{(}2\syntaxOPERATOR{)}\syntaxOPERATOR{{[}}cong\syntaxOPERATOR{{]}}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }reachable\usebox{\underscorebox}s0{\ }\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"reachable0{\ }s0"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{by}{\ }\syntaxOPERATOR{(}metis{\ }SM.reachable\usebox{\underscorebox}def{\ }SM\usebox{\underscorebox}axioms{\ }reachable0\usebox{\underscorebox}def{\ }run.simps\syntaxOPERATOR{(}1\syntaxOPERATOR{)}\syntaxOPERATOR{)}{\ }\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }reachable\usebox{\underscorebox}self{\ }\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"reachable{\ }s{\ }s"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }reachable\usebox{\underscorebox}def{\ }run.simps\syntaxOPERATOR{(}1\syntaxOPERATOR{)}{\ }\syntaxKEYWORDA{by}{\ }fastforce\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }reachable\usebox{\underscorebox}step{\ }\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"s'{\ }={\ }step{\ }s{\ }a{\ }\<Longrightarrow>{\ }reachable{\ }s{\ }s'"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{-}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }a0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"s'{\ }={\ }step{\ }s{\ }a"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDA{have}{\ }\syntaxLITERALA{"s'{\ }={\ }run{\ }s{\ }{[}a{]}"}{\ }\syntaxKEYWORDA{by}{\ }auto{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{using}{\ }reachable\usebox{\underscorebox}def{\ }\syntaxKEYWORDA{by}{\ }blast{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }run\usebox{\underscorebox}trans{\ }\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>C{\ }T{\ }V{\ }as{\ }bs.{\ }T{\ }={\ }run{\ }C{\ }as{\ }\<and>{\ }V{\ }={\ }run{\ }T{\ }bs{\ }\<longrightarrow>{\ }V{\ }={\ }run{\ }C{\ }(as\usebox{\atbox}bs)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }{-}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\opencurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{fix}{\ }T{\ }V{\ }as{\ }bs\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }\syntaxLITERALA{"\<forall>C.{\ }T{\ }={\ }run{\ }C{\ }as{\ }\<and>{\ }V{\ }={\ }run{\ }T{\ }bs{\ }\<longrightarrow>{\ }V{\ }={\ }run{\ }C{\ }(as\usebox{\atbox}bs)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}\syntaxOPERATOR{(}induct{\ }as\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{case}{\ }Nil{\ }\syntaxKEYWORDC{show}{\ }?case{\ }\syntaxKEYWORDA{by}{\ }simp\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{next}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{case}{\ }\syntaxOPERATOR{(}Cons{\ }c{\ }cs\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }a0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>C.{\ }T{\ }={\ }run{\ }C{\ }cs{\ }\<and>{\ }V{\ }={\ }run{\ }T{\ }bs{\ }\<longrightarrow>{\ }V{\ }={\ }run{\ }C{\ }(cs{\ }\usebox{\atbox}{\ }bs)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{show}{\ }?case\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{-}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\opencurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{fix}{\ }C\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }\syntaxLITERALA{"T{\ }={\ }run{\ }C{\ }(c{\ }\usebox{\hashbox}{\ }cs){\ }\<and>{\ }V{\ }={\ }run{\ }T{\ }bs{\ }\<longrightarrow>{\ }V{\ }={\ }run{\ }C{\ }((c{\ }\usebox{\hashbox}{\ }cs){\ }\usebox{\atbox}{\ }bs){\ }"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }b0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"T{\ }={\ }run{\ }C{\ }(c{\ }\usebox{\hashbox}{\ }cs){\ }\<and>{\ }V{\ }={\ }run{\ }T{\ }bs"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{from}{\ }b0{\ }\syntaxKEYWORDC{obtain}{\ }C'{\ }\syntaxKEYWORDB{where}{\ }b2\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"C'{\ }={\ }step{\ }C{\ }c{\ }\<and>{\ }T{\ }={\ }run{\ }C'{\ }cs"}{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{with}{\ }a0{\ }b0{\ }\syntaxKEYWORDA{have}{\ }\syntaxLITERALA{"V{\ }={\ }run{\ }C'{\ }(cs\usebox{\atbox}bs)"}{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{with}{\ }b2{\ }\syntaxKEYWORDC{show}{\ }\syntaxLITERALA{"V{\ }={\ }run{\ }C{\ }((c{\ }\usebox{\hashbox}{\ }cs){\ }\usebox{\atbox}{\ }bs)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }append\usebox{\underscorebox}Cons{\ }run\usebox{\underscorebox}Cons{\ }\syntaxKEYWORDA{by}{\ }auto{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\closecurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\closecurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }reachable\usebox{\underscorebox}trans{\ }\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<lbrakk>reachable{\ }C{\ }T;{\ }reachable{\ }T{\ }V\<rbrakk>{\ }\<Longrightarrow>{\ }reachable{\ }C{\ }V"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{-}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }a0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"reachable{\ }C{\ }T"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }a1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"reachable{\ }T{\ }V"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{from}{\ }a0{\ }\syntaxKEYWORDA{have}{\ }\syntaxLITERALA{"C{\ }={\ }T{\ }\<or>{\ }(\<exists>as.{\ }T{\ }={\ }run{\ }C{\ }as)"}{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }b0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"C{\ }={\ }T"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }{-}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{from}{\ }a1{\ }\syntaxKEYWORDA{have}{\ }\syntaxLITERALA{"T{\ }={\ }V{\ }\<or>{\ }(\<exists>as.{\ }V{\ }={\ }run{\ }T{\ }as)"}{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }c0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"T=V"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{with}{\ }a0{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{next}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }c0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(\<exists>as.{\ }V{\ }={\ }run{\ }T{\ }as)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{using}{\ }a1{\ }b0{\ }\syntaxKEYWORDA{by}{\ }auto{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{next}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }b0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<exists>as.{\ }T{\ }={\ }run{\ }C{\ }as"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{show}{\ }?thesis\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }{-}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{from}{\ }a1{\ }\syntaxKEYWORDA{have}{\ }\syntaxLITERALA{"T{\ }={\ }V{\ }\<or>{\ }(\<exists>as.{\ }V{\ }={\ }run{\ }T{\ }as)"}{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }c0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"T=V"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{using}{\ }a0{\ }\syntaxKEYWORDA{by}{\ }auto{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{next}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }c0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(\<exists>as.{\ }V{\ }={\ }run{\ }T{\ }as)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{from}{\ }b0{\ }\syntaxKEYWORDC{obtain}{\ }as{\ }\syntaxKEYWORDB{where}{\ }d0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"T{\ }={\ }run{\ }C{\ }as"}{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{from}{\ }c0{\ }\syntaxKEYWORDC{obtain}{\ }bs{\ }\syntaxKEYWORDB{where}{\ }d1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"V{\ }={\ }run{\ }T{\ }bs"}{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{using}{\ }d0{\ }{\ }run\usebox{\underscorebox}trans{\ }\syntaxKEYWORDA{by}{\ }fastforce\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }reachableStep{\ }\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<lbrakk>reachable0{\ }C;{\ }C'{\ }={\ }step{\ }C{\ }a\<rbrakk>{\ }\<Longrightarrow>{\ }reachable0{\ }C'"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{apply}{\ }\syntaxOPERATOR{(}simp{\ }add\syntaxOPERATOR{:}{\ }reachable0\usebox{\underscorebox}def\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }reachable\usebox{\underscorebox}step{\ }reachable\usebox{\underscorebox}trans{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }reachable0\usebox{\underscorebox}reach{\ }\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<lbrakk>reachable0{\ }C;{\ }reachable{\ }C{\ }C'\<rbrakk>{\ }\<Longrightarrow>{\ }reachable0{\ }C'"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }{\ }reachable\usebox{\underscorebox}trans{\ }\syntaxKEYWORDA{by}{\ }fastforce\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{declare}{\ }reachable\usebox{\underscorebox}def\syntaxOPERATOR{{[}}cong{\ }del\syntaxOPERATOR{{]}}{\ }\syntaxKEYWORDB{and}{\ }reachable0\usebox{\underscorebox}def\syntaxOPERATOR{{[}}cong{\ }del\syntaxOPERATOR{{]}}\hspace*{\fill}\\
+\syntaxKEYWORDB{end}\hspace*{\fill}\\
+\hspace*{\fill}\\
+\syntaxKEYWORDA{subsection}\syntaxCOMMENTC{\usebox{\opencurlybracket}*{\ }Information{\ }flow{\ }security{\ }properties{\ }*\usebox{\closecurlybracket}}\hspace*{\fill}\\
+\hspace*{\fill}\\
+\syntaxKEYWORDA{locale}{\ }SM\usebox{\underscorebox}enabled{\ }\syntaxOPERATOR{=}{\ }SM{\ }s0{\ }step{\ }domain{\ }vpeq{\ }interferes\hspace*{\fill}\\
+{\ }{\ }\syntaxKEYWORDB{for}{\ }s0{\ }\syntaxOPERATOR{::}{\ }'s{\ }\syntaxKEYWORDB{and}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }step{\ }\syntaxOPERATOR{::}{\ }\syntaxLITERALA{"'s{\ }\<Rightarrow>{\ }'e{\ }\<Rightarrow>{\ }'s"}{\ }\syntaxKEYWORDB{and}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }domain{\ }\syntaxOPERATOR{::}{\ }\syntaxLITERALA{"'e{\ }\<Rightarrow>{\ }('d{\ }option)"}{\ }\syntaxKEYWORDB{and}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }vpeq{\ }\syntaxOPERATOR{::}{\ }\syntaxLITERALA{"'s{\ }\<Rightarrow>{\ }'d{\ }\<Rightarrow>{\ }'s{\ }\<Rightarrow>{\ }bool"}{\ }{\ }\syntaxOPERATOR{(}\syntaxLITERALA{"(\usebox{\underscorebox}{\ }\<sim>{\ }\usebox{\underscorebox}{\ }\<sim>{\ }\usebox{\underscorebox})"}\syntaxOPERATOR{)}{\ }\syntaxKEYWORDB{and}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }interferes{\ }\syntaxOPERATOR{::}{\ }\syntaxLITERALA{"'d{\ }\<Rightarrow>{\ }'s{\ }\<Rightarrow>{\ }'d{\ }\<Rightarrow>{\ }bool"}{\ }\syntaxOPERATOR{(}\syntaxLITERALA{"(\usebox{\underscorebox}{\ }\usebox{\atbox}{\ }\usebox{\underscorebox}{\ }\<leadsto>\usebox{\underscorebox})"}\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }\syntaxOPERATOR{+}\hspace*{\fill}\\
+{\ }{\ }\syntaxKEYWORDB{assumes}{\ }enabled0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>s{\ }a.{\ }reachable0{\ }s{\ }\<longrightarrow>{\ }(\<exists>{\ }s'.{\ }s'{\ }={\ }step{\ }s{\ }a)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDB{and}{\ }{\ }{\ }policy\usebox{\underscorebox}respect\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>v{\ }u{\ }s{\ }t.{\ }(s{\ }\<sim>{\ }u{\ }\<sim>{\ }t)}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<longrightarrow>{\ }(interferes{\ }v{\ }s{\ }u{\ }={\ }interferes{\ }v{\ }t{\ }u)"}\hspace*{\fill}\\
+\syntaxKEYWORDB{begin}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }enabled{\ }\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"reachable0{\ }s{\ }\<Longrightarrow>{\ }(\<exists>{\ }s'.{\ }s'{\ }={\ }step{\ }s{\ }a)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }enabled0{\ }\syntaxKEYWORDA{by}{\ }simp\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{primrec}{\ }sources{\ }\syntaxOPERATOR{::}{\ }\syntaxLITERALA{"'e{\ }list{\ }\<Rightarrow>{\ }'d{\ }\<Rightarrow>{\ }'s{\ }\<Rightarrow>{\ }'d{\ }set"}{\ }\syntaxKEYWORDB{where}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }sources\usebox{\underscorebox}Nil\syntaxOPERATOR{:}\syntaxLITERALA{"sources{\ }{[}{]}{\ }d{\ }s{\ }={\ }\usebox{\opencurlybracket}d\usebox{\closecurlybracket}"}{\ }\syntaxOPERATOR{|}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }sources\usebox{\underscorebox}Cons\syntaxOPERATOR{:}\syntaxLITERALA{"sources{\ }(a{\ }\usebox{\hashbox}{\ }as){\ }d{\ }s{\ }={\ }(\<Union>\usebox{\opencurlybracket}sources{\ }as{\ }d{\ }(step{\ }s{\ }a)\usebox{\closecurlybracket}){\ }\<union>{\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\usebox{\opencurlybracket}w{\ }.{\ }w{\ }={\ }the{\ }(domain{\ }a){\ }\<and>{\ }(\<exists>v{\ }.{\ }interferes{\ }w{\ }s{\ }v{\ }\<and>{\ }v\<in>sources{\ }as{\ }d{\ }(step{\ }s{\ }a))\usebox{\closecurlybracket}"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{declare}{\ }sources\usebox{\underscorebox}Nil{\ }\syntaxOPERATOR{{[}}simp{\ }del\syntaxOPERATOR{{]}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{declare}{\ }sources\usebox{\underscorebox}Cons{\ }\syntaxOPERATOR{{[}}simp{\ }del\syntaxOPERATOR{{]}}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{primrec}{\ }ipurge{\ }\syntaxOPERATOR{::}{\ }\syntaxLITERALA{"'e{\ }list{\ }\<Rightarrow>{\ }'d{\ }\<Rightarrow>{\ }'s{\ }{\ }\<Rightarrow>{\ }'e{\ }list"}{\ }\syntaxKEYWORDB{where}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }ipurge\usebox{\underscorebox}Nil\syntaxOPERATOR{:}{\ }{\ }{\ }\syntaxLITERALA{"ipurge{\ }{[}{]}{\ }u{\ }s{\ }={\ }{[}{]}"}{\ }\syntaxOPERATOR{|}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }ipurge\usebox{\underscorebox}Cons\syntaxOPERATOR{:}{\ }{\ }\syntaxLITERALA{"ipurge{\ }(a\usebox{\hashbox}as){\ }u{\ }s{\ }={\ }(if{\ }(the{\ }(domain{\ }a){\ }\<in>{\ }(sources{\ }(a\usebox{\hashbox}as){\ }u{\ }s))}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }then}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }a{\ }\usebox{\hashbox}{\ }ipurge{\ }as{\ }u{\ }(step{\ }s{\ }a)}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }else}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }ipurge{\ }as{\ }u{\ }(step{\ }s{\ }a)}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ })"}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{definition}{\ }observ\usebox{\underscorebox}equivalence{\ }\syntaxOPERATOR{::}{\ }\syntaxLITERALA{"'s{\ }\<Rightarrow>{\ }'e{\ }list{\ }\<Rightarrow>{\ }'s{\ }\<Rightarrow>{\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }'e{\ }list{\ }\<Rightarrow>{\ }'d{\ }\<Rightarrow>{\ }bool"}{\ }\syntaxOPERATOR{(}\syntaxLITERALA{"(\usebox{\underscorebox}{\ }\<lhd>{\ }\usebox{\underscorebox}{\ }\<cong>{\ }\usebox{\underscorebox}{\ }\<lhd>{\ }\usebox{\underscorebox}{\ }\usebox{\atbox}{\ }\usebox{\underscorebox})"}\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDB{where}{\ }\syntaxLITERALA{"observ\usebox{\underscorebox}equivalence{\ }s{\ }as{\ }t{\ }bs{\ }d{\ }\<equiv>{\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }((run{\ }s{\ }as){\ }\<sim>{\ }d{\ }\<sim>{\ }(run{\ }t{\ }bs))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{declare}{\ }observ\usebox{\underscorebox}equivalence\usebox{\underscorebox}def\syntaxOPERATOR{{[}}cong\syntaxOPERATOR{{]}}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }observ\usebox{\underscorebox}equiv\usebox{\underscorebox}sym\syntaxOPERATOR{:}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxLITERALA{"(s{\ }\<lhd>{\ }as{\ }\<cong>{\ }t{\ }\<lhd>{\ }bs{\ }\usebox{\atbox}{\ }d){\ }\<Longrightarrow>{\ }(t{\ }\<lhd>{\ }bs{\ }\<cong>{\ }s{\ }\<lhd>{\ }as{\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }observ\usebox{\underscorebox}equivalence\usebox{\underscorebox}def{\ }vpeq\usebox{\underscorebox}symmetric\usebox{\underscorebox}lemma{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }observ\usebox{\underscorebox}equiv\usebox{\underscorebox}trans\syntaxOPERATOR{:}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxLITERALA{"\<lbrakk>reachable0{\ }t;{\ }(s{\ }\<lhd>{\ }as{\ }\<cong>{\ }t{\ }\<lhd>{\ }bs{\ }\usebox{\atbox}{\ }d);{\ }(t{\ }\<lhd>{\ }bs{\ }\<cong>{\ }x{\ }\<lhd>{\ }cs{\ }\usebox{\atbox}{\ }d)\<rbrakk>{\ }\<Longrightarrow>{\ }(s{\ }\<lhd>{\ }as{\ }\<cong>{\ }x{\ }\<lhd>{\ }cs{\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }observ\usebox{\underscorebox}equivalence\usebox{\underscorebox}def{\ }vpeq\usebox{\underscorebox}transitive\usebox{\underscorebox}lemma{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{definition}{\ }noninterference\usebox{\underscorebox}r{\ }\syntaxOPERATOR{::}{\ }\syntaxLITERALA{"bool"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDB{where}{\ }\syntaxLITERALA{"noninterference\usebox{\underscorebox}r{\ }\<equiv>{\ }\<forall>d{\ }as{\ }s.{\ }reachable0{\ }s{\ }\<longrightarrow>{\ }(s{\ }\<lhd>{\ }as{\ }\<cong>{\ }s{\ }\<lhd>{\ }(ipurge{\ }as{\ }d{\ }s){\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{definition}{\ }noninterference{\ }\syntaxOPERATOR{::}{\ }\syntaxLITERALA{"bool"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDB{where}{\ }\syntaxLITERALA{"noninterference{\ }\<equiv>{\ }\<forall>d{\ }as.{\ }(s0{\ }\<lhd>{\ }as{\ }\<cong>{\ }s0{\ }\<lhd>{\ }(ipurge{\ }as{\ }d{\ }s0){\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{definition}{\ }weak\usebox{\underscorebox}noninterference{\ }\syntaxOPERATOR{::}{\ }\syntaxLITERALA{"bool"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDB{where}{\ }\syntaxLITERALA{"weak\usebox{\underscorebox}noninterference{\ }\<equiv>{\ }\<forall>d{\ }as{\ }bs.{\ }ipurge{\ }as{\ }d{\ }s0{\ }={\ }ipurge{\ }bs{\ }d{\ }s0}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<longrightarrow>{\ }(s0{\ }\<lhd>{\ }as{\ }\<cong>{\ }s0{\ }\<lhd>{\ }bs{\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{definition}{\ }weak\usebox{\underscorebox}noninterference\usebox{\underscorebox}r{\ }\syntaxOPERATOR{::}{\ }\syntaxLITERALA{"bool"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDB{where}{\ }\syntaxLITERALA{"weak\usebox{\underscorebox}noninterference\usebox{\underscorebox}r{\ }\<equiv>{\ }\<forall>d{\ }as{\ }bs{\ }s.{\ }reachable0{\ }s{\ }\<and>{\ }ipurge{\ }as{\ }d{\ }s{\ }={\ }ipurge{\ }bs{\ }d{\ }s}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<longrightarrow>{\ }(s{\ }\<lhd>{\ }as{\ }\<cong>{\ }s{\ }\<lhd>{\ }bs{\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{definition}{\ }noninfluence\syntaxOPERATOR{::}\syntaxLITERALA{"bool"}{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDB{where}{\ }\syntaxLITERALA{"noninfluence{\ }\<equiv>{\ }\<forall>{\ }d{\ }as{\ }s{\ }t.{\ }reachable0{\ }s{\ }\<and>{\ }reachable0{\ }t}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<and>{\ }(s{\ }\<approx>{\ }(sources{\ }as{\ }d{\ }s){\ }\<approx>{\ }t)}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<longrightarrow>{\ }(s{\ }\<lhd>{\ }as{\ }\<cong>{\ }t{\ }\<lhd>{\ }(ipurge{\ }as{\ }d{\ }t){\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{definition}{\ }weak\usebox{\underscorebox}noninfluence{\ }\syntaxOPERATOR{::}\syntaxLITERALA{"bool"}{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDB{where}{\ }\syntaxLITERALA{"weak\usebox{\underscorebox}noninfluence{\ }\<equiv>{\ }\<forall>{\ }d{\ }as{\ }bs{\ }s{\ }t{\ }.{\ }reachable0{\ }s{\ }\<and>{\ }reachable0{\ }t{\ }\<and>{\ }(s{\ }\<approx>{\ }(sources{\ }as{\ }d{\ }s){\ }\<approx>{\ }t){\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<and>{\ }ipurge{\ }as{\ }d{\ }t{\ }={\ }ipurge{\ }bs{\ }d{\ }t}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<longrightarrow>{\ }(s{\ }\<lhd>{\ }as{\ }\<cong>{\ }t{\ }\<lhd>{\ }bs{\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{definition}{\ }weak\usebox{\underscorebox}noninfluence2{\ }\syntaxOPERATOR{::}\syntaxLITERALA{"bool"}{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDB{where}{\ }\syntaxLITERALA{"weak\usebox{\underscorebox}noninfluence2{\ }\<equiv>{\ }\<forall>{\ }d{\ }as{\ }bs{\ }s{\ }t{\ }.{\ }reachable0{\ }s{\ }\<and>{\ }reachable0{\ }t{\ }\<and>{\ }(s{\ }\<approx>{\ }(sources{\ }as{\ }d{\ }s){\ }\<approx>{\ }t){\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<and>{\ }ipurge{\ }as{\ }d{\ }s{\ }={\ }ipurge{\ }bs{\ }d{\ }t}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<longrightarrow>{\ }(s{\ }\<lhd>{\ }as{\ }\<cong>{\ }t{\ }\<lhd>{\ }bs{\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{definition}{\ }nonleakage{\ }\syntaxOPERATOR{::}{\ }\syntaxLITERALA{"bool"}{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDB{where}{\ }\syntaxLITERALA{"nonleakage{\ }\<equiv>{\ }\<forall>d{\ }as{\ }s{\ }t.{\ }reachable0{\ }s{\ }\<and>{\ }reachable0{\ }t}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<and>{\ }(s{\ }\<approx>{\ }(sources{\ }as{\ }d{\ }s){\ }\<approx>{\ }t){\ }\<longrightarrow>{\ }(s{\ }\<lhd>{\ }as{\ }\<cong>{\ }t{\ }\<lhd>{\ }as{\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{declare}{\ }noninterference\usebox{\underscorebox}r\usebox{\underscorebox}def\syntaxOPERATOR{{[}}cong\syntaxOPERATOR{{]}}{\ }\syntaxKEYWORDB{and}{\ }noninterference\usebox{\underscorebox}def\syntaxOPERATOR{{[}}cong\syntaxOPERATOR{{]}}{\ }\syntaxKEYWORDB{and}{\ }weak\usebox{\underscorebox}noninterference\usebox{\underscorebox}def\syntaxOPERATOR{{[}}cong\syntaxOPERATOR{{]}}{\ }\syntaxKEYWORDB{and}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }weak\usebox{\underscorebox}noninterference\usebox{\underscorebox}r\usebox{\underscorebox}def\syntaxOPERATOR{{[}}cong\syntaxOPERATOR{{]}}{\ }\syntaxKEYWORDB{and}{\ }noninfluence\usebox{\underscorebox}def\syntaxOPERATOR{{[}}cong\syntaxOPERATOR{{]}}{\ }\syntaxKEYWORDB{and}{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }weak\usebox{\underscorebox}noninfluence\usebox{\underscorebox}def\syntaxOPERATOR{{[}}cong\syntaxOPERATOR{{]}}{\ }\syntaxKEYWORDB{and}{\ }weak\usebox{\underscorebox}noninfluence2\usebox{\underscorebox}def\syntaxOPERATOR{{[}}cong\syntaxOPERATOR{{]}}{\ }\syntaxKEYWORDB{and}{\ }nonleakage\usebox{\underscorebox}def\syntaxOPERATOR{{[}}cong\syntaxOPERATOR{{]}}\hspace*{\fill}\\
+\hspace*{\fill}\\
+\syntaxKEYWORDA{subsection}\syntaxCOMMENTC{\usebox{\opencurlybracket}*{\ }Unwinding{\ }conditions*\usebox{\closecurlybracket}}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{definition}{\ }step\usebox{\underscorebox}consistent{\ }\syntaxOPERATOR{::}{\ }\syntaxLITERALA{"bool"}{\ }\syntaxKEYWORDB{where}{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxLITERALA{"step\usebox{\underscorebox}consistent{\ }\<equiv>{\ }{\ }\<forall>a{\ }d{\ }s{\ }t.{\ }reachable0{\ }s{\ }\<and>{\ }reachable0{\ }t{\ }\<and>{\ }(s{\ }\<sim>{\ }d{\ }\<sim>{\ }t){\ }\<and>{\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }(((the{\ }(domain{\ }a)){\ }\usebox{\atbox}{\ }s{\ }\<leadsto>{\ }d){\ }\<longrightarrow>{\ }(s{\ }\<sim>{\ }(the{\ }(domain{\ }a)){\ }\<sim>{\ }t))}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<longrightarrow>{\ }((step{\ }s{\ }a){\ }\<sim>{\ }d{\ }\<sim>{\ }(step{\ }t{\ }a))"}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{definition}{\ }weakly\usebox{\underscorebox}step\usebox{\underscorebox}consistent{\ }\syntaxOPERATOR{::}{\ }\syntaxLITERALA{"bool"}{\ }\syntaxKEYWORDB{where}{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxLITERALA{"weakly\usebox{\underscorebox}step\usebox{\underscorebox}consistent{\ }\<equiv>{\ }{\ }\<forall>a{\ }d{\ }s{\ }t.{\ }reachable0{\ }s{\ }\<and>{\ }reachable0{\ }t{\ }\<and>{\ }(s{\ }\<sim>{\ }d{\ }\<sim>{\ }t){\ }\<and>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }((the{\ }(domain{\ }a)){\ }\usebox{\atbox}{\ }s{\ }\<leadsto>{\ }d){\ }\<and>{\ }(s{\ }\<sim>{\ }(the{\ }(domain{\ }a)){\ }\<sim>{\ }t){\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<longrightarrow>{\ }((step{\ }s{\ }a){\ }\<sim>{\ }d{\ }\<sim>{\ }(step{\ }t{\ }a))"}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{definition}{\ }dynamic\usebox{\underscorebox}local\usebox{\underscorebox}respect{\ }\syntaxOPERATOR{::}{\ }\syntaxLITERALA{"bool"}{\ }\syntaxKEYWORDB{where}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxLITERALA{"dynamic\usebox{\underscorebox}local\usebox{\underscorebox}respect{\ }\<equiv>{\ }\<forall>a{\ }d{\ }s.{\ }reachable0{\ }s{\ }\<and>{\ }\<not>((the{\ }(domain{\ }a)){\ }\usebox{\atbox}{\ }s{\ }\<leadsto>{\ }d){\ }\<longrightarrow>{\ }(s{\ }\<sim>{\ }d{\ }\<sim>{\ }(step{\ }s{\ }a)){\ }"}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxCOMMENTA{(*definition{\ }policy\usebox{\underscorebox}respect{\ }::{\ }"bool"{\ }where{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }}\hspace*{\fill}\\
+\syntaxCOMMENTA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }"policy\usebox{\underscorebox}respect{\ }\<equiv>{\ }\<forall>v{\ }u{\ }s{\ }t.{\ }reachable0{\ }s{\ }\<and>{\ }reachable0{\ }t{\ }\<and>{\ }(s{\ }\<sim>{\ }u{\ }\<sim>{\ }t)}\hspace*{\fill}\\
+\syntaxCOMMENTA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<longrightarrow>{\ }(interferes{\ }v{\ }s{\ }u{\ }={\ }interferes{\ }v{\ }t{\ }u)"*)}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{declare}{\ }step\usebox{\underscorebox}consistent\usebox{\underscorebox}def{\ }\syntaxOPERATOR{{[}}cong\syntaxOPERATOR{{]}}{\ }\syntaxKEYWORDB{and}{\ }weakly\usebox{\underscorebox}step\usebox{\underscorebox}consistent\usebox{\underscorebox}def{\ }\syntaxOPERATOR{{[}}cong\syntaxOPERATOR{{]}}{\ }\syntaxKEYWORDB{and}{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }dynamic\usebox{\underscorebox}local\usebox{\underscorebox}respect\usebox{\underscorebox}def{\ }\syntaxOPERATOR{{[}}cong\syntaxOPERATOR{{]}}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }step\usebox{\underscorebox}cons\usebox{\underscorebox}impl\usebox{\underscorebox}weak{\ }\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"step\usebox{\underscorebox}consistent{\ }\<Longrightarrow>{\ }weakly\usebox{\underscorebox}step\usebox{\underscorebox}consistent"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }step\usebox{\underscorebox}consistent\usebox{\underscorebox}def{\ }weakly\usebox{\underscorebox}step\usebox{\underscorebox}consistent\usebox{\underscorebox}def{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{definition}{\ }lemma\usebox{\underscorebox}local{\ }\syntaxOPERATOR{::}{\ }\syntaxLITERALA{"bool"}{\ }\syntaxKEYWORDB{where}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxLITERALA{"lemma\usebox{\underscorebox}local{\ }\<equiv>{\ }\<forall>s{\ }a{\ }as{\ }u.{\ }the{\ }(domain{\ }a){\ }\<notin>{\ }sources{\ }(a{\ }\usebox{\hashbox}{\ }as){\ }u{\ }s{\ }\<longrightarrow>{\ }(s{\ }\<approx>{\ }(sources{\ }(a{\ }\usebox{\hashbox}{\ }as){\ }u{\ }s){\ }{\ }\<approx>{\ }(step{\ }s{\ }a))"}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }weak\usebox{\underscorebox}with\usebox{\underscorebox}step\usebox{\underscorebox}cons\syntaxOPERATOR{:}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDB{assumes}{\ }p1\syntaxOPERATOR{:}{\ }weakly\usebox{\underscorebox}step\usebox{\underscorebox}consistent\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDB{and}{\ }{\ }{\ }p2\syntaxOPERATOR{:}{\ }dynamic\usebox{\underscorebox}local\usebox{\underscorebox}respect\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDB{shows}{\ }{\ }{\ }step\usebox{\underscorebox}consistent\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }{-}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\opencurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{fix}{\ }a{\ }d{\ }s{\ }t\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }\syntaxLITERALA{"reachable0{\ }s{\ }\<and>{\ }reachable0{\ }t{\ }\<and>{\ }(s{\ }\<sim>{\ }d{\ }\<sim>{\ }t){\ }\<and>{\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }(((the{\ }(domain{\ }a)){\ }\usebox{\atbox}{\ }s{\ }\<leadsto>{\ }d){\ }\<longrightarrow>{\ }(s{\ }\<sim>{\ }(the{\ }(domain{\ }a)){\ }\<sim>{\ }t))}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<longrightarrow>{\ }((step{\ }s{\ }a){\ }\<sim>{\ }d{\ }\<sim>{\ }(step{\ }t{\ }a))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }{-}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\opencurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }a0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"reachable0{\ }s"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }a1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"reachable0{\ }t"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }a2\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(s{\ }\<sim>{\ }d{\ }\<sim>{\ }t)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }a3\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(((the{\ }(domain{\ }a)){\ }\usebox{\atbox}{\ }s{\ }\<leadsto>{\ }d){\ }\<longrightarrow>{\ }(s{\ }\<sim>{\ }(the{\ }(domain{\ }a)){\ }\<sim>{\ }t))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }\syntaxLITERALA{"((step{\ }s{\ }a){\ }\<sim>{\ }d{\ }\<sim>{\ }(step{\ }t{\ }a))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }\syntaxOPERATOR{(}cases{\ }\syntaxLITERALA{"((the{\ }(domain{\ }a)){\ }\usebox{\atbox}{\ }s{\ }\<leadsto>{\ }d)"}\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }b0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"((the{\ }(domain{\ }a)){\ }\usebox{\atbox}{\ }s{\ }\<leadsto>{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(s{\ }\<sim>{\ }(the{\ }(domain{\ }a)){\ }\<sim>{\ }t)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b0{\ }a3{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b2\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"((step{\ }s{\ }a){\ }\<sim>{\ }d{\ }\<sim>{\ }(step{\ }t{\ }a))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a0{\ }a1{\ }a2{\ }b0{\ }b1{\ }p1{\ }weakly\usebox{\underscorebox}step\usebox{\underscorebox}consistent\usebox{\underscorebox}def{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{next}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }b0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<not>((the{\ }(domain{\ }a)){\ }\usebox{\atbox}{\ }s{\ }\<leadsto>{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<not>((the{\ }(domain{\ }a)){\ }\usebox{\atbox}{\ }t{\ }\<leadsto>{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a0{\ }a1{\ }a2{\ }b0{\ }policy\usebox{\underscorebox}respect{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b2\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"s{\ }\<sim>{\ }d{\ }\<sim>{\ }(step{\ }s{\ }a)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b0{\ }p2{\ }a0{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b3\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"t{\ }\<sim>{\ }d{\ }\<sim>{\ }(step{\ }t{\ }a)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b1{\ }p2{\ }a1{\ }\syntaxKEYWORDA{by}{\ }auto{\ }{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b4\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"((step{\ }s{\ }a){\ }\<sim>{\ }d{\ }\<sim>{\ }(step{\ }t{\ }a))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b2{\ }b3{\ }a2{\ }vpeq\usebox{\underscorebox}symmetric\usebox{\underscorebox}lemma{\ }vpeq\usebox{\underscorebox}transitive\usebox{\underscorebox}lemma{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\closecurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\closecurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+\hspace*{\fill}\\
+\syntaxKEYWORDA{subsection}\syntaxCOMMENTC{\usebox{\opencurlybracket}*{\ }Lemmas{\ }for{\ }the{\ }inference{\ }framework{\ }*\usebox{\closecurlybracket}}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }sources\usebox{\underscorebox}refl\syntaxOPERATOR{:}\syntaxLITERALA{"reachable0{\ }s{\ }\<Longrightarrow>{\ }u{\ }\<in>{\ }sources{\ }as{\ }u{\ }s"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{apply}\syntaxOPERATOR{(}induct{\ }as{\ }arbitrary\syntaxOPERATOR{:}{\ }s\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{apply}\syntaxOPERATOR{(}simp{\ }add\syntaxOPERATOR{:}{\ }sources\usebox{\underscorebox}Nil\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{apply}\syntaxOPERATOR{(}simp{\ }add\syntaxOPERATOR{:}{\ }sources\usebox{\underscorebox}Cons\syntaxOPERATOR{)}{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }enabled{\ }reachableStep{\ }{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{by}{\ }metis\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }lemma\usebox{\underscorebox}1\usebox{\underscorebox}sub\usebox{\underscorebox}1{\ }\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<lbrakk>reachable0{\ }s{\ };}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }dynamic\usebox{\underscorebox}local\usebox{\underscorebox}respect;}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }the{\ }(domain{\ }a){\ }\<notin>{\ }sources{\ }(a{\ }\usebox{\hashbox}{\ }as){\ }u{\ }s;}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }(s{\ }\<approx>{\ }(sources{\ }(a{\ }\usebox{\hashbox}{\ }as){\ }u{\ }s){\ }\<approx>{\ }t)\<rbrakk>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<Longrightarrow>{\ }(s{\ }\<approx>{\ }(sources{\ }as{\ }u{\ }(step{\ }s{\ }a)){\ }\<approx>{\ }(step{\ }s{\ }a))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{apply}{\ }\syntaxOPERATOR{(}simp{\ }add\syntaxOPERATOR{:}dynamic\usebox{\underscorebox}local\usebox{\underscorebox}respect\usebox{\underscorebox}def{\ }sources\usebox{\underscorebox}Cons\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }lemma\usebox{\underscorebox}1\usebox{\underscorebox}sub\usebox{\underscorebox}2{\ }\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<lbrakk>reachable0{\ }s{\ };}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }reachable0{\ }t{\ };}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }dynamic\usebox{\underscorebox}local\usebox{\underscorebox}respect;}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }the{\ }(domain{\ }a){\ }\<notin>{\ }sources{\ }(a{\ }\usebox{\hashbox}{\ }as){\ }u{\ }s;{\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }(s{\ }\<approx>{\ }(sources{\ }(a{\ }\usebox{\hashbox}{\ }as){\ }u{\ }s){\ }\<approx>{\ }t)\<rbrakk>{\ }{\ }{\ }{\ }{\ }{\ }{\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<Longrightarrow>{\ }(t{\ }\<approx>{\ }(sources{\ }as{\ }u{\ }(step{\ }s{\ }a)){\ }\<approx>{\ }(step{\ }t{\ }a))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }{-}{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }a1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"reachable0{\ }s"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }a2\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"reachable0{\ }t"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }a3\syntaxOPERATOR{:}{\ }dynamic\usebox{\underscorebox}local\usebox{\underscorebox}respect\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }a6\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"the{\ }(domain{\ }a){\ }\<notin>{\ }sources{\ }(a{\ }\usebox{\hashbox}{\ }as){\ }u{\ }s"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }a7\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(s{\ }\<approx>{\ }(sources{\ }(a{\ }\usebox{\hashbox}{\ }as){\ }u{\ }s){\ }\<approx>{\ }t)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>v.{\ }v\<in>sources{\ }as{\ }u{\ }(step{\ }s{\ }a){\ }\<longrightarrow>{\ }\<not>interferes{\ }(the{\ }(domain{\ }a)){\ }s{\ }v"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a6{\ }sources\usebox{\underscorebox}Cons{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b2\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"sources{\ }(a{\ }\usebox{\hashbox}{\ }as){\ }u{\ }s{\ }={\ }sources{\ }as{\ }u{\ }(step{\ }s{\ }a)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a6{\ }sources\usebox{\underscorebox}Cons{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b3\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>v.{\ }v\<in>sources{\ }as{\ }u{\ }(step{\ }s{\ }a){\ }\<longrightarrow>{\ }(s{\ }\<sim>{\ }v{\ }\<sim>{\ }t)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a7{\ }b2{\ }ivpeq\usebox{\underscorebox}def{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b4\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>v.{\ }v\<in>sources{\ }as{\ }u{\ }(step{\ }s{\ }a){\ }\<longrightarrow>{\ }\<not>interferes{\ }(the{\ }(domain{\ }a)){\ }t{\ }v"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a1{\ }a2{\ }policy\usebox{\underscorebox}respect{\ }b1{\ }b3{\ }{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b5\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>v.{\ }v\<in>sources{\ }as{\ }u{\ }(step{\ }s{\ }a){\ }\<longrightarrow>{\ }(t{\ }\<sim>{\ }v{\ }\<sim>{\ }(step{\ }t{\ }a))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a2{\ }a3{\ }b4{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }ivpeq\usebox{\underscorebox}def{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }lemma\usebox{\underscorebox}1\usebox{\underscorebox}sub\usebox{\underscorebox}3{\ }\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<lbrakk>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }the{\ }(domain{\ }a){\ }\<notin>{\ }sources{\ }(a{\ }\usebox{\hashbox}{\ }as){\ }u{\ }s;}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }(s{\ }\<approx>{\ }(sources{\ }(a{\ }\usebox{\hashbox}{\ }as){\ }u{\ }s){\ }\<approx>{\ }t)\<rbrakk>{\ }{\ }{\ }{\ }{\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<Longrightarrow>{\ }(s{\ }\<approx>{\ }(sources{\ }as{\ }u{\ }(step{\ }s{\ }a)){\ }\<approx>{\ }t)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{apply}{\ }\syntaxOPERATOR{(}simp{\ }add\syntaxOPERATOR{:}sources\usebox{\underscorebox}Cons\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{apply}{\ }\syntaxOPERATOR{(}simp{\ }add\syntaxOPERATOR{:}sources\usebox{\underscorebox}Cons\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{done}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }lemma\usebox{\underscorebox}1\usebox{\underscorebox}sub\usebox{\underscorebox}4{\ }\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<lbrakk>(s{\ }\<approx>{\ }(sources{\ }as{\ }u{\ }(step{\ }s{\ }a)){\ }\<approx>{\ }t);}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }(s{\ }\<approx>{\ }(sources{\ }as{\ }u{\ }(step{\ }s{\ }a)){\ }\<approx>{\ }(step{\ }s{\ }a));}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }(t{\ }\<approx>{\ }(sources{\ }as{\ }u{\ }(step{\ }s{\ }a)){\ }\<approx>{\ }(step{\ }t{\ }a)){\ }\<rbrakk>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<Longrightarrow>{\ }((step{\ }s{\ }a){\ }\<approx>(sources{\ }as{\ }u{\ }(step{\ }s{\ }a)){\ }\<approx>{\ }(step{\ }t{\ }a))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{by}{\ }\syntaxOPERATOR{(}meson{\ }ivpeq\usebox{\underscorebox}def{\ }vpeq\usebox{\underscorebox}symmetric\usebox{\underscorebox}lemma{\ }vpeq\usebox{\underscorebox}transitive\usebox{\underscorebox}lemma\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }lemma\usebox{\underscorebox}1{\ }\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<lbrakk>reachable0{\ }s;}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }reachable0{\ }t;}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }step\usebox{\underscorebox}consistent;}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }dynamic\usebox{\underscorebox}local\usebox{\underscorebox}respect;}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }(s{\ }\<approx>{\ }(sources{\ }(a{\ }\usebox{\hashbox}{\ }as){\ }u{\ }s){\ }\<approx>{\ }t)\<rbrakk>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<Longrightarrow>{\ }((step{\ }s{\ }a){\ }\<approx>{\ }(sources{\ }as{\ }u{\ }(step{\ }s{\ }a)){\ }\<approx>{\ }(step{\ }t{\ }a))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{apply}{\ }\syntaxOPERATOR{(}case\usebox{\underscorebox}tac{\ }\syntaxLITERALA{"the{\ }(domain{\ }a)\<in>sources{\ }(a{\ }\usebox{\hashbox}{\ }as){\ }u{\ }s"}\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{apply}{\ }\syntaxOPERATOR{(}simp{\ }add\syntaxOPERATOR{:}{\ }step\usebox{\underscorebox}consistent\usebox{\underscorebox}def\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{apply}{\ }\syntaxOPERATOR{(}simp{\ }add\syntaxOPERATOR{:}{\ }sources\usebox{\underscorebox}Cons\syntaxOPERATOR{)}{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }{-}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }a1\syntaxOPERATOR{:}{\ }dynamic\usebox{\underscorebox}local\usebox{\underscorebox}respect\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }a4\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"the{\ }(domain{\ }a){\ }\<notin>{\ }sources{\ }(a{\ }\usebox{\hashbox}{\ }as){\ }u{\ }s"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }a5\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(s{\ }\<approx>{\ }(sources{\ }(a{\ }\usebox{\hashbox}{\ }as){\ }u{\ }s){\ }\<approx>{\ }t)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }b0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"reachable0{\ }s"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }b1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"reachable0{\ }t"}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }a6\syntaxOPERATOR{:}\syntaxLITERALA{"(s{\ }\<approx>{\ }(sources{\ }as{\ }u{\ }(step{\ }s{\ }a)){\ }\<approx>{\ }t)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a1{\ }policy\usebox{\underscorebox}respect{\ }a4{\ }a5{\ }lemma\usebox{\underscorebox}1\usebox{\underscorebox}sub\usebox{\underscorebox}3{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDA{have}{\ }a7\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(s{\ }\<approx>{\ }(sources{\ }as{\ }u{\ }(step{\ }s{\ }a)){\ }\<approx>{\ }(step{\ }s{\ }a))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b0{\ }a1{\ }policy\usebox{\underscorebox}respect{\ }a4{\ }a5{\ }lemma\usebox{\underscorebox}1\usebox{\underscorebox}sub\usebox{\underscorebox}1{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDA{have}{\ }a8\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(t{\ }\<approx>{\ }(sources{\ }as{\ }u{\ }(step{\ }s{\ }a)){\ }\<approx>{\ }(step{\ }t{\ }a))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b1{\ }b0{\ }a1{\ }policy\usebox{\underscorebox}respect{\ }a4{\ }a5{\ }lemma\usebox{\underscorebox}1\usebox{\underscorebox}sub\usebox{\underscorebox}2{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }\syntaxLITERALA{"{\ }((step{\ }s{\ }a){\ }\<approx>(sources{\ }as{\ }u{\ }(step{\ }s{\ }a)){\ }\<approx>{\ }(step{\ }t{\ }a))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a6{\ }a7{\ }lemma\usebox{\underscorebox}1\usebox{\underscorebox}sub\usebox{\underscorebox}4{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }lemma\usebox{\underscorebox}2{\ }\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<lbrakk>reachable0{\ }s;}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }dynamic\usebox{\underscorebox}local\usebox{\underscorebox}respect;}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }the{\ }(domain{\ }a){\ }\<notin>{\ }sources{\ }(a{\ }\usebox{\hashbox}{\ }as){\ }u{\ }s\<rbrakk>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<Longrightarrow>{\ }(s{\ }\<approx>{\ }(sources{\ }as{\ }u{\ }(step{\ }s{\ }a)){\ }\<approx>{\ }(step{\ }s{\ }a))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{apply}{\ }\syntaxOPERATOR{(}simp{\ }add\syntaxOPERATOR{:}dynamic\usebox{\underscorebox}local\usebox{\underscorebox}respect\usebox{\underscorebox}def\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{apply}{\ }\syntaxOPERATOR{(}simp{\ }add\syntaxOPERATOR{:}sources\usebox{\underscorebox}Cons\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }sources\usebox{\underscorebox}eq1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>s{\ }t{\ }as{\ }u.{\ }reachable0{\ }s{\ }\<and>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }reachable0{\ }t{\ }\<and>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }step\usebox{\underscorebox}consistent{\ }\<and>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }dynamic\usebox{\underscorebox}local\usebox{\underscorebox}respect{\ }\<and>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }(s{\ }\<approx>{\ }(sources{\ }as{\ }u{\ }s){\ }\<approx>{\ }t)}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<longrightarrow>{\ }(sources{\ }as{\ }u{\ }s){\ }={\ }(sources{\ }as{\ }u{\ }t)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }{-}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\opencurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{fix}{\ }as\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }\syntaxLITERALA{"\<forall>s{\ }t{\ }u.{\ }reachable0{\ }s{\ }\<and>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }reachable0{\ }t{\ }\<and>{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }step\usebox{\underscorebox}consistent{\ }\<and>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }dynamic\usebox{\underscorebox}local\usebox{\underscorebox}respect{\ }\<and>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }(s{\ }\<approx>{\ }(sources{\ }as{\ }u{\ }s){\ }\<approx>{\ }t)}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<longrightarrow>{\ }(sources{\ }as{\ }u{\ }s){\ }={\ }(sources{\ }as{\ }u{\ }t)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}\syntaxOPERATOR{(}induct{\ }as\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{case}{\ }Nil{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?case{\ }\syntaxKEYWORDA{by}{\ }\syntaxOPERATOR{(}simp{\ }add\syntaxOPERATOR{:}{\ }sources\usebox{\underscorebox}Nil\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{next}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{case}{\ }\syntaxOPERATOR{(}Cons{\ }b{\ }bs\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>s{\ }t{\ }u.((reachable0{\ }s){\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<and>{\ }(reachable0{\ }t){\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<and>{\ }step\usebox{\underscorebox}consistent{\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<and>{\ }dynamic\usebox{\underscorebox}local\usebox{\underscorebox}respect{\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<and>{\ }(s{\ }\<approx>{\ }(sources{\ }bs{\ }u{\ }s){\ }\<approx>{\ }t)){\ }\<longrightarrow>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }(sources{\ }bs{\ }u{\ }s){\ }={\ }(sources{\ }bs{\ }u{\ }t)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?case\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }{-}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\opencurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{fix}{\ }s{\ }t{\ }u\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"reachable0{\ }s"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p2\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"reachable0{\ }t"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p3\syntaxOPERATOR{:}{\ }step\usebox{\underscorebox}consistent\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p5\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"dynamic\usebox{\underscorebox}local\usebox{\underscorebox}respect"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p9\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(s{\ }\<approx>{\ }(sources{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }u{\ }s){\ }\<approx>{\ }t)"}{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }a2\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"((step{\ }s{\ }b){\ }\<approx>{\ }(sources{\ }bs{\ }u{\ }(step{\ }s{\ }b)){\ }\<approx>{\ }(step{\ }t{\ }b))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }lemma\usebox{\underscorebox}1{\ }p1{\ }p2{\ }p3{\ }policy\usebox{\underscorebox}respect{\ }p5{\ }p9{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }a3\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"sources{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }u{\ }s{\ }={\ }sources{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }u{\ }t"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }\syntaxOPERATOR{(}cases{\ }\syntaxLITERALA{"the{\ }(domain{\ }b){\ }\<in>{\ }(sources{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }u{\ }s)"}\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }b0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"the{\ }(domain{\ }b){\ }\<in>{\ }(sources{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }u{\ }s)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"s{\ }\<sim>{\ }(the(domain{\ }b)){\ }\<sim>{\ }t"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b0{\ }p9{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b3\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"interferes{\ }(the{\ }(domain{\ }b)){\ }s{\ }u{\ }={\ }interferes{\ }(the{\ }(domain{\ }b)){\ }t{\ }u{\ }"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }p1{\ }p2{\ }policy\usebox{\underscorebox}respect{\ }p9{\ }sources\usebox{\underscorebox}refl{\ }\syntaxKEYWORDA{by}{\ }fastforce\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b4\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(sources{\ }bs{\ }u{\ }(step{\ }s{\ }b)){\ }={\ }(sources{\ }bs{\ }u{\ }(step{\ }t{\ }b))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a2{\ }p0{\ }p1{\ }p2{\ }p3{\ }p5{\ }reachableStep{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b5\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>v.{\ }v\<in>sources{\ }bs{\ }u{\ }(step{\ }s{\ }b){\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<longrightarrow>{\ }interferes{\ }(the{\ }(domain{\ }b)){\ }s{\ }v{\ }={\ }interferes{\ }(the{\ }(domain{\ }b)){\ }t{\ }v{\ }"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }p1{\ }p2{\ }ivpeq\usebox{\underscorebox}def{\ }policy\usebox{\underscorebox}respect{\ }p9{\ }sources\usebox{\underscorebox}Cons{\ }\syntaxKEYWORDA{by}{\ }fastforce\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }\syntaxLITERALA{"sources{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }u{\ }s{\ }={\ }sources{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }u{\ }t"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b4{\ }b5{\ }sources\usebox{\underscorebox}Cons{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{next}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }b0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"the{\ }(domain{\ }b){\ }\<notin>{\ }(sources{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }u{\ }s)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"sources{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }u{\ }s{\ }={\ }sources{\ }bs{\ }u{\ }(step{\ }s{\ }b)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b0{\ }sources\usebox{\underscorebox}Cons{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b2\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(sources{\ }bs{\ }u{\ }(step{\ }s{\ }b)){\ }={\ }(sources{\ }bs{\ }u{\ }(step{\ }t{\ }b))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a2{\ }p0{\ }p1{\ }p2{\ }p3{\ }p5{\ }reachableStep{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b3\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>v.{\ }v\<in>sources{\ }bs{\ }u{\ }(step{\ }s{\ }b)\<longrightarrow>\<not>{\ }interferes{\ }(the{\ }(domain{\ }b)){\ }s{\ }v{\ }"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b0{\ }sources\usebox{\underscorebox}Cons{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b4\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>v.{\ }v\<in>sources{\ }bs{\ }u{\ }(step{\ }s{\ }b)\<longrightarrow>\<not>{\ }interferes{\ }(the{\ }(domain{\ }b)){\ }t{\ }v{\ }"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b1{\ }b3{\ }p1{\ }p2{\ }p9{\ }policy\usebox{\underscorebox}respect{\ }\syntaxKEYWORDA{by}{\ }fastforce\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b5\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>v.{\ }v\<in>sources{\ }bs{\ }u{\ }(step{\ }t{\ }b)\<longrightarrow>\<not>{\ }interferes{\ }(the{\ }(domain{\ }b)){\ }t{\ }v{\ }"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{by}{\ }\syntaxOPERATOR{(}simp{\ }add\syntaxOPERATOR{:}{\ }b2{\ }b4\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b6\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"the{\ }(domain{\ }b){\ }\<notin>{\ }(sources{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }u{\ }t)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b0{\ }b2{\ }b5{\ }sources.simps\syntaxOPERATOR{(}2\syntaxOPERATOR{)}{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b7\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"sources{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }u{\ }t{\ }={\ }sources{\ }bs{\ }u{\ }(step{\ }t{\ }b)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b6{\ }sources\usebox{\underscorebox}Cons{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{by}{\ }\syntaxOPERATOR{(}simp{\ }add\syntaxOPERATOR{:}{\ }b1{\ }b2\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\closecurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\closecurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }ipurge\usebox{\underscorebox}eq\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>s{\ }t{\ }as{\ }u.{\ }reachable0{\ }s{\ }\<and>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }reachable0{\ }t{\ }\<and>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }step\usebox{\underscorebox}consistent{\ }\<and>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }dynamic\usebox{\underscorebox}local\usebox{\underscorebox}respect{\ }\<and>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }(s{\ }\<approx>{\ }(sources{\ }as{\ }u{\ }s){\ }\<approx>{\ }t)}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<longrightarrow>{\ }(ipurge{\ }as{\ }u{\ }s){\ }={\ }(ipurge{\ }as{\ }u{\ }t)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }{-}{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\opencurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{fix}{\ }as\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }\syntaxLITERALA{"\<forall>s{\ }t{\ }u.{\ }reachable0{\ }s{\ }\<and>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }reachable0{\ }t{\ }\<and>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }step\usebox{\underscorebox}consistent{\ }\<and>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }dynamic\usebox{\underscorebox}local\usebox{\underscorebox}respect{\ }\<and>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }(s{\ }\<approx>{\ }(sources{\ }as{\ }u{\ }s){\ }\<approx>{\ }t)}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<longrightarrow>{\ }(ipurge{\ }as{\ }u{\ }s){\ }={\ }(ipurge{\ }as{\ }u{\ }t)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}\syntaxOPERATOR{(}induct{\ }as\syntaxOPERATOR{)}{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{case}{\ }Nil{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?case{\ }\syntaxKEYWORDA{by}{\ }\syntaxOPERATOR{(}simp{\ }add\syntaxOPERATOR{:}{\ }sources\usebox{\underscorebox}Nil\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{next}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{case}{\ }\syntaxOPERATOR{(}Cons{\ }b{\ }bs\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>s{\ }t{\ }u.((reachable0{\ }s){\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<and>{\ }(reachable0{\ }t){\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<and>{\ }step\usebox{\underscorebox}consistent{\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<and>{\ }dynamic\usebox{\underscorebox}local\usebox{\underscorebox}respect{\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<and>{\ }(s{\ }\<approx>{\ }(sources{\ }bs{\ }u{\ }s){\ }\<approx>{\ }t))}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<longrightarrow>{\ }(ipurge{\ }bs{\ }u{\ }s){\ }={\ }(ipurge{\ }bs{\ }u{\ }t)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?case\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }{-}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\opencurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{fix}{\ }s{\ }t{\ }u\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"reachable0{\ }s"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p2\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"reachable0{\ }t"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p3\syntaxOPERATOR{:}{\ }step\usebox{\underscorebox}consistent\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p5\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"dynamic\usebox{\underscorebox}local\usebox{\underscorebox}respect"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p9\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(s{\ }\<approx>{\ }(sources{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }u{\ }s){\ }\<approx>{\ }t)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }a1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"((step{\ }s{\ }b){\ }\<approx>{\ }(sources{\ }bs{\ }u{\ }(step{\ }s{\ }b)){\ }\<approx>{\ }(step{\ }t{\ }b))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }lemma\usebox{\underscorebox}1{\ }p1{\ }p2{\ }p3{\ }p5{\ }p9{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }a2\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(ipurge{\ }bs{\ }u{\ }(step{\ }s{\ }b)){\ }={\ }(ipurge{\ }bs{\ }u{\ }(step{\ }t{\ }b))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a1{\ }p0{\ }p1{\ }p2{\ }p3{\ }p5{\ }p9{\ }reachableStep{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }a3\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"sources{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }u{\ }s{\ }={\ }sources{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }u{\ }t"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }p1{\ }p2{\ }p3{\ }p5{\ }p9{\ }sources\usebox{\underscorebox}eq1{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }a4\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"ipurge{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }u{\ }s{\ }={\ }ipurge{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }u{\ }t"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }\syntaxOPERATOR{(}cases{\ }\syntaxLITERALA{"the{\ }(domain{\ }b){\ }\<in>{\ }(sources{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }u{\ }s)"}\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }b0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"the{\ }(domain{\ }b){\ }\<in>{\ }(sources{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }u{\ }s)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"s{\ }\<sim>{\ }(the(domain{\ }b)){\ }\<sim>{\ }t"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b0{\ }p9{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b3\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"the{\ }(domain{\ }b){\ }\<in>{\ }(sources{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }u{\ }t)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a3{\ }b0{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a2{\ }b0{\ }ipurge\usebox{\underscorebox}Cons{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{next}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }b0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"the{\ }(domain{\ }b){\ }\<notin>{\ }(sources{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }u{\ }s)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"sources{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }u{\ }s{\ }={\ }sources{\ }bs{\ }u{\ }(step{\ }s{\ }b)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b0{\ }sources\usebox{\underscorebox}Cons{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b3\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>v.{\ }v\<in>sources{\ }bs{\ }u{\ }(step{\ }s{\ }b)\<longrightarrow>\<not>{\ }interferes{\ }(the{\ }(domain{\ }b)){\ }s{\ }v{\ }"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b0{\ }sources\usebox{\underscorebox}Cons{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b4\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>v.{\ }v\<in>sources{\ }bs{\ }u{\ }(step{\ }s{\ }b)\<longrightarrow>\<not>{\ }interferes{\ }(the{\ }(domain{\ }b)){\ }t{\ }v{\ }"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b1{\ }b3{\ }p1{\ }p2{\ }p9{\ }policy\usebox{\underscorebox}respect{\ }\syntaxKEYWORDA{by}{\ }fastforce\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b5\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"the{\ }(domain{\ }b){\ }\<notin>{\ }(sources{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }u{\ }t)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a3{\ }b1{\ }b4{\ }interf\usebox{\underscorebox}reflexive{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b6\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"ipurge{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }u{\ }s{\ }={\ }ipurge{\ }bs{\ }u{\ }(step{\ }s{\ }b)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b0{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b7\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"ipurge{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }u{\ }t{\ }={\ }ipurge{\ }bs{\ }u{\ }(step{\ }t{\ }b)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b5{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b6{\ }b7{\ }a2{\ }\syntaxKEYWORDA{by}{\ }auto{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\closecurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\closecurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }non\usebox{\underscorebox}influgence\usebox{\underscorebox}lemma\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>s{\ }t{\ }as{\ }u.{\ }reachable0{\ }s{\ }\<and>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }reachable0{\ }t{\ }\<and>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }step\usebox{\underscorebox}consistent{\ }\<and>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }dynamic\usebox{\underscorebox}local\usebox{\underscorebox}respect{\ }\<and>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }(s{\ }\<approx>{\ }(sources{\ }as{\ }u{\ }s){\ }\<approx>{\ }t)}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<longrightarrow>{\ }((s{\ }\<lhd>{\ }as{\ }\<cong>{\ }t{\ }\<lhd>{\ }(ipurge{\ }as{\ }u{\ }t){\ }\usebox{\atbox}{\ }u))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }{-}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\opencurlybracket}}{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{fix}{\ }as\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }{\ }\syntaxLITERALA{"\<forall>s{\ }t{\ }u.{\ }reachable0{\ }s{\ }\<and>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }reachable0{\ }t{\ }\<and>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }step\usebox{\underscorebox}consistent{\ }\<and>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }dynamic\usebox{\underscorebox}local\usebox{\underscorebox}respect{\ }\<and>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }(s{\ }\<approx>{\ }(sources{\ }as{\ }u{\ }s){\ }\<approx>{\ }t)}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<longrightarrow>{\ }((s{\ }\<lhd>{\ }as{\ }\<cong>{\ }t{\ }\<lhd>{\ }(ipurge{\ }as{\ }u{\ }t){\ }\usebox{\atbox}{\ }u))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }\syntaxOPERATOR{(}induct{\ }as\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{case}{\ }Nil{\ }\syntaxKEYWORDC{show}{\ }?case{\ }\syntaxKEYWORDA{using}{\ }sources\usebox{\underscorebox}Nil{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{next}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{case}{\ }\syntaxOPERATOR{(}Cons{\ }b{\ }bs\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>s{\ }t{\ }u.((reachable0{\ }s){\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<and>{\ }(reachable0{\ }t){\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<and>{\ }step\usebox{\underscorebox}consistent{\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<and>{\ }dynamic\usebox{\underscorebox}local\usebox{\underscorebox}respect{\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<and>{\ }(s{\ }\<approx>{\ }(sources{\ }bs{\ }u{\ }s){\ }\<approx>{\ }t)){\ }\<longrightarrow>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }((s{\ }\<lhd>{\ }bs{\ }\<cong>{\ }t{\ }\<lhd>{\ }(ipurge{\ }bs{\ }u{\ }t){\ }\usebox{\atbox}{\ }u))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?case\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }{-}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\opencurlybracket}}{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{fix}{\ }s{\ }t{\ }u\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"reachable0{\ }s"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p2\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"reachable0{\ }t"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p3\syntaxOPERATOR{:}{\ }step\usebox{\underscorebox}consistent\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p4\syntaxOPERATOR{:}{\ }dynamic\usebox{\underscorebox}local\usebox{\underscorebox}respect\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p8\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(s{\ }\<approx>{\ }(sources{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }u{\ }s){\ }\<approx>{\ }t)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }a1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"((step{\ }s{\ }b){\ }\<approx>{\ }(sources{\ }bs{\ }u{\ }(step{\ }s{\ }b)){\ }\<approx>{\ }(step{\ }t{\ }b))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }lemma\usebox{\underscorebox}1{\ }p1{\ }p2{\ }p3{\ }p4{\ }p8{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }\syntaxLITERALA{"s{\ }\<lhd>{\ }b{\ }\usebox{\hashbox}{\ }bs{\ }\<cong>{\ }t{\ }\<lhd>{\ }ipurge{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }u{\ }t{\ }\usebox{\atbox}{\ }u"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }\syntaxOPERATOR{(}cases{\ }\syntaxLITERALA{"the{\ }(domain{\ }b){\ }\<in>{\ }sources{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }u{\ }s"}\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }b0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"the{\ }(domain{\ }b){\ }\<in>{\ }sources{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }u{\ }s"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"interferes{\ }(the{\ }(domain{\ }b)){\ }s{\ }u{\ }={\ }interferes{\ }(the{\ }(domain{\ }b)){\ }t{\ }u{\ }"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }p1{\ }p2{\ }policy\usebox{\underscorebox}respect{\ }p8{\ }sources\usebox{\underscorebox}refl{\ }\syntaxKEYWORDA{by}{\ }fastforce\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b2\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>v.{\ }v\<in>sources{\ }bs{\ }u{\ }(step{\ }s{\ }b){\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<longrightarrow>{\ }interferes{\ }(the{\ }(domain{\ }b)){\ }s{\ }v{\ }={\ }interferes{\ }(the{\ }(domain{\ }b)){\ }t{\ }v{\ }"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }p1{\ }p2{\ }ivpeq\usebox{\underscorebox}def{\ }policy\usebox{\underscorebox}respect{\ }p8{\ }sources\usebox{\underscorebox}Cons{\ }\syntaxKEYWORDA{by}{\ }fastforce\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b3\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"ipurge{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }u{\ }t{\ }={\ }b{\ }\usebox{\hashbox}{\ }(ipurge{\ }bs{\ }u{\ }(step{\ }t{\ }b))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{by}{\ }\syntaxOPERATOR{(}metis{\ }b0{\ }ipurge\usebox{\underscorebox}Cons{\ }p1{\ }p2{\ }p3{\ }p4{\ }p8{\ }sources\usebox{\underscorebox}eq1\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b4\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(((step{\ }s{\ }b){\ }\<lhd>{\ }bs{\ }\<cong>{\ }(step{\ }t{\ }b){\ }\<lhd>{\ }(ipurge{\ }bs{\ }u{\ }(step{\ }t{\ }b)){\ }\usebox{\atbox}{\ }u))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a1{\ }p0{\ }p1{\ }p2{\ }p3{\ }p4{\ }reachableStep{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{show}{\ }?thesis\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b3{\ }b4{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{next}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }b0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"the{\ }(domain{\ }b){\ }\<notin>{\ }sources{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }u{\ }s"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"ipurge{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }u{\ }t{\ }={\ }(ipurge{\ }bs{\ }u{\ }(step{\ }t{\ }b))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{by}{\ }\syntaxOPERATOR{(}metis{\ }a1{\ }b0{\ }ipurge\usebox{\underscorebox}Cons{\ }ipurge\usebox{\underscorebox}eq{\ }p1{\ }p2{\ }p3{\ }p4{\ }p8{\ }reachableStep\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b2\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(s{\ }\<approx>{\ }(sources{\ }bs{\ }u{\ }(step{\ }s{\ }b)){\ }\<approx>{\ }(step{\ }s{\ }b))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b0{\ }lemma\usebox{\underscorebox}2{\ }p1{\ }p4{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b3\syntaxOPERATOR{:}\syntaxLITERALA{"(s{\ }\<approx>{\ }(sources{\ }bs{\ }u{\ }(step{\ }s{\ }b)){\ }\<approx>{\ }t)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b0{\ }lemma\usebox{\underscorebox}1\usebox{\underscorebox}sub\usebox{\underscorebox}3{\ }p8{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b4\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"((step{\ }s{\ }b){\ }\<approx>{\ }(sources{\ }bs{\ }u{\ }(step{\ }s{\ }b)){\ }\<approx>{\ }t)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{by}{\ }\syntaxOPERATOR{(}meson{\ }b3{\ }b2{\ }ivpeq\usebox{\underscorebox}def{\ }vpeq\usebox{\underscorebox}symmetric\usebox{\underscorebox}lemma{\ }vpeq\usebox{\underscorebox}transitive\usebox{\underscorebox}lemma\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b5\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(((step{\ }s{\ }b){\ }\<lhd>{\ }bs{\ }\<cong>{\ }t{\ }\<lhd>{\ }(ipurge{\ }bs{\ }u{\ }t){\ }\usebox{\atbox}{\ }u))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b4{\ }p0{\ }p1{\ }p2{\ }p3{\ }p4{\ }reachableStep{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b6\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(t{\ }\<approx>{\ }(sources{\ }bs{\ }u{\ }(step{\ }s{\ }b)){\ }\<approx>{\ }(step{\ }t{\ }b))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }p1{\ }p2{\ }b0{\ }lemma\usebox{\underscorebox}1\usebox{\underscorebox}sub\usebox{\underscorebox}2{\ }p4{\ }p8{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b7\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"ipurge{\ }bs{\ }u{\ }t{\ }={\ }ipurge{\ }bs{\ }u{\ }(step{\ }t{\ }b)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{by}{\ }\syntaxOPERATOR{(}metis{\ }a1{\ }b4{\ }ipurge\usebox{\underscorebox}eq{\ }p1{\ }p2{\ }p3{\ }p4{\ }reachableStep\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b8\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(((step{\ }s{\ }b){\ }\<lhd>{\ }bs{\ }\<cong>{\ }t{\ }\<lhd>{\ }(ipurge{\ }bs{\ }u{\ }(step{\ }t{\ }b)){\ }\usebox{\atbox}{\ }u))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b5{\ }b7{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b1{\ }observ\usebox{\underscorebox}equivalence\usebox{\underscorebox}def{\ }run\usebox{\underscorebox}Cons{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\closecurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\closecurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}{\ }\hspace*{\fill}\\
+\hspace*{\fill}\\
+\syntaxKEYWORDA{subsection}\syntaxCOMMENTC{\usebox{\opencurlybracket}*{\ }Interference{\ }framework{\ }of{\ }information{\ }flow{\ }security{\ }properties{\ }*\usebox{\closecurlybracket}}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{theorem}{\ }nonintf\usebox{\underscorebox}impl\usebox{\underscorebox}weak\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"noninterference{\ }\<Longrightarrow>{\ }weak\usebox{\underscorebox}noninterference"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{by}{\ }\syntaxOPERATOR{(}metis{\ }noninterference\usebox{\underscorebox}def{\ }observ\usebox{\underscorebox}equiv\usebox{\underscorebox}sym{\ }observ\usebox{\underscorebox}equiv\usebox{\underscorebox}trans{\ }reachable\usebox{\underscorebox}s0{\ }weak\usebox{\underscorebox}noninterference\usebox{\underscorebox}def\syntaxOPERATOR{)}{\ }{\ }{\ }{\ }{\ }{\ }{\ }\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{theorem}{\ }wk\usebox{\underscorebox}nonintf\usebox{\underscorebox}r\usebox{\underscorebox}impl\usebox{\underscorebox}wk\usebox{\underscorebox}nonintf\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"weak\usebox{\underscorebox}noninterference\usebox{\underscorebox}r{\ }\<Longrightarrow>{\ }weak\usebox{\underscorebox}noninterference"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }reachable\usebox{\underscorebox}s0{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{theorem}{\ }nonintf\usebox{\underscorebox}r\usebox{\underscorebox}impl\usebox{\underscorebox}noninterf\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"noninterference\usebox{\underscorebox}r{\ }\<Longrightarrow>{\ }noninterference"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }noninterference\usebox{\underscorebox}def{\ }noninterference\usebox{\underscorebox}r\usebox{\underscorebox}def{\ }reachable\usebox{\underscorebox}s0{\ }\syntaxKEYWORDA{by}{\ }auto{\ }\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{theorem}{\ }nonintf\usebox{\underscorebox}r\usebox{\underscorebox}impl\usebox{\underscorebox}wk\usebox{\underscorebox}nonintf\usebox{\underscorebox}r\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"noninterference\usebox{\underscorebox}r{\ }\<Longrightarrow>{\ }weak\usebox{\underscorebox}noninterference\usebox{\underscorebox}r"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{by}{\ }\syntaxOPERATOR{(}metis{\ }noninterference\usebox{\underscorebox}r\usebox{\underscorebox}def{\ }observ\usebox{\underscorebox}equiv\usebox{\underscorebox}sym{\ }observ\usebox{\underscorebox}equiv\usebox{\underscorebox}trans{\ }weak\usebox{\underscorebox}noninterference\usebox{\underscorebox}r\usebox{\underscorebox}def\syntaxOPERATOR{)}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }noninf\usebox{\underscorebox}impl\usebox{\underscorebox}nonintf\usebox{\underscorebox}r\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"noninfluence{\ }\<Longrightarrow>{\ }noninterference\usebox{\underscorebox}r"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }ivpeq\usebox{\underscorebox}def{\ }noninfluence\usebox{\underscorebox}def{\ }noninterference\usebox{\underscorebox}r\usebox{\underscorebox}def{\ }vpeq\usebox{\underscorebox}reflexive\usebox{\underscorebox}lemma{\ }\syntaxKEYWORDA{by}{\ }blast{\ }{\ }{\ }{\ }{\ }{\ }\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }noninf\usebox{\underscorebox}impl\usebox{\underscorebox}nonlk\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"noninfluence{\ }\<Longrightarrow>{\ }nonleakage"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }noninterference\usebox{\underscorebox}r\usebox{\underscorebox}def{\ }nonleakage\usebox{\underscorebox}def{\ }observ\usebox{\underscorebox}equiv\usebox{\underscorebox}sym{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }observ\usebox{\underscorebox}equiv\usebox{\underscorebox}trans{\ }noninfluence\usebox{\underscorebox}def{\ }noninf\usebox{\underscorebox}impl\usebox{\underscorebox}nonintf\usebox{\underscorebox}r{\ }\syntaxKEYWORDA{by}{\ }blast{\ }\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }wk\usebox{\underscorebox}noninfl\usebox{\underscorebox}impl\usebox{\underscorebox}nonlk\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"weak\usebox{\underscorebox}noninfluence{\ }\<Longrightarrow>{\ }nonleakage"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }weak\usebox{\underscorebox}noninfluence\usebox{\underscorebox}def{\ }nonleakage\usebox{\underscorebox}def{\ }\syntaxKEYWORDA{by}{\ }blast{\ }{\ }{\ }{\ }{\ }{\ }{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }wk\usebox{\underscorebox}noninfl\usebox{\underscorebox}impl\usebox{\underscorebox}wk\usebox{\underscorebox}nonintf\usebox{\underscorebox}r\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"weak\usebox{\underscorebox}noninfluence{\ }\<Longrightarrow>{\ }weak\usebox{\underscorebox}noninterference\usebox{\underscorebox}r"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }ivpeq\usebox{\underscorebox}def{\ }weak\usebox{\underscorebox}noninfluence\usebox{\underscorebox}def{\ }vpeq\usebox{\underscorebox}reflexive\usebox{\underscorebox}lemma{\ }weak\usebox{\underscorebox}noninterference\usebox{\underscorebox}r\usebox{\underscorebox}def{\ }\syntaxKEYWORDA{by}{\ }blast{\ }\hspace*{\fill}\\
+{\ }{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }sources\usebox{\underscorebox}step2\syntaxOPERATOR{:}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxLITERALA{"\<lbrakk>reachable0{\ }s;{\ }(the{\ }(domain{\ }a))\usebox{\atbox}s{\ }\<leadsto>{\ }d\<rbrakk>{\ }\<Longrightarrow>{\ }sources{\ }{[}a{]}{\ }d{\ }s{\ }={\ }\usebox{\opencurlybracket}the{\ }(domain{\ }a),d\usebox{\closecurlybracket}"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{apply}\syntaxOPERATOR{(}auto{\ }simp\syntaxOPERATOR{:}{\ }sources\usebox{\underscorebox}Cons{\ }sources\usebox{\underscorebox}Nil{\ }enabled{\ }dest\syntaxOPERATOR{:}{\ }enabled\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{done}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }exec\usebox{\underscorebox}equiv\usebox{\underscorebox}both\syntaxOPERATOR{:}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxLITERALA{"\<lbrakk>reachable0{\ }C1;{\ }reachable0{\ }C2;(step{\ }C1{\ }a){\ }\<lhd>{\ }as{\ }\<cong>{\ }(step{\ }C2{\ }b){\ }\<lhd>{\ }bs{\ }\usebox{\atbox}{\ }u\<rbrakk>{\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }\<Longrightarrow>{\ }(C1{\ }\<lhd>{\ }(a{\ }\usebox{\hashbox}{\ }as){\ }\<cong>{\ }C2{\ }\<lhd>{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }\usebox{\atbox}{\ }u)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }sources\usebox{\underscorebox}unwinding\usebox{\underscorebox}step\syntaxOPERATOR{:}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxLITERALA{"\<lbrakk>reachable0{\ }s;{\ }reachable0{\ }t;s{\ }\<approx>(sources{\ }(a\usebox{\hashbox}as){\ }d{\ }s)\<approx>{\ }t;{\ }step\usebox{\underscorebox}consistent\<rbrakk>{\ }{\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<Longrightarrow>{\ }((step{\ }s{\ }a){\ }\<approx>(sources{\ }as{\ }d{\ }(step{\ }s{\ }a))\<approx>{\ }(step{\ }t{\ }a))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{apply}\syntaxOPERATOR{(}clarsimp{\ }simp\syntaxOPERATOR{:}{\ }ivpeq\usebox{\underscorebox}def{\ }sources\usebox{\underscorebox}Cons\syntaxOPERATOR{)}{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }UnionI{\ }step\usebox{\underscorebox}consistent\usebox{\underscorebox}def{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }nonlk\usebox{\underscorebox}imp\usebox{\underscorebox}sc\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"nonleakage{\ }\<Longrightarrow>{\ }step\usebox{\underscorebox}consistent"}{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }{-}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"nonleakage"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }p1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>as{\ }d{\ }s{\ }t.{\ }reachable0{\ }s{\ }\<and>{\ }reachable0{\ }t}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<and>{\ }(s{\ }\<approx>{\ }(sources{\ }as{\ }d{\ }s){\ }\<approx>{\ }t){\ }\<longrightarrow>{\ }(s{\ }\<lhd>{\ }as{\ }\<cong>{\ }t{\ }\<lhd>{\ }as{\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }p0{\ }nonleakage\usebox{\underscorebox}def{\ }\syntaxKEYWORDA{by}{\ }auto{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }p2\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>a{\ }d{\ }s{\ }t.{\ }reachable0{\ }s{\ }\<and>{\ }reachable0{\ }t{\ }\<and>{\ }(s{\ }\<sim>{\ }d{\ }\<sim>{\ }t){\ }\<and>{\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }(((the{\ }(domain{\ }a)){\ }\usebox{\atbox}{\ }s{\ }\<leadsto>{\ }d){\ }\<longrightarrow>{\ }(s{\ }\<sim>{\ }(the{\ }(domain{\ }a)){\ }\<sim>{\ }t))}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<longrightarrow>{\ }((step{\ }s{\ }a){\ }\<sim>{\ }d{\ }\<sim>{\ }(step{\ }t{\ }a))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }{-}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\opencurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{fix}{\ }a{\ }d{\ }s{\ }t\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }a0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"reachable0{\ }s{\ }\<and>{\ }reachable0{\ }t{\ }\<and>{\ }(s{\ }\<sim>{\ }d{\ }\<sim>{\ }t){\ }\<and>{\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }(((the{\ }(domain{\ }a)){\ }\usebox{\atbox}{\ }s{\ }\<leadsto>{\ }d){\ }\<longrightarrow>{\ }(s{\ }\<sim>{\ }(the{\ }(domain{\ }a)){\ }\<sim>{\ }t))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }a4\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"s{\ }\<approx>{\ }(sources{\ }{[}{]}{\ }d{\ }s){\ }\<approx>{\ }t"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a0{\ }sources\usebox{\underscorebox}Nil{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }a5\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(s{\ }\<lhd>{\ }{[}{]}{\ }\<cong>{\ }t{\ }\<lhd>{\ }{[}{]}{\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a4{\ }a0{\ }p1{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }a6\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"((step{\ }s{\ }a){\ }\<sim>{\ }d{\ }\<sim>{\ }(step{\ }t{\ }a))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }\syntaxOPERATOR{(}cases{\ }\syntaxLITERALA{"(the{\ }(domain{\ }a))\usebox{\atbox}s{\ }\<leadsto>{\ }d"}\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }b0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(the{\ }(domain{\ }a))\usebox{\atbox}s{\ }\<leadsto>{\ }d"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"sources{\ }{[}a{]}{\ }d{\ }s{\ }={\ }\usebox{\opencurlybracket}d,{\ }(the(domain{\ }a))\usebox{\closecurlybracket}"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b0{\ }sources\usebox{\underscorebox}Cons{\ }sources\usebox{\underscorebox}Nil{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }c0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(s{\ }\<sim>{\ }(the{\ }(domain{\ }a)){\ }\<sim>{\ }t)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b0{\ }a0{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b2\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"s{\ }\<approx>{\ }(sources{\ }{[}a{]}{\ }d{\ }s){\ }\<approx>{\ }t"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b1{\ }a0{\ }c0{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b3\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(s{\ }\<lhd>{\ }{[}a{]}{\ }\<cong>{\ }t{\ }\<lhd>{\ }{[}a{]}{\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b2{\ }a0{\ }p1{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b4\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"((step{\ }s{\ }a){\ }\<sim>{\ }d{\ }\<sim>{\ }(step{\ }t{\ }a))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b3{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{next}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }b0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<not>((the{\ }(domain{\ }a))\usebox{\atbox}s{\ }\<leadsto>{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"sources{\ }{[}a{]}{\ }d{\ }s{\ }={\ }\usebox{\opencurlybracket}d\usebox{\closecurlybracket}"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b0{\ }sources\usebox{\underscorebox}Cons{\ }sources\usebox{\underscorebox}Nil{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b2\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(s{\ }\<approx>{\ }(sources{\ }{[}a{]}{\ }d{\ }s){\ }\<approx>{\ }t)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b1{\ }a0{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b3\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(s{\ }\<lhd>{\ }{[}a{]}{\ }\<cong>{\ }t{\ }\<lhd>{\ }{[}a{]}{\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b2{\ }a0{\ }p1{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b4\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"((step{\ }s{\ }a){\ }\<sim>{\ }d{\ }\<sim>{\ }(step{\ }t{\ }a))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b3{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\closecurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }sc\usebox{\underscorebox}imp\usebox{\underscorebox}nonlk\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"step\usebox{\underscorebox}consistent{\ }\<Longrightarrow>{\ }nonleakage"}{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }{-}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"step\usebox{\underscorebox}consistent"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }p1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>a{\ }d{\ }s{\ }t.{\ }reachable0{\ }s{\ }\<and>{\ }reachable0{\ }t{\ }\<and>{\ }(s{\ }\<sim>{\ }d{\ }\<sim>{\ }t){\ }\<and>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }(s{\ }\<sim>{\ }(the{\ }(domain{\ }a)){\ }\<sim>{\ }t){\ }\<longrightarrow>{\ }((step{\ }s{\ }a){\ }\<sim>{\ }d{\ }\<sim>{\ }(step{\ }t{\ }a))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }p0{\ }step\usebox{\underscorebox}consistent\usebox{\underscorebox}def{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }p2\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>as{\ }d{\ }s{\ }t.{\ }reachable0{\ }s{\ }\<and>{\ }reachable0{\ }t}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<and>{\ }(s{\ }\<approx>{\ }(sources{\ }as{\ }d{\ }s){\ }\<approx>{\ }t){\ }\<longrightarrow>{\ }(s{\ }\<lhd>{\ }as{\ }\<cong>{\ }t{\ }\<lhd>{\ }as{\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }{-}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\opencurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{fix}{\ }as\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }\syntaxLITERALA{"\<forall>d{\ }s{\ }t.{\ }reachable0{\ }s{\ }\<and>{\ }reachable0{\ }t}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<and>{\ }(s{\ }\<approx>{\ }(sources{\ }as{\ }d{\ }s){\ }\<approx>{\ }t){\ }\<longrightarrow>{\ }(s{\ }\<lhd>{\ }as{\ }\<cong>{\ }t{\ }\<lhd>{\ }as{\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }\syntaxOPERATOR{(}induct{\ }as\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{case}{\ }Nil{\ }\syntaxKEYWORDC{show}{\ }?case{\ }\syntaxKEYWORDA{using}{\ }sources\usebox{\underscorebox}refl{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{next}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{case}{\ }\syntaxOPERATOR{(}Cons{\ }b{\ }bs\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }a0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>d{\ }s{\ }t.{\ }reachable0{\ }s{\ }\<and>{\ }reachable0{\ }t}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<and>{\ }(s{\ }\<approx>{\ }(sources{\ }bs{\ }d{\ }s){\ }\<approx>{\ }t){\ }\<longrightarrow>{\ }(s{\ }\<lhd>{\ }bs{\ }\<cong>{\ }t{\ }\<lhd>{\ }bs{\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{show}{\ }?case\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }{-}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\opencurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{fix}{\ }d{\ }s{\ }t\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }b0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"reachable0{\ }s{\ }\<and>{\ }reachable0{\ }t"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }b1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(s{\ }\<approx>{\ }(sources{\ }(b\usebox{\hashbox}bs){\ }d{\ }s){\ }\<approx>{\ }t)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b2\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"((step{\ }s{\ }b){\ }\<approx>(sources{\ }bs{\ }d{\ }(step{\ }s{\ }b))\<approx>{\ }(step{\ }t{\ }b))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b0{\ }b1{\ }p0{\ }sources\usebox{\underscorebox}unwinding\usebox{\underscorebox}step{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b3\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(step{\ }s{\ }b){\ }\<lhd>{\ }bs{\ }\<cong>{\ }(step{\ }t{\ }b){\ }\<lhd>{\ }bs{\ }\usebox{\atbox}{\ }d"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }Cons.hyps{\ }b0{\ }b2{\ }reachableStep{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b4\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"s{\ }\<lhd>{\ }b{\ }\usebox{\hashbox}{\ }bs{\ }\<cong>{\ }t{\ }\<lhd>{\ }b{\ }\usebox{\hashbox}{\ }bs{\ }\usebox{\atbox}{\ }d"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b3{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\closecurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\closecurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{theorem}{\ }sc\usebox{\underscorebox}eq\usebox{\underscorebox}nonlk\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"step\usebox{\underscorebox}consistent{\ }={\ }nonleakage"}{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }nonlk\usebox{\underscorebox}imp\usebox{\underscorebox}sc{\ }sc\usebox{\underscorebox}imp\usebox{\underscorebox}nonlk{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }noninf\usebox{\underscorebox}imp\usebox{\underscorebox}dlr\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"noninfluence{\ }\<Longrightarrow>{\ }dynamic\usebox{\underscorebox}local\usebox{\underscorebox}respect"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }{-}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"noninfluence"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }p1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>{\ }d{\ }as{\ }s{\ }t.{\ }reachable0{\ }s{\ }\<and>{\ }reachable0{\ }t}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<and>{\ }(s{\ }\<approx>{\ }(sources{\ }as{\ }d{\ }s){\ }\<approx>{\ }t)}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<longrightarrow>{\ }(s{\ }\<lhd>{\ }as{\ }\<cong>{\ }t{\ }\<lhd>{\ }(ipurge{\ }as{\ }d{\ }t){\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }p0{\ }noninfluence\usebox{\underscorebox}def{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }\syntaxLITERALA{"\<forall>a{\ }d{\ }s.{\ }reachable0{\ }s{\ }\<and>{\ }\<not>((the{\ }(domain{\ }a)){\ }\usebox{\atbox}{\ }s{\ }\<leadsto>{\ }d){\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<longrightarrow>{\ }(s{\ }\<sim>{\ }d{\ }\<sim>{\ }(step{\ }s{\ }a)){\ }"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }{-}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\opencurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{fix}{\ }a{\ }d{\ }s\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }a0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"reachable0{\ }s{\ }\<and>{\ }\<not>((the{\ }(domain{\ }a)){\ }\usebox{\atbox}{\ }s{\ }\<leadsto>{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }a1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"sources{\ }{[}a{]}{\ }d{\ }s{\ }={\ }\usebox{\opencurlybracket}d\usebox{\closecurlybracket}"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a0{\ }sources\usebox{\underscorebox}Cons{\ }sources\usebox{\underscorebox}Nil{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }a2\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(ipurge{\ }{[}a{]}{\ }d{\ }s){\ }={\ }{[}{]}"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a0{\ }a1{\ }interf\usebox{\underscorebox}reflexive{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }a3\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"s{\ }\<sim>{\ }d{\ }\<sim>{\ }s"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }vpeq\usebox{\underscorebox}reflexive\usebox{\underscorebox}lemma{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }a4\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(s{\ }\<approx>{\ }(sources{\ }{[}a{]}{\ }d{\ }s){\ }\<approx>{\ }s)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a1{\ }a3{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }a5\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(s{\ }\<lhd>{\ }{[}a{]}{\ }\<cong>{\ }s{\ }\<lhd>{\ }(ipurge{\ }{[}a{]}{\ }d{\ }s){\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a4{\ }a0{\ }p1{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }a6\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(s{\ }\<lhd>{\ }{[}a{]}{\ }\<cong>{\ }s{\ }\<lhd>{\ }{[}{]}{\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a5{\ }a2{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }a7\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(s{\ }\<sim>{\ }d{\ }\<sim>{\ }(step{\ }s{\ }a))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a6{\ }vpeq\usebox{\underscorebox}symmetric\usebox{\underscorebox}lemma{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\closecurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }noninf\usebox{\underscorebox}imp\usebox{\underscorebox}sc\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"noninfluence{\ }\<Longrightarrow>{\ }step\usebox{\underscorebox}consistent"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }nonlk\usebox{\underscorebox}imp\usebox{\underscorebox}sc{\ }noninf\usebox{\underscorebox}impl\usebox{\underscorebox}nonlk{\ }\syntaxKEYWORDA{by}{\ }blast{\ }{\ }\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{theorem}{\ }UnwindingTheorem{\ }\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<lbrakk>step\usebox{\underscorebox}consistent;}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }dynamic\usebox{\underscorebox}local\usebox{\underscorebox}respect\<rbrakk>{\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<Longrightarrow>{\ }noninfluence"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }{-}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p3\syntaxOPERATOR{:}{\ }step\usebox{\underscorebox}consistent\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p4\syntaxOPERATOR{:}{\ }dynamic\usebox{\underscorebox}local\usebox{\underscorebox}respect\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\opencurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{fix}{\ }as{\ }d\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }\syntaxLITERALA{"\<forall>s{\ }t.{\ }reachable0{\ }s{\ }\<and>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }reachable0{\ }t{\ }\<and>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }(s{\ }\<approx>{\ }(sources{\ }as{\ }d{\ }s){\ }\<approx>{\ }t)}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<longrightarrow>{\ }((s{\ }\<lhd>{\ }as{\ }\<cong>{\ }t{\ }\<lhd>{\ }(ipurge{\ }as{\ }d{\ }{\ }t){\ }\usebox{\atbox}{\ }d))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}\syntaxOPERATOR{(}induct{\ }as\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{case}{\ }Nil{\ }\syntaxKEYWORDC{show}{\ }?case{\ }\syntaxKEYWORDA{using}{\ }sources\usebox{\underscorebox}Nil{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{next}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{case}{\ }\syntaxOPERATOR{(}Cons{\ }b{\ }bs\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>s{\ }t.{\ }reachable0{\ }s{\ }\<and>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }reachable0{\ }t{\ }\<and>}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }(s{\ }\<approx>{\ }(sources{\ }bs{\ }d{\ }s){\ }\<approx>{\ }t)}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<longrightarrow>{\ }((s{\ }\<lhd>{\ }bs{\ }\<cong>{\ }t{\ }\<lhd>{\ }(ipurge{\ }bs{\ }d{\ }{\ }t){\ }\usebox{\atbox}{\ }d))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?case\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }{-}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\opencurlybracket}}{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{fix}{\ }s{\ }t\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"reachable0{\ }s"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p2\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"reachable0{\ }t"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p8\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(s{\ }\<approx>{\ }(sources{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }d{\ }s){\ }\<approx>{\ }t)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }a1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"((step{\ }s{\ }b){\ }\<approx>{\ }(sources{\ }bs{\ }d{\ }(step{\ }s{\ }b)){\ }\<approx>{\ }(step{\ }t{\ }b))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }lemma\usebox{\underscorebox}1{\ }p1{\ }p2{\ }p3{\ }p4{\ }p8{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }a2\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"s{\ }\<lhd>{\ }b{\ }\usebox{\hashbox}{\ }bs{\ }\<cong>{\ }t{\ }\<lhd>{\ }ipurge{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }d{\ }t{\ }\usebox{\atbox}{\ }d"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }\syntaxOPERATOR{(}cases{\ }\syntaxLITERALA{"the{\ }(domain{\ }b){\ }\<in>{\ }sources{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }d{\ }s"}\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }b0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"the{\ }(domain{\ }b){\ }\<in>{\ }sources{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }d{\ }s"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"interferes{\ }(the{\ }(domain{\ }b)){\ }s{\ }d{\ }={\ }interferes{\ }(the{\ }(domain{\ }b)){\ }t{\ }d{\ }"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }p1{\ }p2{\ }policy\usebox{\underscorebox}respect{\ }p8{\ }sources\usebox{\underscorebox}refl{\ }\syntaxKEYWORDA{by}{\ }fastforce\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b2\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>v.{\ }v\<in>sources{\ }bs{\ }d{\ }(step{\ }s{\ }b){\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<longrightarrow>{\ }interferes{\ }(the{\ }(domain{\ }b)){\ }s{\ }v{\ }={\ }interferes{\ }(the{\ }(domain{\ }b)){\ }t{\ }v{\ }"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }p1{\ }p2{\ }ivpeq\usebox{\underscorebox}def{\ }policy\usebox{\underscorebox}respect{\ }p8{\ }sources\usebox{\underscorebox}Cons{\ }\syntaxKEYWORDA{by}{\ }fastforce\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b3\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"ipurge{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }d{\ }t{\ }={\ }b{\ }\usebox{\hashbox}{\ }(ipurge{\ }bs{\ }d{\ }(step{\ }t{\ }b))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{by}{\ }\syntaxOPERATOR{(}metis{\ }b0{\ }ipurge\usebox{\underscorebox}Cons{\ }p1{\ }p2{\ }p3{\ }p4{\ }p8{\ }sources\usebox{\underscorebox}eq1\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b4\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(((step{\ }s{\ }b){\ }\<lhd>{\ }bs{\ }\<cong>{\ }(step{\ }t{\ }b){\ }\<lhd>{\ }(ipurge{\ }bs{\ }d{\ }(step{\ }t{\ }b)){\ }\usebox{\atbox}{\ }d))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a1{\ }p0{\ }p1{\ }p2{\ }p3{\ }p4{\ }reachableStep{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b3{\ }b4{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{next}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }b0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"the{\ }(domain{\ }b){\ }\<notin>{\ }sources{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }d{\ }s"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"ipurge{\ }(b{\ }\usebox{\hashbox}{\ }bs){\ }d{\ }t{\ }={\ }(ipurge{\ }bs{\ }d{\ }(step{\ }t{\ }b))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{by}{\ }\syntaxOPERATOR{(}metis{\ }a1{\ }b0{\ }ipurge\usebox{\underscorebox}Cons{\ }ipurge\usebox{\underscorebox}eq{\ }p1{\ }p2{\ }p3{\ }p4{\ }p8{\ }reachableStep\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b2\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(s{\ }\<approx>{\ }(sources{\ }bs{\ }d{\ }(step{\ }s{\ }b)){\ }\<approx>{\ }(step{\ }s{\ }b))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b0{\ }lemma\usebox{\underscorebox}2{\ }p1{\ }p4{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b3\syntaxOPERATOR{:}\syntaxLITERALA{"(s{\ }\<approx>{\ }(sources{\ }bs{\ }d{\ }(step{\ }s{\ }b)){\ }\<approx>{\ }t)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b0{\ }lemma\usebox{\underscorebox}1\usebox{\underscorebox}sub\usebox{\underscorebox}3{\ }p8{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b4\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"((step{\ }s{\ }b){\ }\<approx>{\ }(sources{\ }bs{\ }d{\ }(step{\ }s{\ }b)){\ }\<approx>{\ }t)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{by}{\ }\syntaxOPERATOR{(}meson{\ }b3{\ }b2{\ }ivpeq\usebox{\underscorebox}def{\ }vpeq\usebox{\underscorebox}symmetric\usebox{\underscorebox}lemma{\ }vpeq\usebox{\underscorebox}transitive\usebox{\underscorebox}lemma\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b5\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(((step{\ }s{\ }b){\ }\<lhd>{\ }bs{\ }\<cong>{\ }t{\ }\<lhd>{\ }(ipurge{\ }bs{\ }d{\ }t){\ }\usebox{\atbox}{\ }d))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b4{\ }p0{\ }p1{\ }p2{\ }p3{\ }p4{\ }reachableStep{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b6\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(t{\ }\<approx>{\ }(sources{\ }bs{\ }d{\ }(step{\ }s{\ }b)){\ }\<approx>{\ }(step{\ }t{\ }b))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }p1{\ }p2{\ }b0{\ }lemma\usebox{\underscorebox}1\usebox{\underscorebox}sub\usebox{\underscorebox}2{\ }p4{\ }p8{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b7\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"ipurge{\ }bs{\ }d{\ }t{\ }={\ }ipurge{\ }bs{\ }d{\ }(step{\ }t{\ }b)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{by}{\ }\syntaxOPERATOR{(}metis{\ }a1{\ }b4{\ }ipurge\usebox{\underscorebox}eq{\ }p1{\ }p2{\ }p3{\ }p4{\ }reachableStep\syntaxOPERATOR{)}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b8\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(((step{\ }s{\ }b){\ }\<lhd>{\ }bs{\ }\<cong>{\ }t{\ }\<lhd>{\ }(ipurge{\ }bs{\ }d{\ }(step{\ }t{\ }b)){\ }\usebox{\atbox}{\ }d))"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b5{\ }b7{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b1{\ }observ\usebox{\underscorebox}equivalence\usebox{\underscorebox}def{\ }run\usebox{\underscorebox}Cons{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\closecurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\closecurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{using}{\ }noninfluence\usebox{\underscorebox}def{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{theorem}{\ }UnwindingTheorem1{\ }\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<lbrakk>weakly\usebox{\underscorebox}step\usebox{\underscorebox}consistent;}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }dynamic\usebox{\underscorebox}local\usebox{\underscorebox}respect\<rbrakk>{\ }{\ }\<Longrightarrow>{\ }noninfluence"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }UnwindingTheorem{\ }weak\usebox{\underscorebox}with\usebox{\underscorebox}step\usebox{\underscorebox}cons{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }\syntaxKEYWORDA{theorem}{\ }uc\usebox{\underscorebox}eq\usebox{\underscorebox}noninf{\ }\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(step\usebox{\underscorebox}consistent{\ }\<and>{\ }dynamic\usebox{\underscorebox}local\usebox{\underscorebox}respect){\ }={\ }noninfluence"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }UnwindingTheorem1{\ }step\usebox{\underscorebox}cons\usebox{\underscorebox}impl\usebox{\underscorebox}weak{\ }noninf\usebox{\underscorebox}imp\usebox{\underscorebox}dlr{\ }noninf\usebox{\underscorebox}imp\usebox{\underscorebox}sc{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }\syntaxCOMMENTA{(*}\hspace*{\fill}\\
+\syntaxCOMMENTA{{\ }{\ }{\ }{\ }{\ }dipurge\usebox{\underscorebox}eq{\ }required}\hspace*{\fill}\\
+\syntaxCOMMENTA{{\ }{\ }{\ }*)}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }\syntaxKEYWORDA{theorem}{\ }noninf\usebox{\underscorebox}impl\usebox{\underscorebox}weak\syntaxOPERATOR{:}\syntaxLITERALA{"noninfluence{\ }\<Longrightarrow>{\ }weak\usebox{\underscorebox}noninfluence"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }{-}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"noninfluence"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }p1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>{\ }d{\ }as{\ }s{\ }t.{\ }reachable0{\ }s{\ }\<and>{\ }reachable0{\ }t}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<and>{\ }(s{\ }\<approx>{\ }(sources{\ }as{\ }d{\ }s){\ }\<approx>{\ }t){\ }{\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<longrightarrow>{\ }(s{\ }\<lhd>{\ }as{\ }\<cong>{\ }t{\ }\<lhd>{\ }(ipurge{\ }as{\ }d{\ }t){\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }p0{\ }noninfluence\usebox{\underscorebox}def{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }p2\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(step\usebox{\underscorebox}consistent{\ }\<and>{\ }dynamic\usebox{\underscorebox}local\usebox{\underscorebox}respect)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }p0{\ }uc\usebox{\underscorebox}eq\usebox{\underscorebox}noninf{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }\syntaxLITERALA{"\<forall>{\ }d{\ }as{\ }bs{\ }s{\ }t{\ }.{\ }reachable0{\ }s{\ }\<and>{\ }reachable0{\ }t{\ }\<and>{\ }(s{\ }\<approx>{\ }(sources{\ }as{\ }d{\ }s){\ }\<approx>{\ }t){\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<and>{\ }ipurge{\ }as{\ }d{\ }t{\ }={\ }ipurge{\ }bs{\ }d{\ }t}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<longrightarrow>{\ }(s{\ }\<lhd>{\ }as{\ }\<cong>{\ }t{\ }\<lhd>{\ }bs{\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }{-}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\opencurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{fix}{\ }d{\ }as{\ }bs{\ }s{\ }t\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }a0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"reachable0{\ }s{\ }\<and>{\ }reachable0{\ }t{\ }\<and>{\ }(s{\ }\<approx>{\ }(sources{\ }as{\ }d{\ }s){\ }\<approx>{\ }t){\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<and>{\ }ipurge{\ }as{\ }d{\ }t{\ }={\ }ipurge{\ }bs{\ }d{\ }t"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }a4\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"noninterference\usebox{\underscorebox}r"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }noninf\usebox{\underscorebox}impl\usebox{\underscorebox}nonintf\usebox{\underscorebox}r{\ }p0{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }a7\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"weak\usebox{\underscorebox}noninterference\usebox{\underscorebox}r"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a4{\ }nonintf\usebox{\underscorebox}r\usebox{\underscorebox}impl\usebox{\underscorebox}wk\usebox{\underscorebox}nonintf\usebox{\underscorebox}r{\ }\syntaxKEYWORDA{by}{\ }auto{\ }{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }a6\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"ipurge{\ }as{\ }d{\ }s{\ }={\ }ipurge{\ }as{\ }d{\ }t"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a0{\ }p2{\ }ipurge\usebox{\underscorebox}eq{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(s{\ }\<lhd>{\ }as{\ }\<cong>{\ }t{\ }\<lhd>{\ }(ipurge{\ }as{\ }d{\ }t){\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a0{\ }p1{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b4\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(s{\ }\<lhd>{\ }as{\ }\<cong>{\ }t{\ }\<lhd>{\ }as{\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a0{\ }noninf\usebox{\underscorebox}imp\usebox{\underscorebox}sc{\ }nonleakage\usebox{\underscorebox}def{\ }p0{\ }sc\usebox{\underscorebox}imp\usebox{\underscorebox}nonlk{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b5\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(t{\ }\<lhd>{\ }bs{\ }\<cong>{\ }t{\ }\<lhd>{\ }(ipurge{\ }bs{\ }d{\ }t){\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a0{\ }a4{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b6\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(t{\ }\<lhd>{\ }bs{\ }\<cong>{\ }t{\ }\<lhd>{\ }(ipurge{\ }as{\ }d{\ }t){\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }b5{\ }a0{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }b7\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(s{\ }\<lhd>{\ }as{\ }\<cong>{\ }t{\ }\<lhd>{\ }bs{\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a0{\ }b1{\ }b6{\ }observ\usebox{\underscorebox}equiv\usebox{\underscorebox}sym{\ }observ\usebox{\underscorebox}equiv\usebox{\underscorebox}trans{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\closecurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }wk\usebox{\underscorebox}nonintf\usebox{\underscorebox}r\usebox{\underscorebox}and\usebox{\underscorebox}nonlk\usebox{\underscorebox}impl\usebox{\underscorebox}noninfl\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<lbrakk>weak\usebox{\underscorebox}noninterference\usebox{\underscorebox}r;{\ }nonleakage\<rbrakk>{\ }\<Longrightarrow>{\ }weak\usebox{\underscorebox}noninfluence"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }{-}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"weak\usebox{\underscorebox}noninterference\usebox{\underscorebox}r"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"nonleakage"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }p2\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>d{\ }as{\ }bs{\ }s.{\ }reachable0{\ }s{\ }\<and>{\ }ipurge{\ }as{\ }d{\ }s{\ }={\ }ipurge{\ }bs{\ }d{\ }s}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<longrightarrow>{\ }(s{\ }\<lhd>{\ }as{\ }\<cong>{\ }s{\ }\<lhd>{\ }bs{\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }weak\usebox{\underscorebox}noninterference\usebox{\underscorebox}r\usebox{\underscorebox}def{\ }p0{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }p3\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>d{\ }as{\ }s{\ }t.{\ }reachable0{\ }s{\ }\<and>{\ }reachable0{\ }t}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<and>{\ }(s{\ }\<approx>{\ }(sources{\ }as{\ }d{\ }s){\ }\<approx>{\ }t){\ }\<longrightarrow>{\ }(s{\ }\<lhd>{\ }as{\ }\<cong>{\ }t{\ }\<lhd>{\ }as{\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }nonleakage\usebox{\underscorebox}def{\ }p1{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }\syntaxLITERALA{"\<forall>{\ }d{\ }as{\ }bs{\ }s{\ }t{\ }.{\ }reachable0{\ }s{\ }\<and>{\ }reachable0{\ }t{\ }\<and>{\ }(s{\ }\<approx>{\ }(sources{\ }as{\ }d{\ }s){\ }\<approx>{\ }t){\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<and>{\ }ipurge{\ }as{\ }d{\ }t{\ }={\ }ipurge{\ }bs{\ }d{\ }t}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<longrightarrow>{\ }(s{\ }\<lhd>{\ }as{\ }\<cong>{\ }t{\ }\<lhd>{\ }bs{\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }{-}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\opencurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{fix}{\ }d{\ }as{\ }bs{\ }s{\ }t\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }a0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"reachable0{\ }s{\ }\<and>{\ }reachable0{\ }t{\ }\<and>{\ }(s{\ }\<approx>{\ }(sources{\ }as{\ }d{\ }s){\ }\<approx>{\ }t){\ }}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<and>{\ }ipurge{\ }as{\ }d{\ }t{\ }={\ }ipurge{\ }bs{\ }d{\ }t"}{\ }{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }a1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"s{\ }\<lhd>{\ }as{\ }\<cong>{\ }t{\ }\<lhd>{\ }as{\ }\usebox{\atbox}{\ }d"}{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a0{\ }p3{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }a2\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"t{\ }\<lhd>{\ }as{\ }\<cong>{\ }t{\ }\<lhd>{\ }bs{\ }\usebox{\atbox}{\ }d"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a0{\ }p2{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }a3\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(s{\ }\<lhd>{\ }as{\ }\<cong>{\ }t{\ }\<lhd>{\ }bs{\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a0{\ }a1{\ }a2{\ }observ\usebox{\underscorebox}equiv\usebox{\underscorebox}trans{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\closecurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{lemma}{\ }nonintf\usebox{\underscorebox}r\usebox{\underscorebox}and\usebox{\underscorebox}nonlk\usebox{\underscorebox}impl\usebox{\underscorebox}noninfl\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<lbrakk>noninterference\usebox{\underscorebox}r;{\ }nonleakage\<rbrakk>{\ }\<Longrightarrow>{\ }noninfluence"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }{-}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"noninterference\usebox{\underscorebox}r"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }p1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"nonleakage"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }p2\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"{\ }\<forall>d{\ }as{\ }s.{\ }reachable0{\ }s{\ }\<longrightarrow>{\ }(s{\ }\<lhd>{\ }as{\ }\<cong>{\ }s{\ }\<lhd>{\ }(ipurge{\ }as{\ }d{\ }s){\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }p0{\ }noninterference\usebox{\underscorebox}r\usebox{\underscorebox}def{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }p3\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"\<forall>d{\ }as{\ }s{\ }t.{\ }reachable0{\ }s{\ }\<and>{\ }reachable0{\ }t}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<and>{\ }(s{\ }\<approx>{\ }(sources{\ }as{\ }d{\ }s){\ }\<approx>{\ }t){\ }\<longrightarrow>{\ }(s{\ }\<lhd>{\ }as{\ }\<cong>{\ }t{\ }\<lhd>{\ }as{\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }p1{\ }nonleakage\usebox{\underscorebox}def{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }\syntaxLITERALA{"\<forall>{\ }d{\ }as{\ }s{\ }t.{\ }reachable0{\ }s{\ }\<and>{\ }reachable0{\ }t}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<and>{\ }(s{\ }\<approx>{\ }(sources{\ }as{\ }d{\ }s){\ }\<approx>{\ }t)}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<longrightarrow>{\ }(s{\ }\<lhd>{\ }as{\ }\<cong>{\ }t{\ }\<lhd>{\ }(ipurge{\ }as{\ }d{\ }t){\ }\usebox{\atbox}{\ }d)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{proof}{\ }{-}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\opencurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{fix}{\ }d{\ }as{\ }bs{\ }s{\ }t\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDC{assume}{\ }a0\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"reachable0{\ }s{\ }\<and>{\ }reachable0{\ }t}\hspace*{\fill}\\
+\syntaxLITERALA{{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\<and>{\ }(s{\ }\<approx>{\ }(sources{\ }as{\ }d{\ }s){\ }\<approx>{\ }t)"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }a1\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"s{\ }\<lhd>{\ }as{\ }\<cong>{\ }t{\ }\<lhd>{\ }as{\ }\usebox{\atbox}{\ }d"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }p3{\ }a0{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }a2\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"s{\ }\<lhd>{\ }as{\ }\<cong>{\ }s{\ }\<lhd>{\ }(ipurge{\ }as{\ }d{\ }s){\ }\usebox{\atbox}{\ }d"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a0{\ }p2{\ }\syntaxKEYWORDA{by}{\ }fast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }a3\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"t{\ }\<lhd>{\ }as{\ }\<cong>{\ }t{\ }\<lhd>{\ }(ipurge{\ }as{\ }d{\ }t){\ }\usebox{\atbox}{\ }d"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a0{\ }p2{\ }\syntaxKEYWORDA{by}{\ }fast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{have}{\ }\syntaxLITERALA{"s{\ }\<lhd>{\ }as{\ }\<cong>{\ }t{\ }\<lhd>{\ }(ipurge{\ }as{\ }d{\ }t){\ }\usebox{\atbox}{\ }d"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }a0{\ }a1{\ }a3{\ }observ\usebox{\underscorebox}equiv\usebox{\underscorebox}trans{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{\usebox{\closecurlybracket}}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{by}{\ }auto\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{then}{\ }\syntaxKEYWORDC{show}{\ }?thesis{\ }\syntaxKEYWORDA{using}{\ }noninfluence\usebox{\underscorebox}def{\ }\syntaxKEYWORDA{by}{\ }blast\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{qed}\hspace*{\fill}\\
+\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }\syntaxKEYWORDA{theorem}{\ }nonintf\usebox{\underscorebox}r\usebox{\underscorebox}and\usebox{\underscorebox}nonlk\usebox{\underscorebox}eq\usebox{\underscorebox}strnoninfl\syntaxOPERATOR{:}{\ }\syntaxLITERALA{"(noninterference\usebox{\underscorebox}r{\ }\<and>{\ }nonleakage){\ }={\ }noninfluence"}\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }{\ }\syntaxKEYWORDA{using}{\ }nonintf\usebox{\underscorebox}r\usebox{\underscorebox}and\usebox{\underscorebox}nonlk\usebox{\underscorebox}impl\usebox{\underscorebox}noninfl{\ }noninf\usebox{\underscorebox}impl\usebox{\underscorebox}nonintf\usebox{\underscorebox}r{\ }noninf\usebox{\underscorebox}impl\usebox{\underscorebox}nonlk{\ }\syntaxKEYWORDA{by}{\ }blast{\ }\hspace*{\fill}\\
+{\ }{\ }{\ }{\ }{\ }\hspace*{\fill}\\
+{\ }{\ }\syntaxKEYWORDB{end}\hspace*{\fill}\\
+\syntaxKEYWORDB{end}\hspace*{\fill}\\
+\mbox{}
+\normalfont
+\end{document}

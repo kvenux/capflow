@@ -215,36 +215,46 @@ begin
 
 subsection{* Unwinding conditions*}
 
-     definition step_consistent :: "bool" where 
-        "step_consistent \<equiv>  \<forall>a d s t. reachable0 s \<and> reachable0 t \<and> (s \<sim> d \<sim> t) \<and> 
+     definition dynamic_step_consistent :: "bool" where 
+        "dynamic_step_consistent \<equiv>  \<forall>a d s t. reachable0 s \<and> reachable0 t \<and> (s \<sim> d \<sim> t) \<and> 
                               (((the (domain a)) @ s \<leadsto> d) \<longrightarrow> (s \<sim> (the (domain a)) \<sim> t))
                               \<longrightarrow> ((step s a) \<sim> d \<sim> (step t a))"
 
-     definition weakly_step_consistent :: "bool" where 
-        "weakly_step_consistent \<equiv>  \<forall>a d s t. reachable0 s \<and> reachable0 t \<and> (s \<sim> d \<sim> t) \<and>
+     definition dynamic_weakly_step_consistent :: "bool" where 
+        "dynamic_weakly_step_consistent \<equiv>  \<forall>a d s t. reachable0 s \<and> reachable0 t \<and> (s \<sim> d \<sim> t) \<and>
                               ((the (domain a)) @ s \<leadsto> d) \<and> (s \<sim> (the (domain a)) \<sim> t) 
                               \<longrightarrow> ((step s a) \<sim> d \<sim> (step t a))"
+
+     definition dynamic_weakly_step_consistent_e :: "'e \<Rightarrow> bool" where 
+        "dynamic_weakly_step_consistent_e a \<equiv>  \<forall>d s t. reachable0 s \<and> reachable0 t \<and> (s \<sim> d \<sim> t) \<and>
+                              ((the (domain a)) @ s \<leadsto> d) \<and> (s \<sim> (the (domain a)) \<sim> t) 
+                              \<longrightarrow> ((step s a) \<sim> d \<sim> (step t a))"
+
+     lemma dynamic_weakly_step_consistent_all_evt : "dynamic_weakly_step_consistent = (\<forall>a. dynamic_weakly_step_consistent_e a)"
+      by (simp add: dynamic_weakly_step_consistent_def dynamic_weakly_step_consistent_e_def)
 
      definition dynamic_local_respect :: "bool" where
         "dynamic_local_respect \<equiv> \<forall>a d s. reachable0 s \<and> \<not>((the (domain a)) @ s \<leadsto> d) \<longrightarrow> (s \<sim> d \<sim> (step s a)) "
 
-     (*definition policy_respect :: "bool" where                           
-        "policy_respect \<equiv> \<forall>v u s t. reachable0 s \<and> reachable0 t \<and> (s \<sim> u \<sim> t)
-                              \<longrightarrow> (interferes v s u = interferes v t u)"*)
+     definition dynamic_local_respect_e :: "'e \<Rightarrow> bool" where
+        "dynamic_local_respect_e a \<equiv> \<forall>d s. reachable0 s \<and> \<not>((the (domain a)) @ s \<leadsto> d) \<longrightarrow> (s \<sim> d \<sim> (step s a))"
+        
+     lemma dynamic_local_respect_all_evt : "dynamic_local_respect = (\<forall>a. dynamic_local_respect_e a)"
+      by (simp add: dynamic_local_respect_def dynamic_local_respect_e_def)
 
-     declare step_consistent_def [cong] and weakly_step_consistent_def [cong] and 
+     declare dynamic_step_consistent_def [cong] and dynamic_weakly_step_consistent_def [cong] and 
        dynamic_local_respect_def [cong]
 
-     lemma step_cons_impl_weak : "step_consistent \<Longrightarrow> weakly_step_consistent"
-      using step_consistent_def weakly_step_consistent_def by blast
+     lemma step_cons_impl_weak : "dynamic_step_consistent \<Longrightarrow> dynamic_weakly_step_consistent"
+      using dynamic_step_consistent_def dynamic_weakly_step_consistent_def by blast
 
      definition lemma_local :: "bool" where
         "lemma_local \<equiv> \<forall>s a as u. the (domain a) \<notin> sources (a # as) u s \<longrightarrow> (s \<approx> (sources (a # as) u s)  \<approx> (step s a))"
 
      lemma weak_with_step_cons:
-      assumes p1: weakly_step_consistent
+      assumes p1: dynamic_weakly_step_consistent
         and   p2: dynamic_local_respect
-      shows   step_consistent
+      shows   dynamic_step_consistent
       proof -
       {
         fix a d s t
@@ -263,7 +273,7 @@ subsection{* Unwinding conditions*}
                 have b1: "(s \<sim> (the (domain a)) \<sim> t)"
                   using b0 a3 by auto
                 have b2: "((step s a) \<sim> d \<sim> (step t a))"
-                  using a0 a1 a2 b0 b1 p1 weakly_step_consistent_def by blast
+                  using a0 a1 a2 b0 b1 p1 dynamic_weakly_step_consistent_def by blast
                 then show ?thesis by auto
               next
                 assume b0: "\<not>((the (domain a)) @ s \<leadsto> d)"
@@ -346,12 +356,12 @@ subsection{* Lemmas for the inference framework *}
 
      lemma lemma_1 : "\<lbrakk>reachable0 s;
                       reachable0 t;
-                      step_consistent;
+                      dynamic_step_consistent;
                       dynamic_local_respect;
                       (s \<approx> (sources (a # as) u s) \<approx> t)\<rbrakk>
                       \<Longrightarrow> ((step s a) \<approx> (sources as u (step s a)) \<approx> (step t a))"
        apply (case_tac "the (domain a)\<in>sources (a # as) u s")
-       apply (simp add: step_consistent_def)
+       apply (simp add: dynamic_step_consistent_def)
        apply (simp add: sources_Cons)                                                        
          proof -
            assume a1: dynamic_local_respect
@@ -380,7 +390,7 @@ subsection{* Lemmas for the inference framework *}
 
      lemma sources_eq1: "\<forall>s t as u. reachable0 s \<and>
                     reachable0 t \<and>
-                    step_consistent \<and>
+                    dynamic_step_consistent \<and>
                     dynamic_local_respect \<and>
                     (s \<approx> (sources as u s) \<approx> t)
                     \<longrightarrow> (sources as u s) = (sources as u t)"
@@ -389,7 +399,7 @@ subsection{* Lemmas for the inference framework *}
         fix as
         have "\<forall>s t u. reachable0 s \<and>
                     reachable0 t \<and>                     
-                    step_consistent \<and>
+                    dynamic_step_consistent \<and>
                     dynamic_local_respect \<and>
                     (s \<approx> (sources as u s) \<approx> t)
                     \<longrightarrow> (sources as u s) = (sources as u t)"
@@ -399,7 +409,7 @@ subsection{* Lemmas for the inference framework *}
             case (Cons b bs)
             assume p0: "\<forall>s t u.((reachable0 s) 
                                 \<and> (reachable0 t) 
-                                \<and> step_consistent 
+                                \<and> dynamic_step_consistent 
                                 \<and> dynamic_local_respect 
                                 \<and> (s \<approx> (sources bs u s) \<approx> t)) \<longrightarrow>
                                   (sources bs u s) = (sources bs u t)"
@@ -409,7 +419,7 @@ subsection{* Lemmas for the inference framework *}
                  fix s t u
                  assume p1: "reachable0 s"
                  assume p2: "reachable0 t"
-                 assume p3: step_consistent
+                 assume p3: dynamic_step_consistent
                  assume p5: "dynamic_local_respect"
                  assume p9: "(s \<approx> (sources (b # bs) u s) \<approx> t)" 
                  have a2: "((step s b) \<approx> (sources bs u (step s b)) \<approx> (step t b))"
@@ -458,7 +468,7 @@ subsection{* Lemmas for the inference framework *}
 
     lemma ipurge_eq: "\<forall>s t as u. reachable0 s \<and>
                     reachable0 t \<and>
-                    step_consistent \<and>
+                    dynamic_step_consistent \<and>
                     dynamic_local_respect \<and>
                     (s \<approx> (sources as u s) \<approx> t)
                     \<longrightarrow> (ipurge as u s) = (ipurge as u t)"
@@ -467,7 +477,7 @@ subsection{* Lemmas for the inference framework *}
         fix as
         have "\<forall>s t u. reachable0 s \<and>
                     reachable0 t \<and>
-                    step_consistent \<and>
+                    dynamic_step_consistent \<and>
                     dynamic_local_respect \<and>
                     (s \<approx> (sources as u s) \<approx> t)
                     \<longrightarrow> (ipurge as u s) = (ipurge as u t)"
@@ -477,7 +487,7 @@ subsection{* Lemmas for the inference framework *}
             case (Cons b bs)
             assume p0: "\<forall>s t u.((reachable0 s) 
                                 \<and> (reachable0 t) 
-                                \<and> step_consistent 
+                                \<and> dynamic_step_consistent 
                                 \<and> dynamic_local_respect 
                                 \<and> (s \<approx> (sources bs u s) \<approx> t))
                                 \<longrightarrow> (ipurge bs u s) = (ipurge bs u t)"
@@ -487,7 +497,7 @@ subsection{* Lemmas for the inference framework *}
                  fix s t u
                  assume p1: "reachable0 s"
                  assume p2: "reachable0 t"
-                 assume p3: step_consistent
+                 assume p3: dynamic_step_consistent
                  assume p5: "dynamic_local_respect"
                  assume p9: "(s \<approx> (sources (b # bs) u s) \<approx> t)"
                  have a1: "((step s b) \<approx> (sources bs u (step s b)) \<approx> (step t b))"
@@ -532,7 +542,7 @@ subsection{* Lemmas for the inference framework *}
 
     lemma non_influgence_lemma: "\<forall>s t as u. reachable0 s \<and>
                     reachable0 t \<and>
-                    step_consistent \<and>
+                    dynamic_step_consistent \<and>
                     dynamic_local_respect \<and>
                     (s \<approx> (sources as u s) \<approx> t)
                     \<longrightarrow> ((s \<lhd> as \<cong> t \<lhd> (ipurge as u t) @ u))"
@@ -541,7 +551,7 @@ subsection{* Lemmas for the inference framework *}
         fix as
         have  "\<forall>s t u. reachable0 s \<and>
                     reachable0 t \<and>
-                    step_consistent \<and>
+                    dynamic_step_consistent \<and>
                     dynamic_local_respect \<and>
                     (s \<approx> (sources as u s) \<approx> t)
                     \<longrightarrow> ((s \<lhd> as \<cong> t \<lhd> (ipurge as u t) @ u))"
@@ -551,7 +561,7 @@ subsection{* Lemmas for the inference framework *}
             case (Cons b bs)
             assume p0: "\<forall>s t u.((reachable0 s) 
                                 \<and> (reachable0 t) 
-                                \<and> step_consistent 
+                                \<and> dynamic_step_consistent 
                                 \<and> dynamic_local_respect 
                                 \<and> (s \<approx> (sources bs u s) \<approx> t)) \<longrightarrow>
                                   ((s \<lhd> bs \<cong> t \<lhd> (ipurge bs u t) @ u))"
@@ -561,7 +571,7 @@ subsection{* Lemmas for the inference framework *}
                 fix s t u
                 assume p1: "reachable0 s"
                 assume p2: "reachable0 t"
-                assume p3: step_consistent
+                assume p3: dynamic_step_consistent
                 assume p4: dynamic_local_respect
                 assume p8: "(s \<approx> (sources (b # bs) u s) \<approx> t)"
                 have a1: "((step s b) \<approx> (sources bs u (step s b)) \<approx> (step t b))"
@@ -647,12 +657,12 @@ subsection{* Interference framework of information flow security properties *}
         by auto
 
     lemma sources_unwinding_step:
-      "\<lbrakk>reachable0 s; reachable0 t;s \<approx>(sources (a#as) d s)\<approx> t; step_consistent\<rbrakk>  
+      "\<lbrakk>reachable0 s; reachable0 t;s \<approx>(sources (a#as) d s)\<approx> t; dynamic_step_consistent\<rbrakk>  
         \<Longrightarrow> ((step s a) \<approx>(sources as d (step s a))\<approx> (step t a))"
        apply(clarsimp simp: ivpeq_def sources_Cons)        
-        using UnionI step_consistent_def by blast
+        using UnionI dynamic_step_consistent_def by blast
 
-    lemma nonlk_imp_sc: "nonleakage \<Longrightarrow> step_consistent" 
+    lemma nonlk_imp_sc: "nonleakage \<Longrightarrow> dynamic_step_consistent" 
       proof -
         assume p0: "nonleakage"
         have p1: "\<forall>as d s t. reachable0 s \<and> reachable0 t
@@ -703,12 +713,12 @@ subsection{* Interference framework of information flow security properties *}
       then show ?thesis by auto
     qed
 
-    lemma sc_imp_nonlk: "step_consistent \<Longrightarrow> nonleakage" 
+    lemma sc_imp_nonlk: "dynamic_step_consistent \<Longrightarrow> nonleakage" 
       proof -
-        assume p0: "step_consistent"
+        assume p0: "dynamic_step_consistent"
         have p1: "\<forall>a d s t. reachable0 s \<and> reachable0 t \<and> (s \<sim> d \<sim> t) \<and>
                (s \<sim> (the (domain a)) \<sim> t) \<longrightarrow> ((step s a) \<sim> d \<sim> (step t a))"
-          using p0 step_consistent_def by auto
+          using p0 dynamic_step_consistent_def by auto
         have p2: "\<forall>as d s t. reachable0 s \<and> reachable0 t
                   \<and> (s \<approx> (sources as d s) \<approx> t) \<longrightarrow> (s \<lhd> as \<cong> t \<lhd> as @ d)"
           proof -
@@ -744,7 +754,7 @@ subsection{* Interference framework of information flow security properties *}
       then show ?thesis by auto
     qed
           
-    theorem sc_eq_nonlk: "step_consistent = nonleakage" 
+    theorem sc_eq_nonlk: "dynamic_step_consistent = nonleakage" 
       using nonlk_imp_sc sc_imp_nonlk by blast
     
     lemma noninf_imp_dlr: "noninfluence \<Longrightarrow> dynamic_local_respect"
@@ -780,14 +790,14 @@ subsection{* Interference framework of information flow security properties *}
       then show ?thesis by auto
     qed
 
-    lemma noninf_imp_sc: "noninfluence \<Longrightarrow> step_consistent"
+    lemma noninf_imp_sc: "noninfluence \<Longrightarrow> dynamic_step_consistent"
       using nonlk_imp_sc noninf_impl_nonlk by blast  
 
-    theorem UnwindingTheorem : "\<lbrakk>step_consistent;
+    theorem UnwindingTheorem : "\<lbrakk>dynamic_step_consistent;
                             dynamic_local_respect\<rbrakk> 
                             \<Longrightarrow> noninfluence"
       proof -
-        assume p3: step_consistent
+        assume p3: dynamic_step_consistent
         assume p4: dynamic_local_respect
         {
         fix as d
@@ -855,11 +865,11 @@ subsection{* Interference framework of information flow security properties *}
       then show ?thesis using noninfluence_def by blast
     qed
 
-    theorem UnwindingTheorem1 : "\<lbrakk>weakly_step_consistent;
+    theorem UnwindingTheorem1 : "\<lbrakk>dynamic_weakly_step_consistent;
                             dynamic_local_respect\<rbrakk>  \<Longrightarrow> noninfluence"
       using UnwindingTheorem weak_with_step_cons by blast
 
-   theorem uc_eq_noninf : "(step_consistent \<and> dynamic_local_respect) = noninfluence"
+   theorem uc_eq_noninf : "(dynamic_step_consistent \<and> dynamic_local_respect) = noninfluence"
      using UnwindingTheorem1 step_cons_impl_weak noninf_imp_dlr noninf_imp_sc by blast
 
    (*
@@ -873,7 +883,7 @@ subsection{* Interference framework of information flow security properties *}
                \<and> (s \<approx> (sources as d s) \<approx> t)  
                \<longrightarrow> (s \<lhd> as \<cong> t \<lhd> (ipurge as d t) @ d)"
        using p0 noninfluence_def by auto
-     have p2: "(step_consistent \<and> dynamic_local_respect)"
+     have p2: "(dynamic_step_consistent \<and> dynamic_local_respect)"
        using p0 uc_eq_noninf by auto
      have "\<forall> d as bs s t . reachable0 s \<and> reachable0 t \<and> (s \<approx> (sources as d s) \<approx> t) 
                \<and> ipurge as d t = ipurge bs d t
