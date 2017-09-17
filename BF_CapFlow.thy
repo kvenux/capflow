@@ -150,7 +150,7 @@ definition sys_dispatcher_properties :: "StateR \<Rightarrow> domain_id \<Righta
   "sys_dispatcher_properties sr did p_type p_deadline p_wcet p_period p_release p_weight \<equiv>   
                    let
                     new_dispatchers = dispatchers sr;
-                    t_dcb = new_dispatchers did;
+                    t_dcb = the(new_dispatchers did);
                     new_dcb =t_dcb\<lparr> 
                                     wcet := p_wcet,
                                     t_type := p_type,
@@ -164,7 +164,7 @@ definition sys_dispatcher_properties :: "StateR \<Rightarrow> domain_id \<Righta
                                     release_time := release_time t_dcb\<rparr>
                   in
                     (sr\<lparr>
-                      dispatchers := new_dispatchers(did := new_dcb)
+                      dispatchers := new_dispatchers(did := Some new_dcb)
                       \<rparr>, True)"
 
 definition sys_dispatcher_setup :: "StateR \<Rightarrow> domain_id \<Rightarrow> cte \<Rightarrow> lpaddr_t  \<Rightarrow> dispatcher_handle_t 
@@ -174,7 +174,7 @@ definition sys_dispatcher_setup :: "StateR \<Rightarrow> domain_id \<Rightarrow>
                   then
                     let
                       new_dispatchers = dispatchers sr;
-                      t_dcb = new_dispatchers did;
+                      t_dcb = the (new_dispatchers did);
                       new_dcb = t_dcb
                                   \<lparr> 
                                     cspace := p_cptr,
@@ -184,12 +184,12 @@ definition sys_dispatcher_setup :: "StateR \<Rightarrow> domain_id \<Rightarrow>
                                   \<rparr>
                     in
                       (sr\<lparr>
-                        dispatchers := new_dispatchers(did := new_dcb)
+                        dispatchers := new_dispatchers(did := Some new_dcb)
                         \<rparr>, True)
                   else
                     let
                       new_dispatchers = dispatchers sr;
-                      t_dcb = new_dispatchers did;
+                      t_dcb = the(new_dispatchers did);
                       new_dcb = t_dcb
                                   \<lparr> 
                                     cspace := p_cptr,
@@ -198,7 +198,7 @@ definition sys_dispatcher_setup :: "StateR \<Rightarrow> domain_id \<Rightarrow>
                                   \<rparr>
                     in
                       (sr\<lparr>
-                        dispatchers := new_dispatchers(did := new_dcb)
+                        dispatchers := new_dispatchers(did := Some new_dcb)
                         \<rparr>, True)"
 
 definition dispatcher_dump_ptables :: "StateR \<Rightarrow> domain_id \<Rightarrow> (StateR \<times> bool )" where
