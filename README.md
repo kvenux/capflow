@@ -1,2 +1,2 @@
 # capflow
-Isabelle proof for CapFlow
+Isabelle proof for CapFlow 
