@@ -1,5 +1,5 @@
-theory CapFlow_v6_0
-imports Dynamic_model_v6
+theory CapFlow
+imports Dynamic_model
 begin
 
 subsection {* Definitions *}
