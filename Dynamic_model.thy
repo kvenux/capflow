@@ -1,4 +1,4 @@
-theory Dynamic_model_v6
+theory Dynamic_model
 imports Main
 begin
 subsection {* Security State Machine *}

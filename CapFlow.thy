@@ -389,7 +389,7 @@ definition system_init :: "Sys_Config \<Rightarrow> State"
                             domain_endpoint = e_listener(commconf sc)
                            \<rparr>"  
 
-subsubsection{* Instantiation and Its Proofs of Security Model  *}
+subsection{* Instantiation and Its Proofs of Security Model  *}
 
 consts sysconf :: "Sys_Config" 
 definition sys_config_witness :: Sys_Config 
